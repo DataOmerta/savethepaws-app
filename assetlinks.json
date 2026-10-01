@@ -1,8 +1,0 @@
-[{
-      "relation": ["delegate_permission/common.handle_all_urls"],
-      "target": {
-        "namespace": "android_app",
-        "package_name": "com.savethepaws.app",
-        "sha256_cert_fingerprints": ["B2:40:A3:C5:5D:1F:C6:FF:49:AB:5D:AA:D7:B5:22:66:35:90:45:9B:F1:64:17:7A:9B:FF:EF:50:39:28:79:75"]
-      }
-    }]
