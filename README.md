@@ -25,7 +25,7 @@ The application is built as a single-file PWA, fully compatible with all modern 
 | manifest.json `"id"` | com.savethepaws.app |
 | sw.js cache name | savethepaws-v1 |
 | localStorage key | savethepaws_db_v2 |
-| Admin email | admin@savethepaws.app |
+| Admin email | gds_gr@hotmail.gr |
 
 ---
 
@@ -138,38 +138,6 @@ savethepaws-app/
 └── README.md             # This file
 ```
 
----
-
-## Deployment — GitHub Pages
-
-1. Upload all files to the `savethepaws-app` repository root.
-2. Go to **Settings → Pages → Source**: `main` branch, `/ (root)`.
-3. Live URL: `https://yourusername.github.io/savethepaws-app`
-
-## Deployment — Google Play (PWABuilder)
-
-1. Visit [pwabuilder.com](https://pwabuilder.com)
-2. Enter: `https://yourusername.github.io/savethepaws-app`
-3. Select **Android** → set package ID: `com.savethepaws.app`
-4. App name: `SaveThePaws`
-5. Signing: **Generate new** — save the keystore permanently
-6. Download the `.aab` file
-7. Upload to Google Play Console → Production → Create new release
-
-## Deployment — Apple App Store (PWABuilder)
-
-1. Same PWABuilder flow → select **iOS**
-2. Requires Apple Developer account (USD 99/year)
-3. Submit via Xcode or Transporter
-
----
-
-## Google Play Store Listing — Ready to Paste
-
-### Short Description (65 / 80 characters)
-```
-Report, locate and rescue stray animals in your city. Free to use.
-```
 
 ### Full Description
 ```
@@ -212,37 +180,10 @@ PRIVACY
 No advertising. No tracking. No third-party analytics. Location data is captured only with your explicit consent and shown only to verified subscribers within the app.
 
 SaveThePaws is an independent civic technology platform. Not affiliated with any government agency or commercial animal service.
-```
+
 
 ---
 
-## Google Play Checklist
-
-- [x] PWA with valid Web App Manifest (`manifest.json`)
-- [x] HTTPS deployment (GitHub Pages)
-- [x] Service Worker registered (`sw.js`)
-- [x] Icons at 192x192 and 512x512 (`icon-192.png`, `icon-512.png`)
-- [x] Package name: `com.savethepaws.app`
-- [x] Privacy Policy / Terms: `TERMS.md` → hosted at GitHub Pages URL `/TERMS`
-- [ ] Store listing screenshots (min 2, phone form factor — take on mobile browser)
-- [ ] Feature graphic: 1024 x 500 px (create free at canva.com)
-- [ ] Content rating questionnaire (complete in Play Console)
-- [ ] PWABuilder `.aab` file generated and uploaded
-
----
-
-## Roadmap
-
-- [ ] Backend API (Node.js + PostgreSQL or Supabase)
-- [ ] Real-time push notifications for nearby animal alerts
-- [ ] In-app messaging between subscribers and uploaders
-- [ ] Stripe payment integration for subscriptions
-- [ ] Veterinary partner and NGO verified accounts
-- [ ] Multi-city leaderboard (most animals rescued per city)
-- [ ] Export reports to PDF for local authority submission
-- [ ] Arabic, Turkish, Spanish localization
-
----
 
 ## License
 
@@ -250,7 +191,6 @@ MIT License. See [LICENSE](./LICENSE).
 
 ---
 
-## Legal
 
 By using SaveThePaws, users agree to the [Terms and Conditions](./TERMS.md). The platform uses the W3C Geolocation API, which may delegate to Google Location Services on Android devices. See Terms Section 6 for full disclosure.
 
