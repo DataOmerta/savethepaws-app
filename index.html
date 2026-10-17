@@ -977,34 +977,28 @@ function initDB(){
     const raw = localStorage.getItem(DB_KEY);
     if(raw) return JSON.parse(raw);
   } catch(e){}
+  
   const db = {
+    // KEEP: Required for you to log in as Admin right now
     users:[
-      {id:'u0',name:'Admin User',email:'',password:'',role:'admin',subscribed:true,subExpires:'2027-12-31',joined:'2025-01-01',posts:0},
-      {id:'u1',name:'Maria K.',email:'maria@test.com',password:'test123',role:'subscriber',subscribed:true,subExpires:'2026-12-01',joined:'2025-03-20',posts:2},
-      {id:'u2',name:'Nikos P.',email:'nikos@test.com',password:'test123',role:'user',subscribed:false,subExpires:null,joined:'2026-01-10',posts:1}
+      {id:'u0',name:'Admin User',email:'admin@savethepaws.app',password:'admin123',role:'admin',subscribed:true,subExpires:'2027-12-31',joined:'2025-01-01',posts:0}
     ],
-    posts:[
-      {id:'p1',animalType:'cat',condition:'healthy',desc:'Grey tabby, very friendly. Approaches people easily. No collar.',uploader:'Maria K.',uploaderId:'u1',city:'Thessaloniki',country:'Greece',lat:'40.6401',lon:'22.9444',timestamp:Date.now()-86400000*2,saved:false,status:'live',photoData:null},
-      {id:'p2',animalType:'dog',condition:'injured',desc:'Medium brown dog with a limp on left front leg. Needs vet attention.',uploader:'Nikos P.',uploaderId:'u2',city:'Athens',country:'Greece',lat:'37.9755',lon:'23.7348',timestamp:Date.now()-3600000*5,saved:false,status:'live',photoData:null},
-      {id:'p3',animalType:'cat',condition:'lost',desc:'White cat with blue eyes. Has collar. Seems lost and scared near the park.',uploader:'Maria K.',uploaderId:'u1',city:'Thessaloniki',country:'Greece',lat:'40.6391',lon:'22.9512',timestamp:Date.now()-3600000,saved:true,savedBy:'Subscriber',status:'live',photoData:null},
-      {id:'p4',animalType:'bird',condition:'injured',desc:'Pigeon with injured wing found near the market. Cannot fly.',uploader:'Nikos P.',uploaderId:'u2',city:'Patras',country:'Greece',lat:'38.2466',lon:'21.7346',timestamp:Date.now()-1800000,saved:false,status:'live',photoData:null}
-    ],
+    // EMPTY: We want ONLY real posts from Supabase
+    posts: [], 
+    // KEEP: Ensures the Donate button and Ad slots work professionally on Day 1
     ads:[
       {id:'a1',type:'full',title:'Help Street Cats This Winter',desc:'Donate blankets, food, or funds to help feral cats survive the cold months.',media:'',link:'https://example.com/donate',freq:6,active:true}
     ],
     donors:[
       {id:'d1',name:'SaveThePaws Fund',icon:'🐾',desc:'All donations go directly to supporting stray animal rescue operations, veterinary care, and platform maintenance.',url:'https://paypal.me/JimOem'}
     ],
-    activity:[
-      {type:'saved',text:'White cat claimed in Thessaloniki',time:'1 hr ago'},
-      {type:'new',text:'Bird reported in Patras',time:'30 min ago'},
-      {type:'sub',text:'New subscriber joined',time:'2 hr ago'},
-      {type:'new',text:'Injured dog in Athens posted',time:'5 hr ago'}
-    ],
-    notifications:[],
-    settings:{adFreq:6,minKeywords:1,weeklyPrice:1.99,monthlyPrice:4.99,quarterlyPrice:11.99,annualPrice:29},
-    pendingNotif:null
+    // EMPTY: We want the sidebar to only show REAL user activity
+    activity: [], 
+    notifications: [],
+    settings: {adFreq:6, minKeywords:1, weeklyPrice:1.99, monthlyPrice:4.99, quarterlyPrice:11.99, annualPrice:29},
+    pendingNotif: null
   };
+  
   saveDB(db);
   return db;
 }
@@ -1124,7 +1118,8 @@ function renderPosts(){
   else if(currentFilter==='saved') posts=posts.filter(p=>p.saved);
   else if(currentFilter!=='all') posts=posts.filter(p=>p.animalType===currentFilter);
 
-  if(q) posts=posts.filter(p=>p.desc.toLowerCase().includes(q)||p.city.toLowerCase().includes(q)||p.animalType.includes(q));
+  
+  if(q) posts=posts.filter(p=>p.description.toLowerCase().includes(q)||p.city.toLowerCase().includes(q)||p.animalType.includes(q));
 
   // inject ads
   const adFreq = db.settings.adFreq||6;
@@ -1195,7 +1190,7 @@ function renderPostCard(post, isSub, isReg){
         </div>
       </div>
       <div class="pc-img-wrap">${photoContent}${savedWM}</div>
-      <div class="pc-desc">${post.desc}</div>
+     <div class="pc-desc">${post.description}</div>
       <div class="pc-info">${coords}</div>
       <div class="pc-actions">${claimBtn}${editBtn}${flagBtn}</div>
     </div>`;
@@ -1420,7 +1415,7 @@ function saveEdit(){
   if(!post)return;
   const newDesc=document.getElementById('editDesc').value.trim();
   if(!newDesc){showToast('Description cannot be empty','warn');return;}
-  post.desc=newDesc;
+ post.description=newDesc;
   saveDB(db);
   closeModal('editModal');
   renderPosts();
@@ -1686,7 +1681,7 @@ function renderPending(){
       ${p.photoData?`<img src="${p.photoData}" alt="Animal">`:`<div class="pci-placeholder">${animalEmoji(p.animalType)}</div>`}
       <div class="pending-info">
         <h4>${animalEmoji(p.animalType)} ${p.animalType} — ${p.city}, ${p.country}</h4>
-        <p>${p.desc}</p>
+        <td>${p.description}</td>
         ${p.flagReason?`<div class="pi-reason">⚠ ${p.flagReason}</div>`:''}
         <div class="pending-actions">
           <button class="abtn green" onclick="approvePost('${p.id}')">✓ Approve</button>
@@ -1696,14 +1691,25 @@ function renderPending(){
     </div>`).join('');
 }
 
-function approvePost(id){
-  const p=db.posts.find(x=>x.id===id);
-  if(p){p.status='live';p.flagReason='';saveDB(db);renderPending();renderAdminData();renderPosts();renderStats();showToast('Post approved','success');}
+async function approvePost(id){
+  const { error } = await supabase.from('posts').update({ status: 'live', flagReason: '' }).eq('id', id);
+  if(!error) {
+    showToast('Post approved','success');
+    loadCloudPosts(); // Refreshes the whole app instantly
+    renderPending();
+  } else {
+    showToast('Failed to approve','danger');
+  }
 }
-function deletePost(id){
-  if(!confirm('Delete this post?'))return;
-  db.posts=db.posts.filter(p=>p.id!==id);
-  saveDB(db);renderAdminData();renderPending();renderPosts();renderStats();showToast('Post deleted');
+
+async function deletePost(id){
+  if(!confirm('Delete this post permanently?')) return;
+  const { error } = await supabase.from('posts').delete().eq('id', id);
+  if(!error) {
+    showToast('Post deleted','success');
+    loadCloudPosts();
+    renderPending();
+  }
 }
 function makeAdmin(uid){
   if(!confirm('Grant admin to this user?'))return;
@@ -2027,7 +2033,7 @@ initRating();
       uploader: currentUser.name,
       animalType: type,
       condition: condition,
-      desc: desc || 'No description provided.',
+      description: desc || 'No description provided.',
       city: city,
       country: country,
       lat: window._geoLat || (40 + Math.random()*2).toFixed(4),
