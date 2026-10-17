@@ -1284,116 +1284,6 @@ function keywordCheck(desc, type){
   return ANIMAL_KEYWORDS.some(kw => text.includes(kw));
 }
 
-async function claudeImageCheck(imageData, desc){
-  try {
-    const b64 = imageData.split(',')[1];
-    const mediaType = imageData.split(';')[0].split(':')[1] || 'image/jpeg';
-    const response = await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        model:'claude-sonnet-4-6',
-        max_tokens:100,
-        messages:[{
-          role:'user',
-          content:[
-            {type:'image',source:{type:'base64',media_type:mediaType,data:b64}},
-            {type:'text',text:'Does this image contain an animal (cat, dog, bird, rabbit, or other pet/stray animal)? Reply with JSON only: {"isAnimal": true/false, "confidence": "high/medium/low", "reason": "one sentence"}'}
-          ]
-        }]
-      })
-    });
-    const data = await response.json();
-    const txt = data.content?.[0]?.text || '{"isAnimal":true,"confidence":"low","reason":"Could not verify"}';
-    const clean = txt.replace(/```json|```/g,'').trim();
-    return JSON.parse(clean);
-  } catch(e) {
-    return {isAnimal: true, confidence:'low', reason:'AI check unavailable'};
-  }
-}
-
-async function submitPost(){
-  if(!currentUser){ showToast('Sign in to post','warn'); return; }
-  const desc = document.getElementById('animalDesc').value.trim();
-  const city = document.getElementById('animalCity').value.trim();
-  const country = document.getElementById('animalCountry').value.trim();
-  const type = document.getElementById('animalType').value;
-  const condition = document.getElementById('animalCondition').value;
-  const photoSrc = document.getElementById('photoPreview').src;
-  const hasPhoto = document.getElementById('photoPreview').style.display !== 'none' && photoSrc && photoSrc.startsWith('data:');
-
-  if(!city){ showToast('Please enter the city','warn'); return; }
-  if(!country){ showToast('Please enter the country','warn'); return; }
-
-  const btn = document.getElementById('submitPostBtn');
-  btn.disabled = true; btn.textContent = 'Checking...';
-
-  // STEP 1: Keyword check
-  const kwPass = keywordCheck(desc, type);
-  let status = 'live';
-  let flagReason = '';
-
-  if(!kwPass){
-    flagReason = 'Description contains no animal-related keywords';
-    status = 'pending';
-  }
-
-  // STEP 2: Claude AI image check (if photo present)
-  if(hasPhoto){
-    document.getElementById('aiChecking').style.display = 'block';
-    const aiResult = await claudeImageCheck(photoSrc, desc);
-    document.getElementById('aiChecking').style.display = 'none';
-    if(!aiResult.isAnimal || aiResult.confidence === 'low'){
-      flagReason = flagReason || ('AI check: ' + (aiResult.reason||'Uncertain'));
-      status = 'pending';
-    }
-  }
-
-  const post = {
-    id: 'p'+Date.now(),
-    animalType: type,
-    condition: condition,
-    description: desc || 'No description provided.',
-    uploader: currentUser.name,
-    uploaderId: currentUser.id,
-    city: city || 'Unknown',
-    country: country || 'Unknown',
-    lat: window._geoLat || (40 + Math.random()*2).toFixed(4),
-    lon: window._geoLon || (22 + Math.random()*2).toFixed(4),
-    timestamp: Date.now(),
-    saved: false,
-    status: status,
-    flagReason: flagReason,
-    photoData: hasPhoto ? photoSrc : null
-  };
-
-  db.posts.push(post);
-  const user = db.users.find(u=>u.id===currentUser.id);
-  if(user) user.posts = (user.posts||0)+1;
-
-  if(status==='live'){
-    db.activity.unshift({type:'new',text:'New '+type+' reported in '+city,time:'just now'});
-    showToast('Report posted successfully! 🐾','success');
-  } else {
-    showToast('Post submitted — pending admin review 🔍','warn');
-  }
-
-  saveDB(db);
-  closeModal('uploadModal');
-  renderPosts();
-  renderActivity();
-  renderStats();
-
-  // reset form
-  document.getElementById('animalDesc').value='';
-  document.getElementById('animalCity').value='';
-  document.getElementById('animalCountry').value='';
-  document.getElementById('photoPreview').style.display='none';
-  document.querySelector('#photoDrop .pd-icon').textContent='📷';
-  document.querySelector('#photoDrop p').textContent=LANG[currentLang].photo_drop;
-  btn.disabled=false; btn.textContent='🐾 Submit Report';
-}
-
 // ─── CLAIM ──────────────────────────────────
 function openClaim(postId){
   if(!currentUser||!currentUser.subscribed){openSubModal();return;}
@@ -1664,12 +1554,10 @@ function renderAdminData(){
   const live=db.posts.filter(p=>p.status==='live');
   const saved=live.filter(p=>p.saved).length;
   const pend=db.posts.filter(p=>p.status==='pending').length;
-  const subs=db.users.filter(u=>u.subscribed).length;
+  
   document.getElementById('adminStatGrid').innerHTML=[
     {l:'Total Posts',v:live.length,s:pend+' pending'},
     {l:'Animals Saved',v:saved,s:Math.round(saved/(live.length||1)*100)+'% save rate'},
-    {l:'Total Users',v:db.users.length,s:subs+' subscribers'},
-    {l:'Est. Revenue',v:'€'+(subs*29),s:'annual basis'},
     {l:'Ads Active',v:db.ads.filter(a=>a.active).length,s:'in feed rotation'},
     {l:'Donors Listed',v:db.donors.length,s:'organizations'}
   ].map(s=>`<div class="astat"><div class="al">${s.l}</div><div class="av">${s.v}</div><div class="as">${s.s}</div></div>`).join('');
@@ -1686,20 +1574,6 @@ function renderAdminData(){
       </td>
     </tr>`).join('');
 
-  document.getElementById('adminUsersBody').innerHTML=db.users.map(u=>`
-    <tr>
-      <td>${u.name}</td>
-      <td style="color:var(--text3);font-size:12px;">${u.email}</td>
-      <td><span class="badge ${u.role==='admin'?'yellow':u.subscribed?'green':'purple'}">${u.role}</span></td>
-      <td style="color:var(--text3);font-size:12px;">${u.subExpires||'—'}</td>
-      <td>${u.posts||0}</td>
-      <td>
-        ${u.role!=='admin'?`<button class="abtn warn" onclick="makeAdmin('${u.id}')">Admin</button>`:''}
-        ${!u.subscribed?`<button class="abtn green" onclick="grantSub('${u.id}')">Sub</button>`:''}
-        ${u.id!=='u0'?`<button class="abtn danger" onclick="removeUser('${u.id}')">Remove</button>`:''}
-      </td>
-    </tr>`).join('');
-
   document.getElementById('adminPostsBody').innerHTML=[...db.posts].reverse().map(p=>`
     <tr>
       <td>${animalEmoji(p.animalType)} ${p.animalType}</td>
@@ -1712,9 +1586,12 @@ function renderAdminData(){
         <button class="abtn danger" onclick="deletePost('${p.id}')">Delete</button>
       </td>
     </tr>`).join('');
-     loadAdminUsers();
+    
+  // Load real users from Supabase
+  loadAdminUsers();
 }
-   async function loadAdminUsers() {
+
+async function loadAdminUsers() {
   const { data, error } = await supabase.from('profiles').select('*');
   if (!error && data) {
     document.getElementById('adminUsersBody').innerHTML = data.map(u => {
@@ -1733,12 +1610,12 @@ function renderAdminData(){
     }).join('');
   }
 }
-}
+
 async function grantSubSupabase(uid) {
   const { error } = await supabase.from('profiles').update({ is_subscriber: true }).eq('id', uid);
   if (!error) {
     showToast('Subscription granted!', 'success');
-    loadAdminUsers(); // Refresh the list
+    loadAdminUsers();//refresh the list
   }
 }
 function renderPending(){
