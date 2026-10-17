@@ -500,7 +500,7 @@ body{overscroll-behavior:none;}
       <div class="feed-controls" id="feedControls">
         <div class="search-wrap">
           <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <input placeholder="Search animals, cities..." id="searchInput" oninput="renderPosts()">
+             <input placeholder="Search animals, cities..." id="searchInput" oninput="renderPosts()" autocomplete="off">
         </div>
       <div class="filter-row"> <div class="fchip active" onclick="setFilter('all',this)" data-i18n="filter_all">All</div> 
           <div class="fchip" onclick="setLocationFilter('near',this)">📍 Near Me (50km)</div>
