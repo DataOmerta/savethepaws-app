@@ -1241,7 +1241,7 @@ if (currentLocationMode === 'near' && window._geoLat && window._geoLon) {
   });
 } else if (currentLocationMode === 'country' && userCountry) {
   posts = posts.filter(p => p.country === userCountry);
-
+}
   if(currentFilter==='injured') posts=posts.filter(p=>p.condition==='injured');
   else if(currentFilter==='saved') posts=posts.filter(p=>p.saved);
   else if(currentFilter!=='all') posts=posts.filter(p=>p.animalType===currentFilter);
@@ -2228,10 +2228,7 @@ initRating();
     
 </script>
 <script>
-  // 1. Initialize Supabase (REPLACE THE 2 LINES BELOW WITH YOUR KEYS)
-  const SUPABASE_URL = 'https://zqnwjdaxffsoglmhkqxc.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_wjWekEPeo6QXJD6s-7RO6Q_SLgvfKqF';
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 
   // 2. OVERRIDE: The new, secure submitPost function
     window.submitPost = async function() {
@@ -2345,23 +2342,7 @@ initRating();
       loadCloudPosts();
     }
   };
-  // 3. REAL-TIME FEED: Fetch posts from Supabase instead of localStorage
-  async function loadCloudPosts() {
-    const { data, error } = await supabase
-      .from('posts')
-      .select('*')
-      .order('timestamp', { ascending: false });
-    
-    if (!error && data) {
-      // Merge cloud posts into your existing db.posts array so your UI keeps working perfectly
-      db.posts = data; 
-      renderPosts();
-      renderStats();
-    }
-  }
 
-  // Load cloud posts on startup
-  loadCloudPosts();
 
   // 4. REAL-TIME LISTENER: If someone else posts, the feed updates instantly
 // ─── PROXIMITY NOTIFICATION SYSTEM ─────────────────────────
