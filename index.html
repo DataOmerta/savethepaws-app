@@ -1017,7 +1017,16 @@ function saveDB(d){
 }
 
 // ─── STATE ──────────────────────────────────
-let currentUser = null;
+    // ─── SUPABASE INITIALIZATION (MOVED TO TOP FOR GLOBAL ACCESS) ───
+const SUPABASE_URL = 'https://zqnwjdaxffsoglmhkqxc.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_wjWekEPeo6QXJD6s-7R06Q_SLgvfKqF'; // Ensure this is a zero (0), not letter O
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+
+    let currentLocationMode = 'all'; // 'all', 'near', 'country', 'continent'
+let userCountry = null;
+let userContinent = null;
+    let currentUser = null;
 let currentFilter = 'all';
 let currentTab = 'feed';
 let claimTargetId = null;
@@ -1062,7 +1071,7 @@ function checkBadgeEligibility() {
   }
   
   // Guardian: 4 injured OR (1 adoption + shared)
-  if (!earnedBadges.includes('guardian') && (stats.injured >= 4 || (stats.adoptions >= 1 && stats.shared))) {
+  if (!earnedBadges.includes('guardian') && (stats.injured >= 4 || stats.referrals >= 1)) {
     earnedBadges.push('guardian');
     showBadgeEarned('guardian');
   }
@@ -1232,9 +1241,7 @@ if (currentLocationMode === 'near' && window._geoLat && window._geoLon) {
   });
 } else if (currentLocationMode === 'country' && userCountry) {
   posts = posts.filter(p => p.country === userCountry);
-} else if (currentLocationMode === 'continent' && userContinent) {
-  posts = posts.filter(p => p.continent === userContinent);
-}
+
   if(currentFilter==='injured') posts=posts.filter(p=>p.condition==='injured');
   else if(currentFilter==='saved') posts=posts.filter(p=>p.saved);
   else if(currentFilter!=='all') posts=posts.filter(p=>p.animalType===currentFilter);
@@ -1369,9 +1376,7 @@ function setMobileTab(tab){ switchTab(tab); }
 // ─── FILTER ─────────────────────────────────
 
     // ─── FILTER & LOCATION MODES ───────────────────────────────
-let currentLocationMode = 'all'; // 'all', 'near', 'country', 'continent'
-let userCountry = null;
-let userContinent = null;
+
 
 function setFilter(f, el){
   currentFilter = f;
@@ -2219,7 +2224,9 @@ initRating();
    <!-- ═══════════════════════════════════════════
      CLOUD BRIDGE: SUPABASE + SIGHTENGINE
 ═══════════════════════════════════════════ -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    
+</script>
 <script>
   // 1. Initialize Supabase (REPLACE THE 2 LINES BELOW WITH YOUR KEYS)
   const SUPABASE_URL = 'https://zqnwjdaxffsoglmhkqxc.supabase.co';
@@ -2227,33 +2234,36 @@ initRating();
   const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   // 2. OVERRIDE: The new, secure submitPost function
-  window.submitPost = async function() {
+    window.submitPost = async function() {
     if(!currentUser){ showToast('Sign in to post','warn'); return; }
-      // ─── DAILY UPLOAD LIMIT CHECK ───────────────────────────────
-const today = new Date().toDateString();
-const uploadKey = `stp_uploads_${currentUser.id}_${today}`;
-const todayUploads = parseInt(localStorage.getItem(uploadKey) || '0');
+    
+    const today = new Date().toDateString();
+    const uploadKey = `stp_uploads_${currentUser.id}_${today}`;
+    const todayUploads = parseInt(localStorage.getItem(uploadKey) || '0');
 
-if (todayUploads >= 7) {
-  showToast('Amazing work today! Your daily limit is reached. Rest up, rescuer.', 'warn');
-  return;
-}
-      // Increment today's upload count
-localStorage.setItem(uploadKey, (todayUploads + 1).toString());
+    if (todayUploads >= 7) {
+      showToast('Amazing work today! Your daily limit is reached. Rest up, rescuer.', 'warn');
+      return;
+    }
+
     const desc = document.getElementById('animalDesc').value.trim();
     const city = document.getElementById('animalCity').value.trim();
     const country = document.getElementById('animalCountry').value.trim();
     const type = document.getElementById('animalType').value;
     const condition = document.getElementById('animalCondition').value;
-        const fileInput = document.getElementById('photoInput');
+    
+    if(!city || !country){ showToast('Please enter city and country','warn'); return; }
+
+    const fileInput = document.getElementById('photoInput');
     const file = fileInput.files[0];
     const hasPhoto = file && file.type.startsWith('image/');
-    
-    // ... (keep the limit check here) ...
+
+    const btn = document.getElementById('submitPostBtn');
+    btn.disabled = true; 
+    btn.textContent = hasPhoto ? '🔄 Optimizing Image...' : '☁️ Uploading to Cloud...';
 
     let compressedPhotoData = null;
     if(hasPhoto) {
-      btn.textContent = '🔄 Optimizing Image...';
       try {
         compressedPhotoData = await compressImage(file, 1080, 0.7);
       } catch(e) {
@@ -2263,12 +2273,12 @@ localStorage.setItem(uploadKey, (todayUploads + 1).toString());
       }
     }
 
-    // STEP 1: Sightengine AI Moderation Check (using compressed data)
     let isSafe = true;
     if(hasPhoto && compressedPhotoData) {
+      btn.textContent = '🔒 Scanning photo...';
       try {
         const formData = new FormData();
-        formData.append('media', compressedPhotoData); // <-- USE COMPRESSED HERE
+        formData.append('media', compressedPhotoData);
         formData.append('models', 'nudity-2.1,weapon,gore');
         formData.append('api_user', '1622452775'); 
         formData.append('api_secret', '5DGESTpwGTFUntMYVjDbG6mo3mV9FqwH'); 
@@ -2283,43 +2293,6 @@ localStorage.setItem(uploadKey, (todayUploads + 1).toString());
         isSafe = false; 
       }
     }
-    // ... (keep the rest of the submitPost logic, but change `photoData: hasPhoto ? photoSrc : null` to `photoData: hasPhoto ? compressedPhotoData : null`) ...
-    
-    // Add offline fallback at the very end of submitPost:
-    if(error) {
-      if (!navigator.onLine) {
-        saveToOfflineQueue(newPost);
-      } else {
-        showToast('Upload failed. Check internet.','danger');
-      }
-    }
-
-    if(!city || !country){ showToast('Please enter city and country','warn'); return; }
-
-    const btn = document.getElementById('submitPostBtn');
-    btn.disabled = true; btn.textContent = '🔒 Scanning photo...';
-
-    // STEP 1: Sightengine AI Moderation Check
-    let isSafe = true;
-    if(hasPhoto) {
-      try {
-        const formData = new FormData();
-        formData.append('media', photoSrc);
-        formData.append('models', 'nudity-2.1,weapon,gore');
-        formData.append('api_user', '1622452775'); // REPLACE
-        formData.append('api_secret', '5DGESTpwGTFUntMYVjDbG6mo3mV9FqwH'); // REPLACE
-
-        const response = await fetch('https://api.sightengine.com/1.0/check.json', { method: 'POST', body: formData });
-        const data = await response.json();
-
-        if((data.nudity && data.nudity.raw > 0.6) || (data.weapon && data.weapon > 0.6) || (data.gore && data.gore > 0.6)) {
-          isSafe = false;
-        }
-      } catch(e) {
-        console.error("Moderation API error:", e);
-        isSafe = false; // Fail safe: if API is down, hold for manual review
-      }
-    }
 
     if(!isSafe) {
       btn.disabled = false; btn.textContent = '🐾 Submit Report';
@@ -2327,8 +2300,7 @@ localStorage.setItem(uploadKey, (todayUploads + 1).toString());
       return;
     }
 
-    // STEP 2: Save to Supabase Cloud
-    btn.textContent = 'Uploading to Cloud...';
+    btn.textContent = '☁️ Uploading to Cloud...';
     const newPost = {
       uploader: currentUser.name,
       animalType: type,
@@ -2340,32 +2312,39 @@ localStorage.setItem(uploadKey, (todayUploads + 1).toString());
       lon: window._geoLon || (22 + Math.random()*2).toFixed(4),
       timestamp: Date.now(),
       saved: false,
-      status: 'pending', // HELD FOR YOUR ADMIN REVIEW
-      photoData: hasPhoto ? photoSrc : null
+      status: 'pending',
+      photoData: hasPhoto ? compressedPhotoData : null
     };
 
     const { error } = await supabase.from('posts').insert([newPost]);
     btn.disabled = false; btn.textContent = '🐾 Submit Report';
 
     if(error) {
-      showToast('Upload failed. Check internet.','danger');
-      console.error(error);
+      if (!navigator.onLine) {
+        saveToOfflineQueue(newPost);
+      } else {
+        showToast('Upload failed. Check internet.','danger');
+        console.error(error);
+      }
     } else {
+      localStorage.setItem(uploadKey, (todayUploads + 1).toString());
+      updateUserStats('post');
+      if (condition === 'injured') updateUserStats('injured');
+      
       showToast('Report submitted! Pending admin review 🔍','success');
       closeModal('uploadModal');
-      // Reset form
+      
       document.getElementById('animalDesc').value='';
       document.getElementById('animalCity').value='';
       document.getElementById('animalCountry').value='';
       document.getElementById('photoPreview').style.display='none';
       document.querySelector('#photoDrop .pd-icon').textContent='📷';
       document.querySelector('#photoDrop p').textContent=LANG[currentLang].photo_drop;
+      fileInput.value = '';
       
-      // Refresh feed from cloud
       loadCloudPosts();
     }
   };
-
   // 3. REAL-TIME FEED: Fetch posts from Supabase instead of localStorage
   async function loadCloudPosts() {
     const { data, error } = await supabase
