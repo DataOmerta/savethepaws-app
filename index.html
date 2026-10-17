@@ -446,6 +446,25 @@ document.addEventListener('mouseup', (e) => {
 @media(max-width:660px){
   
 }
+    /* ═══════════════════════════════════════════
+   DRAGGABLE CIRCULAR MUSIC PLAYER
+═══════════════════════════════════════════ */
+.music-circular {
+  position: fixed; bottom: 100px; right: 30px; width: 60px; height: 60px;
+  background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  cursor: grab; z-index: 9999; box-shadow: 0 4px 20px rgba(124,111,224,0.5); transition: width 0.3s, height 0.3s, border-radius 0.3s;
+}
+.music-circular:active { cursor: grabbing; }
+.music-circular.expanded { width: 220px; height: 70px; border-radius: 35px; justify-content: space-between; padding: 0 15px; }
+.mc-btn { background: none; border: none; color: #fff; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; transition: background 0.2s; }
+.mc-btn:hover { background: rgba(255,255,255,0.2); }
+.mc-info { flex: 1; color: #fff; font-size: 12px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: none; }
+.mc-vol { width: 60px; accent-color: #fff; display: none; }
+.music-circular.expanded .mc-info, .music-circular.expanded .mc-vol { display: block; }
+
+@media(max-width:660px){
+  .music-circular { bottom: 90px; right: 20px; }
+}
 </style>
 </head>
 <body>
@@ -1787,7 +1806,63 @@ function removeDonor(id){db.donors=db.donors.filter(d=>d.id!==id);saveDB(db);ren
 // ─── SETTINGS ───────────────────────────────
 function saveSettings(){showToast('Settings saved','success');}
 
+// ─── DRAGGABLE CIRCULAR MUSIC PLAYER ───────────────────────────
+const tracks = ['Free Soul.mp3', 'Purify.mp3', 'Fairytale.mp3']; // Your exact filenames
+let currentTrackIndex = 0;
+let isPlaying = false;
+const audio = document.getElementById('bgAudio');
+const mcCircular = document.getElementById('musicCircular');
+const mcPlayBtn = document.getElementById('mcPlayBtn');
+const mcInfo = document.getElementById('mcInfo');
+const mcVol = document.getElementById('mcVol');
 
+function loadRandomTrack() {
+  currentTrackIndex = Math.floor(Math.random() * tracks.length);
+  audio.src = tracks[currentTrackIndex];
+  // Clean up the filename for display (removes .mp3)
+  mcInfo.textContent = tracks[currentTrackIndex].replace('.mp3', '');
+}
+
+mcPlayBtn.addEventListener('click', () => {
+  if (!audio.src) loadRandomTrack();
+  if (isPlaying) {
+    audio.pause(); isPlaying = false; mcPlayBtn.textContent = '▶';
+  } else {
+    audio.play().catch(()=>{}); isPlaying = true; mcPlayBtn.textContent = '⏸';
+  }
+});
+
+// Auto-shuffle when a track ends
+audio.addEventListener('ended', () => { 
+  loadRandomTrack(); 
+  if(isPlaying) audio.play(); 
+});
+
+mcVol.addEventListener('input', (e) => { audio.volume = e.target.value; });
+
+// Draggable Logic
+let isDragging = false, startX, startY, initialX, initialY;
+mcCircular.addEventListener('mousedown', (e) => {
+  isDragging = true; startX = e.clientX; startY = e.clientY;
+  const rect = mcCircular.getBoundingClientRect();
+  initialX = rect.left; initialY = rect.top;
+  mcCircular.style.transition = 'none';
+});
+document.addEventListener('mousemove', (e) => {
+  if (!isDragging) return;
+  mcCircular.style.left = `${initialX + (e.clientX - startX)}px`;
+  mcCircular.style.top = `${initialY + (e.clientY - startY)}px`;
+  mcCircular.style.right = 'auto'; mcCircular.style.bottom = 'auto';
+});
+document.addEventListener('mouseup', (e) => {
+  if (!isDragging) return; 
+  isDragging = false; 
+  mcCircular.style.transition = 'width 0.3s, height 0.3s, border-radius 0.3s';
+  // Expand on click if not dragged far
+  if (Math.abs(e.clientX - startX) < 5 && Math.abs(e.clientY - startY) < 5) {
+    mcCircular.classList.toggle('expanded');
+  }
+});
 
 // ─── LOGOUT ─────────────────────────────────
 function updateLogoutBtn(){
