@@ -506,15 +506,17 @@ body{overscroll-behavior:none;}
           <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           <input placeholder="Search animals, cities..." id="searchInput" oninput="renderPosts()">
         </div>
-        <div class="filter-row">
-          <div class="fchip active" onclick="setFilter('all',this)" data-i18n="filter_all">All</div>
-          <div class="fchip" onclick="setFilter('cat',this)">🐱 Cats</div>
+      <div class="filter-row"> <div class="fchip active" onclick="setFilter('all',this)" data-i18n="filter_all">All</div> 
+          <div class="fchip" onclick="setLocationFilter('near',this)">📍 Near Me (50km)</div>
+          <div class="fchip" onclick="setLocationFilter('country',this)">🏙 My Country</div> 
+          <div class="fchip" onclick="setLocationFilter('continent',this)">🌍 My Continent</div>
+          <div class="fchip" onclick="setFilter('cat',this)">🐱 Cats</div> 
           <div class="fchip" onclick="setFilter('dog',this)">🐶 Dogs</div>
-          <div class="fchip" onclick="setFilter('bird',this)">🐦 Birds</div>
+          <div class="fchip" onclick="setFilter('bird',this)">🐦 Birds</div> 
           <div class="fchip" onclick="setFilter('rabbit',this)">🐰 Rabbits</div>
           <div class="fchip" onclick="setFilter('injured',this)">🚑 Injured</div>
-          <div class="fchip" onclick="setFilter('saved',this)" data-i18n="filter_saved">✓ Saved</div>
-        </div>
+          <div class="fchip" onclick="setFilter('saved',this)" data-i18n="filter_saved">✓ Saved</div> 
+      </div>
       </div>
 
       <!-- FEED VIEW -->
@@ -1024,8 +1026,92 @@ let currentAdType = 'image_link';
 let themeMode = 'dark';
 
 const ANIMAL_KEYWORDS = ['cat','dog','bird','rabbit','animal','stray','injured','lost','paw','fur','feather','kitten','puppy','feral','rescue','adopt','pet','meow','bark','collar','vet','wounded','limping','hungry','scared','domestic','pigeon','parrot','hamster','turtle','ζώο','γάτα','σκύλος','πουλί','κουτάβι','γατάκι'];
+// ─── BADGE SYSTEM ──────────────────────────────────────────
+const BADGES = {
+  scout: { name: 'Scout', icon: '🔍', requirement: 'Post 10 animals or refer friends' },
+  guardian: { name: 'Guardian', icon: '🛡', requirement: 'Post 4 injured or 1 adoption + share' },
+  hero: { name: 'Hero', icon: '⭐', requirement: '2 adoptions or 15 posts or 8 injured (subscribers only)' },
+  legend: { name: 'Legend', icon: '👑', requirement: '3 adoptions or 12 injured or 24 posts (limited to 9/year)' }
+};
 
-// ─── BOOT ───────────────────────────────────
+function getUserStats() {
+  const statsKey = `stp_stats_${currentUser.id}`;
+  return JSON.parse(localStorage.getItem(statsKey) || '{"posts":0,"injured":0,"adoptions":0,"referrals":0}');
+}
+
+function updateUserStats(action) {
+  const stats = getUserStats();
+  if (action === 'post') stats.posts++;
+  if (action === 'injured') stats.injured++;
+  if (action === 'adoption') stats.adoptions++;
+  if (action === 'referral') stats.referrals++;
+  
+  localStorage.setItem(`stp_stats_${currentUser.id}`, JSON.stringify(stats));
+  checkBadgeEligibility();
+}
+
+function checkBadgeEligibility() {
+  const stats = getUserStats();
+  const badgesKey = `stp_badges_${currentUser.id}`;
+  const earnedBadges = JSON.parse(localStorage.getItem(badgesKey) || '[]');
+  
+  // Scout: 10 posts OR 3 referrals
+  if (!earnedBadges.includes('scout') && (stats.posts >= 10 || stats.referrals >= 3)) {
+    earnedBadges.push('scout');
+    showBadgeEarned('scout');
+  }
+  
+  // Guardian: 4 injured OR (1 adoption + shared)
+  if (!earnedBadges.includes('guardian') && (stats.injured >= 4 || (stats.adoptions >= 1 && stats.shared))) {
+    earnedBadges.push('guardian');
+    showBadgeEarned('guardian');
+  }
+  
+  // Hero: 2 adoptions OR 15 posts OR 8 injured (subscribers only)
+  if (!earnedBadges.includes('hero') && currentUser.subscribed && 
+      (stats.adoptions >= 2 || stats.posts >= 15 || stats.injured >= 8)) {
+    earnedBadges.push('hero');
+    showBadgeEarned('hero');
+  }
+  
+  // Legend: 3 adoptions OR 12 injured OR 24 posts (all subscribers, limited to 9/year)
+  // This requires server-side tracking, so we'll implement it in Phase 5
+  
+  localStorage.setItem(badgesKey, JSON.stringify(earnedBadges));
+}
+
+function showBadgeEarned(badgeKey) {
+  const badge = BADGES[badgeKey];
+  showToast(`🎉 You earned the ${badge.name} badge!`, 'success');
+  
+  // Prompt to share
+  setTimeout(() => {
+    if (confirm(`Congratulations! You earned the ${badge.name} badge. Share it now?`)) {
+      shareBadge(badgeKey);
+    }
+  }, 1000);
+}
+
+function shareBadge(badgeKey) {
+  const badge = BADGES[badgeKey];
+  const text = `I just earned the ${badge.name} badge on SaveThePaws, the world's first real-time animal rescue network. Join me in saving lives!`;
+  const url = 'https://dataomerta.github.io/savethepaws-app/';
+  
+  if (navigator.share) {
+    navigator.share({
+      title: 'SaveThePaws Badge',
+      text: text,
+      url: url
+    });
+  } else {
+    // Fallback: copy to clipboard
+    navigator.clipboard.writeText(`${text} ${url}`);
+    showToast('Badge link copied to clipboard!', 'success');
+      // Update stats
+updateUserStats('post');
+if (condition === 'injured') updateUserStats('injured');
+  }
+}
 // ─── BOOT ───────────────────────────────────
 window.onload = async function(){
   // 1. Check if user is already logged in via Supabase
@@ -1129,7 +1215,17 @@ function renderPosts(){
   const isReg = !!currentUser;
 
   let posts = db.posts.filter(p=>p.status==='live').slice().reverse();
-
+// Apply location filter
+if (currentLocationMode === 'near' && window._geoLat && window._geoLon) {
+  posts = posts.filter(p => {
+    const dist = getDistance(parseFloat(window._geoLat), parseFloat(window._geoLon), parseFloat(p.lat), parseFloat(p.lon));
+    return dist <= 50; // 50km radius
+  });
+} else if (currentLocationMode === 'country' && userCountry) {
+  posts = posts.filter(p => p.country === userCountry);
+} else if (currentLocationMode === 'continent' && userContinent) {
+  posts = posts.filter(p => p.continent === userContinent);
+}
   if(currentFilter==='injured') posts=posts.filter(p=>p.condition==='injured');
   else if(currentFilter==='saved') posts=posts.filter(p=>p.saved);
   else if(currentFilter!=='all') posts=posts.filter(p=>p.animalType===currentFilter);
@@ -1175,7 +1271,13 @@ function renderPostCard(post, isSub, isReg){
 
   const uploaderName = isSub ? post.uploader : `<span class="blurred-text" onclick="openSubModal()" title="Subscribe to see">${post.uploader}</span>`;
   const uploaderDisplay = isSub ? post.uploader : '••••••';
-
+// Add urgency text for non-subscribers
+const urgencyText = !isSub ? `
+  <div style="color:var(--danger);font-size:12px;font-weight:700;margin-top:8px;animation:pulse 2s infinite;">
+    This ${post.animalType} has been waiting for ${fmtTime(post.timestamp).replace('ago', '')}. 
+    I could be there in minutes if I could just see the map.
+  </div>
+` : '';
   const coords = isSub
     ? `<span class="info-chip"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="10" r="3"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>${post.lat}, ${post.lon}</span>
        <span class="info-chip"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>${post.city}, ${post.country}</span>`
@@ -1191,7 +1293,7 @@ function renderPostCard(post, isSub, isReg){
 
   const editBtn = isOwner ? `<button class="btn-edit" onclick="openEdit('${post.id}')" title="Edit description">✏️</button>` : '';
   const flagBtn = `<button class="btn-flag" onclick="flagPost('${post.id}')" title="Flag as inappropriate">⚑</button>`;
-
+const shareBtn = `<button class="btn-edit" onclick="sharePost('${post.id}')" title="Share this post">📤</button>`;
   return `
     <div class="post-card" id="post-${post.id}">
       <div class="pc-header">
@@ -1206,9 +1308,9 @@ function renderPostCard(post, isSub, isReg){
         </div>
       </div>
       <div class="pc-img-wrap">${photoContent}${savedWM}</div>
-     <div class="pc-desc">${post.description}</div>
+  <div class="pc-desc">${post.description}${urgencyText}</div>
       <div class="pc-info">${coords}</div>
-      <div class="pc-actions">${claimBtn}${editBtn}${flagBtn}</div>
+      <div class="pc-actions">${claimBtn}${editBtn}${flagBtn}${shareBtn}</div>
     </div>`;
 }
 
@@ -1256,11 +1358,55 @@ function switchTab(tab, el){
 function setMobileTab(tab){ switchTab(tab); }
 
 // ─── FILTER ─────────────────────────────────
+
+    // ─── FILTER & LOCATION MODES ───────────────────────────────
+let currentLocationMode = 'all'; // 'all', 'near', 'country', 'continent'
+let userCountry = null;
+let userContinent = null;
+
 function setFilter(f, el){
   currentFilter = f;
+  currentLocationMode = 'all'; // Reset location mode when changing animal filter
   document.querySelectorAll('.fchip').forEach(c=>c.classList.remove('active'));
   el.classList.add('active');
   renderPosts();
+}
+
+function setLocationFilter(mode, el){
+  if (mode === 'near' && !window._geoLat) {
+    // Prompt for location
+    if (confirm('Enable location to see animals near you?')) {
+      startGeo();
+      setTimeout(() => {
+        if (window._geoLat) {
+          currentLocationMode = mode;
+          document.querySelectorAll('.fchip').forEach(c=>c.classList.remove('active'));
+          el.classList.add('active');
+          renderPosts();
+        } else {
+          showToast('Location not available', 'warn');
+        }
+      }, 2000);
+    }
+    return;
+  }
+  
+  currentLocationMode = mode;
+  document.querySelectorAll('.fchip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderPosts();
+}
+
+// Helper function to calculate distance between two coordinates (Haversine formula)
+function getDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371; // Earth's radius in km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c; // Distance in km
 }
 
 // ─── POST SUBMISSION + SMART FILTER ─────────
@@ -1298,9 +1444,26 @@ function openClaim(postId){
   openModal('claimModal');
 }
 function confirmClaim(){
+    // ─── DAILY CLAIM LIMIT CHECK ───────────────────────────────
+const today = new Date().toDateString();
+const claimKey = `stp_claims_${currentUser.id}_${today}`;
+const todayClaims = parseInt(localStorage.getItem(claimKey) || '0');
+
+if (todayClaims >= 3) {
+  showToast('You have reached your daily claim limit. Every rescue counts!', 'warn');
+  return;
+}
   const post=db.posts.find(p=>p.id===claimTargetId);
   if(!post)return;
   post.saved=true; post.savedBy=currentUser.name; post.savedAt=Date.now();
+    // Update stats
+updateUserStats('adoption');
+    // Haptic feedback for claim
+if (navigator.vibrate) {
+  navigator.vibrate(200); // Single sharp vibration
+}
+    // Increment today's claim count
+localStorage.setItem(claimKey, (todayClaims + 1).toString());
   db.activity.unshift({type:'saved',text:post.animalType+' in '+post.city+' claimed by '+currentUser.name,time:'just now'});
   saveDB(db);
   closeModal('claimModal');
@@ -1339,7 +1502,24 @@ function flagPost(postId){
   renderPosts();renderStats();
   showToast('Post flagged for admin review','warn');
 }
-
+function sharePost(postId) {
+  const post = db.posts.find(p => p.id === postId);
+  if (!post) return;
+  
+  const text = `Check out this ${post.animalType} in ${post.city} on SaveThePaws!`;
+  const url = 'https://dataomerta.github.io/savethepaws-app/';
+  
+  if (navigator.share) {
+    navigator.share({
+      title: 'SaveThePaws',
+      text: text,
+      url: url
+    });
+  } else {
+    navigator.clipboard.writeText(`${text} ${url}`);
+    showToast('Post link copied to clipboard!', 'success');
+  }
+}
 // ─── AUTH ───────────────────────────────────
 function handleAccountBtn(){
   if(currentUser){
@@ -1379,6 +1559,10 @@ function doSubscribe(plan){
   if(links[plan]) {
     // Open Stripe securely in a new tab
     window.open(links[plan], '_blank');
+      // Rhythmic vibration for new subscriber
+if (navigator.vibrate) {
+  navigator.vibrate([100, 50, 100, 50, 300, 50, 100]);
+}
     closeModal('subModal');
     showToast('Redirecting to secure payment...', 'success');
   }
@@ -1528,9 +1712,20 @@ document.querySelectorAll('.modal-overlay').forEach(m=>{
 });
 
 // ─── TOAST ──────────────────────────────────
+// ─── TOAST WITH CUSTOM SOUND ───────────────────────────────
+const mewSound = new Audio('./mew.mp3');
+mewSound.volume = 0.3; // Keep it subtle
+
 function showToast(msg,type=''){
   const t=document.getElementById('toast');
   t.textContent=msg; t.className='toast show '+(type||'');
+  
+  // Play mew sound for notifications
+  if (type === 'success' || type === 'warn') {
+    mewSound.currentTime = 0;
+    mewSound.play().catch(e => console.log('Audio play failed:', e));
+  }
+  
   setTimeout(()=>t.className='toast',2800);
 }
 
@@ -1928,6 +2123,17 @@ initRating();
   // 2. OVERRIDE: The new, secure submitPost function
   window.submitPost = async function() {
     if(!currentUser){ showToast('Sign in to post','warn'); return; }
+      // ─── DAILY UPLOAD LIMIT CHECK ───────────────────────────────
+const today = new Date().toDateString();
+const uploadKey = `stp_uploads_${currentUser.id}_${today}`;
+const todayUploads = parseInt(localStorage.getItem(uploadKey) || '0');
+
+if (todayUploads >= 15) {
+  showToast('Amazing work today! Your daily limit is reached. Rest up, rescuer.', 'warn');
+  return;
+}
+      // Increment today's upload count
+localStorage.setItem(uploadKey, (todayUploads + 1).toString());
     const desc = document.getElementById('animalDesc').value.trim();
     const city = document.getElementById('animalCity').value.trim();
     const country = document.getElementById('animalCountry').value.trim();
@@ -2027,11 +2233,43 @@ initRating();
   loadCloudPosts();
 
   // 4. REAL-TIME LISTENER: If someone else posts, the feed updates instantly
-  supabase.channel('public:posts')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, () => {
-      loadCloudPosts();
-    })
-    .subscribe();
+// ─── PROXIMITY NOTIFICATION SYSTEM ─────────────────────────
+const chimeSound = new Audio('./chime.mp3'); // You need to add chime.mp3 to your repo
+chimeSound.volume = 0.4;
+
+function playProximityAlert() {
+  // Play chime 4 times
+  for (let i = 0; i < 4; i++) {
+    setTimeout(() => {
+      chimeSound.currentTime = 0;
+      chimeSound.play().catch(e => console.log('Chime play failed:', e));
+      
+      // Vibrate rhythmically: short-short-long-short
+      if (navigator.vibrate) {
+        navigator.vibrate([100, 50, 100, 50, 300, 50, 100]);
+      }
+    }, i * 400);
+  }
+}
+
+// 4. REAL-TIME LISTENER with proximity check
+supabase.channel('public:posts')
+  .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, (payload) => {
+    const newPost = payload.new;
+    
+    // Check if post is within 5km-50km
+    if (window._geoLat && window._geoLon && newPost.status === 'live') {
+      const dist = getDistance(parseFloat(window._geoLat), parseFloat(window._geoLon), parseFloat(newPost.lat), parseFloat(newPost.lon));
+      
+      if (dist >= 5 && dist <= 50) {
+        playProximityAlert();
+        showToast(`New animal reported ${Math.round(dist)}km away!`, 'success');
+      }
+    }
+    
+    loadCloudPosts();
+  })
+  .subscribe();
 </script>
 
 <!-- ═══ CREDITS WATERMARK ═══ -->
