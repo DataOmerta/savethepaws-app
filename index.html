@@ -810,7 +810,7 @@ body{overscroll-behavior:none;}
       <div class="fg"><label>Password</label><input type="password" id="loginPass" placeholder="••••••••"></div>
       <button class="btn-primary" onclick="doLogin()">Sign In</button>
       <button class="btn-secondary" onclick="switchForm('register')">Create Free Account →</button>
-      <div style="text-align:center;margin-top:10px;font-size:11px;color:var(--text3);</div>
+      <div style="text-align:center;margin-top:10px;font-size:11px;color:var(--text3);">Secure login.</div>
     </div>
     <div id="registerForm" style="display:none;">
       <div class="fg-row">
@@ -980,9 +980,7 @@ function initDB(){
   
   const db = {
     // KEEP: Required for you to log in as Admin right now
-    users:[
-      {id:'u0',name:'Admin User',email:'admin@savethepaws.app',password:'admin123',role:'admin',subscribed:true,subExpires:'2027-12-31',joined:'2025-01-01',posts:0}
-    ],
+    users:[],
     // EMPTY: We want ONLY real posts from Supabase
     posts: [], 
     // KEEP: Ensures the Donate button and Ad slots work professionally on Day 1
@@ -1022,9 +1020,21 @@ let themeMode = 'dark';
 const ANIMAL_KEYWORDS = ['cat','dog','bird','rabbit','animal','stray','injured','lost','paw','fur','feather','kitten','puppy','feral','rescue','adopt','pet','meow','bark','collar','vet','wounded','limping','hungry','scared','domestic','pigeon','parrot','hamster','turtle','ζώο','γάτα','σκύλος','πουλί','κουτάβι','γατάκι'];
 
 // ─── BOOT ───────────────────────────────────
-window.onload = function(){
-  const saved = localStorage.getItem('stp_user');
-  if(saved){try{const u=JSON.parse(saved);const found=db.users.find(x=>x.id===u.id);if(found){currentUser=found;}}catch(e){}}
+// ─── BOOT ───────────────────────────────────
+window.onload = async function(){
+  // 1. Check if user is already logged in via Supabase
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session) {
+    const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
+    currentUser = {
+      id: session.user.id,
+      name: profile?.name || session.user.email.split('@')[0],
+      email: session.user.email,
+      role: session.user.email === 'admin@savethepaws.app' ? 'admin' : (profile?.is_subscriber ? 'subscriber' : 'user'),
+      subscribed: profile?.is_subscriber || false
+    };
+  }
+
   updateUI();
   renderPosts();
   renderActivity();
@@ -1407,7 +1417,7 @@ function openEdit(postId){
   editTargetId=postId;
   const post=db.posts.find(p=>p.id===postId);
   if(!post)return;
-  document.getElementById('editDesc').value=post.desc;
+  document.getElementById('editDesc').value=post.description;
   openModal('editModal');
 }
 function saveEdit(){
@@ -1451,37 +1461,9 @@ function mobileAccountMenu(){
 }
 function openLoginModal(){ openModal('loginModal'); }
 
-function doLogin(){
-  const email=document.getElementById('loginEmail').value.trim();
-  const pass=document.getElementById('loginPass').value;
-  const user=db.users.find(u=>u.email===email&&u.password===pass);
-  if(!user){showToast('Invalid email or password','warn');return;}
-  currentUser=user;
-  if(user.subscribed) localStorage.setItem('stp_user',JSON.stringify({id:user.id}));
-  updateUI();
-  closeModal('loginModal');
-  showToast('Welcome back, '+user.name+'! 👋','success');
-  renderPosts();renderStats();
-  if(user.role==='admin') showAdminBtn();
-}
 
-function doRegister(){
-  const first=document.getElementById('regFirst').value.trim();
-  const last=document.getElementById('regLast').value.trim();
-  const email=document.getElementById('regEmail').value.trim();
-  const pass=document.getElementById('regPass').value;
-  if(!first||!email||!pass){showToast('Fill in all fields','warn');return;}
-  if(pass.length<8){showToast('Password must be 8+ characters','warn');return;}
-  if(db.users.find(u=>u.email===email)){showToast('Email already registered','warn');return;}
-  const u={id:'u'+Date.now(),name:first+(last?' '+last:''),email,password:pass,role:'user',subscribed:false,subExpires:null,joined:new Date().toISOString().split('T')[0],posts:0};
-  db.users.push(u);
-  currentUser=u;
-  saveDB(db);
-  updateUI();
-  closeModal('loginModal');
-  showToast('Account created! Welcome, '+first+'!','success');
-  renderPosts();
-}
+
+
 
 function doSubscribe(plan){
   if(!currentUser){ 
@@ -1506,11 +1488,72 @@ function doSubscribe(plan){
   }
 }
 
-function signOut(){
-  currentUser=null;
-  localStorage.removeItem('stp_user');
+// ─── SECURE CLOUD LOGIN ───────────────────────────
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: email,
+    password: pass
+  });
+
+  if (error) {
+    showToast('Invalid email or password', 'warn');
+    return;
+  }
+
+  // Fetch user profile from database
+  const { data: profile } = await supabase.from('profiles').select('*').eq('id', data.user.id).single();
+  
+  // Set current user (Check if email matches admin)
+  currentUser = {
+    id: data.user.id,
+    name: profile?.name || email.split('@')[0],
+    email: profile?.email,
+    role: profile?.email === 'admin@savethepaws.app' ? 'admin' : (profile?.is_subscriber ? 'subscriber' : 'user'),
+    subscribed: profile?.is_subscriber || false
+  };
+
   updateUI();
-  renderPosts();
+  closeModal('loginModal');
+  showToast('Welcome back! 👋', 'success');
+  loadCloudPosts();
+}
+
+// ─── SECURE CLOUD REGISTRATION ────────────────────
+async function doRegister() {
+  const first = document.getElementById('regFirst').value.trim();
+  const last = document.getElementById('regLast').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const pass = document.getElementById('regPass').value;
+  
+  if (!first || !email || !pass) { showToast('Fill in all fields', 'warn'); return; }
+  if (pass.length < 8) { showToast('Password must be 8+ characters', 'warn'); return; }
+
+  const { data, error } = await supabase.auth.signUp({
+    email: email,
+    password: pass,
+    options: {
+      data: { name: first + (last ? ' ' + last : '') }
+    }
+  });
+
+  if (error) {
+    showToast(error.message, 'warn');
+    return;
+  }
+
+  showToast('Account created! Please check your email to verify.', 'success');
+  closeModal('loginModal');
+}
+
+// ─── SECURE LOGOUT ────────────────────────────────
+async function signOut() {
+  await supabase.auth.signOut();
+  currentUser = null;
+  updateUI();
+  loadCloudPosts();
   showToast('Signed out');
 }
 
@@ -1669,8 +1712,35 @@ function renderAdminData(){
         <button class="abtn danger" onclick="deletePost('${p.id}')">Delete</button>
       </td>
     </tr>`).join('');
+     loadAdminUsers();
 }
-
+   async function loadAdminUsers() {
+  const { data, error } = await supabase.from('profiles').select('*');
+  if (!error && data) {
+    document.getElementById('adminUsersBody').innerHTML = data.map(u => {
+      const role = u.email === 'admin@savethepaws.app' ? 'admin' : (u.is_subscriber ? 'subscriber' : 'user');
+      return `
+        <tr>
+          <td>${u.name || 'Unknown'}</td>
+          <td style="color:var(--text3);font-size:12px;">${u.email}</td>
+          <td><span class="badge ${role==='admin'?'yellow':u.is_subscriber?'green':'purple'}">${role}</span></td>
+          <td style="color:var(--text3);font-size:12px;">—</td>
+          <td>0</td>
+          <td>
+            ${!u.is_subscriber && role !== 'admin' ? `<button class="abtn green" onclick="grantSubSupabase('${u.id}')">Grant Sub</button>` : ''}
+          </td>
+        </tr>`;
+    }).join('');
+  }
+}
+}
+async function grantSubSupabase(uid) {
+  const { error } = await supabase.from('profiles').update({ is_subscriber: true }).eq('id', uid);
+  if (!error) {
+    showToast('Subscription granted!', 'success');
+    loadAdminUsers(); // Refresh the list
+  }
+}
 function renderPending(){
   const pend=db.posts.filter(p=>p.status==='pending');
   const list=document.getElementById('pendingList');
@@ -1681,7 +1751,7 @@ function renderPending(){
       ${p.photoData?`<img src="${p.photoData}" alt="Animal">`:`<div class="pci-placeholder">${animalEmoji(p.animalType)}</div>`}
       <div class="pending-info">
         <h4>${animalEmoji(p.animalType)} ${p.animalType} — ${p.city}, ${p.country}</h4>
-        <td>${p.description}</td>
+        <p>${p.description}</p>
         ${p.flagReason?`<div class="pi-reason">⚠ ${p.flagReason}</div>`:''}
         <div class="pending-actions">
           <button class="abtn green" onclick="approvePost('${p.id}')">✓ Approve</button>
