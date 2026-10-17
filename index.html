@@ -409,6 +409,31 @@ body{overscroll-behavior:none;}
 @media(max-width:660px){
   .music-circular { bottom: 90px; right: 20px; }
 }
+    /* ═══════════════════════════════════════════
+   CREDITS WATERMARK
+═══════════════════════════════════════════ */
+.credits-watermark {
+  position: fixed;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: var(--text3);
+  opacity: 0.35; /* Very subtle */
+  text-align: center;
+  pointer-events: none; /* Allows clicking through it */
+  z-index: 5;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+/* Push it above the bottom navigation bar on mobile */
+@media(max-width: 660px) {
+  .credits-watermark {
+    bottom: calc(var(--bottom-nav-h) + 8px); 
+    font-size: 9px;
+  }
+}
 </style>
 </head>
 <body>
@@ -2008,5 +2033,11 @@ initRating();
     })
     .subscribe();
 </script>
+
+<!-- ═══ CREDITS WATERMARK ═══ -->
+<div class="credits-watermark">
+  Sound/Art Direction by Bill Melachrinos &nbsp;•&nbsp; Planning/Development Dimitris Paraschidis &nbsp;•&nbsp; Communication/Advertising Aneta Conic
+</div>
+    
 </body>
 </html>
