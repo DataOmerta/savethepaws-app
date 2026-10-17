@@ -12,7 +12,7 @@
 <title>SaveThePaws — Rescue Urban Animals</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-/* ═══════════════════════════════════════════ THEME TOKENS ═══════════════════════════════════════════ */
+/* ═══════════════════════════════════════════ THEME TOKENS ══════════════════════════════════════════ */
 :root {
   --bg:#0f0f1a;--bg2:#16162a;--bg3:#1e1e35;--card:#1a1a2e;--card2:#22223a;
   --accent:#7c6fe0;--accent2:#a593f5;--accent-bg:rgba(124,111,224,0.12);
@@ -337,7 +337,7 @@ body{overscroll-behavior:none;}
 .music-circular.expanded .mc-info, .music-circular.expanded .mc-vol { display: block; }
 @media(max-width:660px){ .music-circular { bottom: 90px; right: 20px; } }
 
-/* ═══════════════════════════════════════════ CREDITS WATERMARK ═══════════════════════════════════════════ */
+/* ══════════════════════════════════════════ CREDITS WATERMARK ═══════════════════════════════════════════ */
 .credits-watermark {
   position: fixed; bottom: 8px; left: 50%; transform: translateX(-50%);
   font-size: 11px; color: var(--text2); opacity: 0.6; text-align: center;
@@ -356,7 +356,7 @@ body{overscroll-behavior:none;}
       <button class="lang-btn" onclick="toggleLang()" id="langBtn">EL</button>
       <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">🌙 Dark</button>
       <button class="notif-bell" onclick="openNotifPanel()" id="notifBell">🔔<span class="notif-dot" id="notifDot"></span></button>
-      <button class="login-btn" id="adminBtnTop" onclick="goToAdmin()" style="display:none;background:var(--warn-bg);border-color:var(--warn);color:var(--warn);">🛡 Admin</button>
+      <button class="login-btn" id="adminBtnTop" onclick="goToAdmin()" style="display:none;background:var(--warn-bg);border-color:var(--warn);color:var(--warn);"> Admin</button>
       <button class="login-btn" id="loginBtnTop" onclick="handleAccountBtn()">Sign in</button>
     </div>
   </div>
@@ -406,7 +406,7 @@ body{overscroll-behavior:none;}
 
       <div class="main-feed" id="mainFeed">
         <div class="sub-banner" id="subBanner">
-          <div class="sb-icon">🔐</div>
+          <div class="sb-icon"></div>
           <div class="sb-text">
             <strong data-i18n="sub_banner_title">Unlock location & contact details</strong>
             <span data-i18n="sub_banner_sub">Subscribe to claim animals and see GPS data</span>
@@ -443,7 +443,7 @@ body{overscroll-behavior:none;}
 
 <div class="rating-overlay" id="ratingOverlay">
   <div class="rating-box">
-    <div class="rating-paw">🐾</div>
+    <div class="rating-paw"></div>
     <h3>Enjoying SaveThePaws?</h3>
     <p>Your rating helps more people find stray animals that need help. It takes 5 seconds.</p>
     <div class="star-row" id="starRow">
@@ -506,7 +506,7 @@ body{overscroll-behavior:none;}
 <div class="modal-overlay" id="uploadModal">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('uploadModal')">✕</button>
-    <h2>📷 <span data-i18n="report_title">Report an Animal</span></h2>
+    <h2> <span data-i18n="report_title">Report an Animal</span></h2>
     <p class="modal-sub" data-i18n="report_sub">Photo + description only. Location is collected automatically.</p>
     <div class="photo-drop" id="photoDrop">
       <input type="file" accept="image/*" capture="environment" id="photoInput" onchange="previewPhoto(this)">
@@ -521,7 +521,7 @@ body{overscroll-behavior:none;}
     </div>
     <div class="fg"><label data-i18n="description">Description</label><textarea id="animalDesc" placeholder="Color, size, behavior..."></textarea></div>
     <div class="fg"><label>Location <span style="color:var(--text3);font-weight:400;">(auto)</span></label><div class="fg-row"><input id="animalCity" placeholder="City"><input id="animalCountry" placeholder="Country"></div><div class="geo-status" id="geoStatus">Getting GPS...</div></div>
-    <button class="btn-primary" onclick="submitPost()" id="submitPostBtn">🐾 Submit Report</button>
+    <button class="btn-primary" onclick="submitPost()" id="submitPostBtn"> Submit Report</button>
   </div>
 </div>
 
@@ -580,7 +580,7 @@ body{overscroll-behavior:none;}
 <div class="modal-overlay" id="claimModal">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('claimModal')">✕</button>
-    <h2>🏠 Claim this Animal</h2>
+    <h2> Claim this Animal</h2>
     <p class="modal-sub">Confirm you are rescuing or adopting this animal.</p>
     <div class="fg"><label>Your Note</label><textarea id="claimNote" placeholder="e.g. Taking to vet..."></textarea></div>
     <button class="btn-primary" onclick="confirmClaim()">✓ Confirm Rescue</button>
@@ -590,7 +590,7 @@ body{overscroll-behavior:none;}
 <div class="toast" id="toast"></div>
 
 <script>
-// ─── i18n ───────────────────────────────────
+// ─── i18n ──────────────────────────────────
 const LANG = {
   en: { report_btn:'Report Animal', saved_label:'Animals Saved', posted_label:'Total Reports', pending_label:'Pending Review', your_role:'Your Role', feed_tab:'Feed', map_tab:'Map', donate_tab:'Donate', activity_title:'Recent Activity', donate_title:'Support Organizations', donate_float:'Donate', report_title:'Report an Animal', report_sub:'Photo + description only. Location is collected automatically.', photo_drop:'Tap to take photo or upload', animal_type:'Type', condition:'Condition', description:'Description', adopted:'adopted / claimed', all_posts:'all community posts', awaiting:'awaiting moderation', filter_all:'All', filter_saved:'✓ Saved', sub_banner_title:'Unlock location & contact details', sub_banner_sub:'Subscribe to claim animals and see GPS data', subscribe_btn:'Subscribe' },
   el: { report_btn:'Αναφορά Ζώου', saved_label:'Ζώα Σώθηκαν', posted_label:'Συνολικές Αναφορές', pending_label:'Σε Αναμονή', your_role:'Ρόλος Σας', feed_tab:'Ροή', map_tab:'Χάρτης', donate_tab:'Δωρεά', activity_title:'Πρόσφατη Δραστηριότητα', donate_title:'Υποστήριξη Οργανισμών', donate_float:'Δωρεά', report_title:'Αναφορά Ζώου', report_sub:'Μόνο φωτογραφία + περιγραφή.', photo_drop:'Πατήστε για φωτογραφία', animal_type:'Είδος', condition:'Κατάσταση', description:'Περιγραφή', adopted:'υιοθετήθηκαν', all_posts:'όλες οι αναφορές', awaiting:'αναμένουν έγκριση', filter_all:'Όλα', filter_saved:'✓ Σώθηκαν', sub_banner_title:'Ξεκλειδώστε τοποθεσία', sub_banner_sub:'Εγγραφείτε για πλήρη πρόσβαση', subscribe_btn:'Εγγραφή' }
@@ -609,9 +609,12 @@ let db = initDB();
 function saveDB(d){ try{ if(currentUser && currentUser.subscribed) localStorage.setItem(DB_KEY, JSON.stringify(d)); else sessionStorage.setItem(DB_KEY+'_s', JSON.stringify(d)); }catch(e){} }
 
 // ─── STATE ──────────────────────────────────
-const SUPABASE_URL = 'https://zqnwjdaxffsoglmhkqxc.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_wjWekEPeo6QXJD6s-7R06Q_SLgvfKqF';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let supabase;
+try {
+  const SUPABASE_URL = 'https://zqnwjdaxffsoglmhkqxc.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_wjWekEPeo6QXJD6s-7R06Q_SLgvfKqF';
+  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+} catch (e) { console.error("Supabase failed to load:", e); }
 
 let currentLocationMode = 'all';
 let userCountry = null;
@@ -626,7 +629,7 @@ let themeMode = 'dark';
 
 const ANIMAL_KEYWORDS = ['cat','dog','bird','rabbit','animal','stray','injured','lost','paw','fur','kitten','puppy','rescue','adopt','pet','meow','bark','collar','vet','ζώο','γάτα','σκύλος'];
 
-const BADGES = { scout: { name: 'Scout', icon: '🔍' }, guardian: { name: 'Guardian', icon: '🛡' }, hero: { name: 'Hero', icon: '⭐' }, legend: { name: 'Legend', icon: '👑' } };
+const BADGES = { scout: { name: 'Scout', icon: '' }, guardian: { name: 'Guardian', icon: '🛡' }, hero: { name: 'Hero', icon: '⭐' }, legend: { name: 'Legend', icon: '' } };
 
 function getUserStats() {
   if (!currentUser) return {posts:0, injured:0, adoptions:0, referrals:0};
@@ -675,21 +678,30 @@ function updateSidebarBadges() {
   if (el) el.textContent = earned.length > 0 ? '🏆 ' + earned.map(b => BADGES[b].icon + ' ' + BADGES[b].name).join(', ') : 'No badges yet';
 }
 
-// ─── BOOT ───────────────────────────────────
+// ── BOOT ───────────────────────────────────
 window.onload = async function(){
+  // FORCE CLEAR SERVICE WORKER CACHE
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(function(registrations) {
+      for(let registration of registrations) { registration.unregister(); }
+    });
+  }
+
   document.getElementById('searchInput').value = '';
-  const { data: { session } } = await supabase.auth.getSession();
-  if (session) {
-    const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
-    currentUser = {
-      id: session.user.id, name: profile?.name || session.user.email.split('@')[0], email: session.user.email,
-      role: session.user.email === 'admin@savethepaws.app' ? 'admin' : (profile?.is_subscriber ? 'subscriber' : 'user'),
-      subscribed: profile?.is_subscriber || false
-    };
+  if (supabase) {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
+      currentUser = {
+        id: session.user.id, name: profile?.name || session.user.email.split('@')[0], email: session.user.email,
+        role: session.user.email === 'admin@savethepaws.app' ? 'admin' : (profile?.is_subscriber ? 'subscriber' : 'user'),
+        subscribed: profile?.is_subscriber || false
+      };
+    }
   }
   updateUI(); renderPosts(); renderActivity(); renderSidebarDonations(); renderStats(); startGeo(); checkPendingNotif();
-  if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
   applyLang();
+  console.log("SaveThePaws System Initialized Successfully");
 };
 
 function checkPendingNotif(){
@@ -704,7 +716,7 @@ function checkPendingNotif(){
 function toggleTheme(){
   themeMode = themeMode === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', themeMode);
-  document.getElementById('themeBtn').textContent = themeMode === 'dark' ? '🌙 Dark' : '☀️ Light';
+  document.getElementById('themeBtn').textContent = themeMode === 'dark' ? '🌙 Dark' : '️ Light';
   document.getElementById('metaTheme').content = themeMode === 'dark' ? '#1a1a2e' : '#f5f5fa';
 }
 
@@ -793,7 +805,7 @@ function renderPostCard(post, isSub){
     ? `<span class="info-chip">📍 ${post.lat}, ${post.lon}</span><span class="info-chip">🏙 ${post.city}, ${post.country}</span>`
     : `<span class="info-chip blurred-chip" onclick="openSubModal()">📍 Hidden</span><span class="info-chip blurred-chip" onclick="openSubModal()">🏙 Hidden</span><span class="lock-pill" onclick="openSubModal()">🔒 Subscribe</span>`;
 
-  const claimBtn = post.saved ? `<button class="btn-claim claimed" disabled>✓ Adopted</button>` : isSub ? `<button class="btn-claim" onclick="openClaim('${post.id}')">🏠 Claim</button>` : `<button class="btn-claim" style="background:var(--bg3);color:var(--text3);" onclick="openSubModal()">🔒 Claim</button>`;
+  const claimBtn = post.saved ? `<button class="btn-claim claimed" disabled>✓ Adopted</button>` : isSub ? `<button class="btn-claim" onclick="openClaim('${post.id}')">🏠 Claim</button>` : `<button class="btn-claim" style="background:var(--bg3);color:var(--text3);" onclick="openSubModal()"> Claim</button>`;
   const editBtn = isOwner ? `<button class="btn-edit" onclick="openEdit('${post.id}')">✏️</button>` : '';
   const flagBtn = `<button class="btn-flag" onclick="flagPost('${post.id}')">⚑</button>`;
   const shareBtn = `<button class="btn-edit" onclick="sharePost('${post.id}')">📤</button>`;
@@ -957,7 +969,7 @@ function doSubscribe(plan){
   }
 }
 
-// ─── SCALABILITY TRIO ───
+// ─── SCALABILITY TRIO ──
 function compressImage(file, maxWidth = 1080, quality = 0.7) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -1001,6 +1013,7 @@ window.addEventListener('online', processOfflineQueue);
 
 let currentPage = 0, pageSize = 20, isLoadingPosts = false, hasMorePosts = true;
 async function loadCloudPosts(isAppend = false) {
+  if (!supabase) return;
   if (isLoadingPosts || !hasMorePosts) return;
   isLoadingPosts = true;
   const { data, error } = await supabase.from('posts').select('*').eq('status', 'live').order('timestamp', { ascending: false }).range(currentPage * pageSize, (currentPage * pageSize) + pageSize - 1);
@@ -1015,6 +1028,7 @@ window.addEventListener('scroll', () => { if (window.innerHeight + window.scroll
 
 // ─── AUTH ───────────────────────────────────
 async function doLogin() {
+  if (!supabase) return;
   const { data, error } = await supabase.auth.signInWithPassword({ email: document.getElementById('loginEmail').value.trim(), password: document.getElementById('loginPass').value });
   if (error) { showToast('Invalid email or password', 'warn'); return; }
   const { data: profile } = await supabase.from('profiles').select('*').eq('id', data.user.id).single();
@@ -1023,6 +1037,7 @@ async function doLogin() {
 }
 
 async function doRegister() {
+  if (!supabase) return;
   const first = document.getElementById('regFirst').value.trim(), last = document.getElementById('regLast').value.trim(), email = document.getElementById('regEmail').value.trim(), pass = document.getElementById('regPass').value;
   if (!first || !email || !pass) { showToast('Fill all fields', 'warn'); return; }
   if (pass.length < 8) { showToast('Password must be 8+ chars', 'warn'); return; }
@@ -1032,7 +1047,7 @@ async function doRegister() {
 }
 
 async function signOut() {
-  await supabase.auth.signOut();
+  if (supabase) await supabase.auth.signOut();
   currentUser = null;
   updateUI(); loadCloudPosts(); showToast('Signed out');
 }
@@ -1122,6 +1137,7 @@ function renderAdminData(){
 }
 
 async function loadAdminUsers() {
+  if (!supabase) return;
   const { data, error } = await supabase.from('profiles').select('*');
   if (!error && data) {
     document.getElementById('adminUsersBody').innerHTML = data.map(u => {
@@ -1131,6 +1147,7 @@ async function loadAdminUsers() {
   }
 }
 async function grantSubSupabase(uid) {
+  if (!supabase) return;
   const { error } = await supabase.from('profiles').update({ is_subscriber: true }).eq('id', uid);
   if (!error) { showToast('Subscription granted!', 'success'); loadAdminUsers(); }
 }
@@ -1143,10 +1160,12 @@ function renderPending(){
 }
 
 async function approvePost(id){
+  if (!supabase) return;
   const { error } = await supabase.from('posts').update({ status: 'live', flagReason: '' }).eq('id', id);
   if(!error) { showToast('Post approved','success'); loadCloudPosts(); renderPending(); } else { showToast('Failed to approve','danger'); }
 }
 async function deletePost(id){
+  if (!supabase) return;
   if(!confirm('Delete permanently?')) return;
   const { error } = await supabase.from('posts').delete().eq('id', id);
   if(!error) { showToast('Post deleted','success'); loadCloudPosts(); renderPending(); }
@@ -1248,7 +1267,6 @@ function startDrag(e) {
 }
 function onDrag(e) {
   if (!isDragging) return;
-  e.preventDefault();
   const clientX = e.touches ? e.touches[0].clientX : e.clientX;
   const clientY = e.touches ? e.touches[0].clientY : e.clientY;
   mcCircular.style.left = `${initialX + (clientX - startX)}px`;
@@ -1264,13 +1282,13 @@ function endDrag(e) {
   if (Math.abs(clientX - startX) < 10 && Math.abs(clientY - startY) < 10) mcCircular.classList.toggle('expanded');
 }
 mcCircular.addEventListener('mousedown', startDrag);
-mcCircular.addEventListener('touchstart', startDrag, {passive: false});
+mcCircular.addEventListener('touchstart', startDrag, {passive: true});
 document.addEventListener('mousemove', onDrag);
-document.addEventListener('touchmove', onDrag, {passive: false});
+document.addEventListener('touchmove', onDrag, {passive: true});
 document.addEventListener('mouseup', endDrag);
 document.addEventListener('touchend', endDrag);
 
-// ─── RATING POPUP ───────────────────────────
+// ── RATING POPUP ───────────────────────────
 const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.savethepaws.app&reviewId=0';
 let selectedStars = 0;
 const RATING_KEY = 'stp_rating_state';
@@ -1406,19 +1424,21 @@ function playProximityAlert() {
   }
 }
 
-supabase.channel('public:posts')
-  .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, (payload) => {
-    const newPost = payload.new;
-    if (window._geoLat && window._geoLon && newPost.status === 'live') {
-      const dist = getDistance(parseFloat(window._geoLat), parseFloat(window._geoLon), parseFloat(newPost.lat), parseFloat(newPost.lon));
-      if (dist >= 5 && dist <= 50) {
-        playProximityAlert();
-        showToast(`New animal reported ${Math.round(dist)}km away!`, 'success');
+if (supabase) {
+  supabase.channel('public:posts')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, (payload) => {
+      const newPost = payload.new;
+      if (window._geoLat && window._geoLon && newPost.status === 'live') {
+        const dist = getDistance(parseFloat(window._geoLat), parseFloat(window._geoLon), parseFloat(newPost.lat), parseFloat(newPost.lon));
+        if (dist >= 5 && dist <= 50) {
+          playProximityAlert();
+          showToast(`New animal reported ${Math.round(dist)}km away!`, 'success');
+        }
       }
-    }
-    loadCloudPosts();
-  })
-  .subscribe();
+      loadCloudPosts();
+    })
+    .subscribe();
+}
 </script>
 
 <div class="credits-watermark">
