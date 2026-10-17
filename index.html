@@ -394,21 +394,16 @@ body{overscroll-behavior:none;}
     /* ═══════════════════════════════════════════
    DRAGGABLE CIRCULAR MUSIC PLAYER
 ═══════════════════════════════════════════ */
-.music-circular {
-  position: fixed; bottom: 100px; right: 30px; width: 60px; height: 60px;
-  background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center;
-  cursor: grab; z-index: 9999; box-shadow: 0 4px 20px rgba(124,111,224,0.5); transition: width 0.3s, height 0.3s, border-radius 0.3s;
-}
-.music-circular:active { cursor: grabbing; }
-.music-circular.expanded { width: 220px; height: 70px; border-radius: 35px; justify-content: space-between; padding: 0 15px; }
-.mc-btn { background: none; border: none; color: #fff; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; transition: background 0.2s; }
-.mc-btn:hover { background: rgba(255,255,255,0.2); }
-.mc-info { flex: 1; color: #fff; font-size: 12px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: none; }
-.mc-vol { width: 60px; accent-color: #fff; display: none; }
-.music-circular.expanded .mc-info, .music-circular.expanded .mc-vol { display: block; }
+   .music-circular { position: fixed; bottom: 100px; right: 30px; width: 60px; height: 60px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: grab; z-index: 9999; box-shadow: 0 4px 20px rgba(124,111,224,0.5); transition: width 0.3s, height 0.3s, border-radius 0.3s; }
+   .music-circular:active { cursor: grabbing; }
+   .music-circular.expanded { width: 240px; height: 70px; border-radius: 35px; justify-content: space-between; padding: 0 15px; }
+   .mc-btn { background: none; border: none; color: #fff; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; }
+   .mc-btn:hover { background: rgba(255,255,255,0.2); }
+   .mc-info { flex: 1; color: #fff; font-size: 12px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: none; }
+   .mc-vol { width: 60px; accent-color: #fff; display: none; }
+   .music-circular.expanded .mc-info, .music-circular.expanded .mc-vol { display: block; }
+   @media(max-width:660px){ .music-circular { bottom: 90px; right: 20px; } }
 
-@media(max-width:660px){
-  .music-circular { bottom: 90px; right: 20px; }
 }
     /* ═══════════════════════════════════════════
    CREDITS WATERMARK
@@ -879,6 +874,13 @@ body{overscroll-behavior:none;}
         </ul>
         <button class="plan-btn">Choose 3-Month</button>
       </div>
+
+           <div class="plan-card" onclick="doSubscribe('quarterly')" style="border-color: var(--orange);">
+     <div class="plan-badge" style="background:var(--orange);">WEEKEND WARRIOR</div>
+     <div class="plan-name">Weekend Rescue</div><div class="plan-price">€4.99</div><div class="plan-period">48-hour access (Fri-Sun)</div>
+     <ul class="plan-perks"><li>Full live map access</li><li>Near Me & Country modes</li><li>Claim animals</li></ul>
+     <button class="plan-btn" style="background:var(--orange);">Activate Weekend</button>
+   </div>
       <div class="plan-card featured" onclick="doSubscribe('annual')">
         <div class="plan-badge" style="background:var(--success);">BEST VALUE</div>
         <div class="plan-name">Annual</div>
@@ -1165,34 +1167,36 @@ function toggleTheme(){
 }
 
 // ─── GEO ────────────────────────────────────
-function startGeo(){
-  const gs = document.getElementById('geoStatus');
-  if(!navigator.geolocation){gs.textContent='GPS not supported — enter manually';gs.className='geo-status err';return;}
-  navigator.geolocation.getCurrentPosition(pos=>{
-    document.getElementById('animalCity').placeholder = 'Detected...';
-    const gs2 = document.getElementById('geoStatus');
-    gs2.textContent = '✓ GPS: '+pos.coords.latitude.toFixed(4)+', '+pos.coords.longitude.toFixed(4);
-    gs2.className = 'geo-status ok';
-    window._geoLat = pos.coords.latitude.toFixed(6);
-    window._geoLon = pos.coords.longitude.toFixed(6);
-    
-    // Reverse geocoding to get country/continent (using a free, no-key API)
-    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${window._geoLat}&lon=${window._geoLon}`)
-      .then(res => res.json())
-      .then(data => {
-        userCountry = data.address.country || 'Unknown';
-        // Simple continent mapping based on country (can be expanded)
-        const country = userCountry.toLowerCase();
-        if(['greece','italy','spain','france','germany','uk'].some(c => country.includes(c))) userContinent = 'Europe';
-        else if(['usa','canada','mexico'].some(c => country.includes(c))) userContinent = 'North America';
-        else userContinent = 'Global';
-      });
-  }, ()=>{
-    const gs2 = document.getElementById('geoStatus');
-    gs2.textContent = '⚠ GPS unavailable — enter city manually';
-    gs2.className = 'geo-status err';
-  });
-}
+   function startGeo(){
+     const gs = document.getElementById('geoStatus');
+     if(!navigator.geolocation){gs.textContent='GPS not supported — enter manually';gs.className='geo-status err';return;}
+     navigator.geolocation.getCurrentPosition(pos=>{
+       document.getElementById('animalCity').placeholder = 'Detecting...';
+       const gs2 = document.getElementById('geoStatus');
+       gs2.textContent = '✓ GPS: '+pos.coords.latitude.toFixed(4)+', '+pos.coords.longitude.toFixed(4);
+       gs2.className = 'geo-status ok';
+       window._geoLat = pos.coords.latitude.toFixed(6);
+       window._geoLon = pos.coords.longitude.toFixed(6);
+       
+       fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${window._geoLat}&lon=${window._geoLon}`)
+         .then(res => res.json())
+         .then(data => {
+           const city = data.address.city || data.address.town || data.address.village || data.address.county || 'Unknown';
+           const country = data.address.country || 'Unknown';
+           document.getElementById('animalCity').value = city;
+           document.getElementById('animalCountry').value = country;
+           userCountry = country;
+           const c = country.toLowerCase();
+           if(['greece','italy','spain','france','germany','uk','united kingdom'].some(x => c.includes(x))) userContinent = 'Europe';
+           else if(['usa','canada','mexico','united states'].some(x => c.includes(x))) userContinent = 'North America';
+           else userContinent = 'Global';
+         }).catch(()=>{});
+     }, ()=>{
+       const gs2 = document.getElementById('geoStatus');
+       gs2.textContent = '⚠ GPS unavailable — enter city manually';
+       gs2.className = 'geo-status err';
+     });
+   }
 
 // ─── STATS ──────────────────────────────────
 function renderStats(){
