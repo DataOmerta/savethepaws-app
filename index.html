@@ -361,63 +361,7 @@ body{overscroll-behavior:none;}
   .admin-content{padding:12px;}
 }
 @media(max-width:380px){.plans-grid{grid-template-columns:1fr;}}
-// ─── DRAGGABLE CIRCULAR MUSIC PLAYER ───────────────────────────
-const tracks = ['Free Soul.mp3', 'Purify.mp3', 'Fairytale.mp3']; // Your exact filenames
-let currentTrackIndex = 0;
-let isPlaying = false;
-const audio = document.getElementById('bgAudio');
-const mcCircular = document.getElementById('musicCircular');
-const mcPlayBtn = document.getElementById('mcPlayBtn');
-const mcInfo = document.getElementById('mcInfo');
-const mcVol = document.getElementById('mcVol');
 
-function loadRandomTrack() {
-  currentTrackIndex = Math.floor(Math.random() * tracks.length);
-  audio.src = tracks[currentTrackIndex];
-  // Clean up the filename for display (removes .mp3)
-  mcInfo.textContent = tracks[currentTrackIndex].replace('.mp3', '');
-}
-
-mcPlayBtn.addEventListener('click', () => {
-  if (!audio.src) loadRandomTrack();
-  if (isPlaying) {
-    audio.pause(); isPlaying = false; mcPlayBtn.textContent = '▶';
-  } else {
-    audio.play().catch(()=>{}); isPlaying = true; mcPlayBtn.textContent = '⏸';
-  }
-});
-
-// Auto-shuffle when a track ends
-audio.addEventListener('ended', () => { 
-  loadRandomTrack(); 
-  if(isPlaying) audio.play(); 
-});
-
-mcVol.addEventListener('input', (e) => { audio.volume = e.target.value; });
-
-// Draggable Logic
-let isDragging = false, startX, startY, initialX, initialY;
-mcCircular.addEventListener('mousedown', (e) => {
-  isDragging = true; startX = e.clientX; startY = e.clientY;
-  const rect = mcCircular.getBoundingClientRect();
-  initialX = rect.left; initialY = rect.top;
-  mcCircular.style.transition = 'none';
-});
-document.addEventListener('mousemove', (e) => {
-  if (!isDragging) return;
-  mcCircular.style.left = `${initialX + (e.clientX - startX)}px`;
-  mcCircular.style.top = `${initialY + (e.clientY - startY)}px`;
-  mcCircular.style.right = 'auto'; mcCircular.style.bottom = 'auto';
-});
-document.addEventListener('mouseup', (e) => {
-  if (!isDragging) return; 
-  isDragging = false; 
-  mcCircular.style.transition = 'width 0.3s, height 0.3s, border-radius 0.3s';
-  // Expand on click if not dragged far
-  if (Math.abs(e.clientX - startX) < 5 && Math.abs(e.clientY - startY) < 5) {
-    mcCircular.classList.toggle('expanded');
-  }
-});
 /* ═══════════════════════════════════════════
    LOGOUT BUTTON
 ═══════════════════════════════════════════ */
