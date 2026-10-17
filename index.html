@@ -209,11 +209,7 @@ body{overscroll-behavior:none;}
 .bnav-fab{width:50px;height:50px;background:var(--accent);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 16px rgba(124,111,224,.5);transform:translateY(-8px);}
 .bnav-fab svg{width:22px;height:22px;color:#fff;}
 
-/* ═══════════════════════════════════════════
-   FLOATING DONATION BUTTON
-═══════════════════════════════════════════ */
-.float-donate{position:fixed;bottom:80px;right:16px;z-index:300;background:linear-gradient(135deg,#f59e0b,#ef4444);border:none;color:#fff;border-radius:50px;padding:11px 16px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(239,68,68,.4);display:flex;align-items:center;gap:6px;animation:pulse 2.5s infinite;}
-@keyframes pulse{0%,100%{box-shadow:0 4px 20px rgba(239,68,68,.4)}50%{box-shadow:0 4px 28px rgba(239,68,68,.65)}}
+
 
 /* ═══════════════════════════════════════════
    MODALS
@@ -356,7 +352,7 @@ body{overscroll-behavior:none;}
   .bottom-nav{display:block;}
   .main-feed{padding:10px;padding-bottom:calc(var(--bottom-nav-h) + 20px);}
   .feed-controls{padding:10px 10px 0;}
-  .float-donate{bottom:calc(var(--bottom-nav-h) + 12px);}
+
   .admin-nav{display:none;}
   .admin-content{padding:12px;}
 }
@@ -410,22 +406,22 @@ body{overscroll-behavior:none;}
    CREDITS WATERMARK
 ═══════════════════════════════════════════ */
 .credits-watermark {
-  position: fixed;
-  bottom: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 11px;
-  color: var(--text2);
-  opacity: 0.6;
-  text-align: center;
-  pointer-events: none;
-  z-index: 9998;
-  line-height: 1.4;
-  white-space: nowrap;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+position: fixed;
+bottom: 8px;
+left: 50%;
+transform: translateX(-50%);
+font-size: 11px;
+color: var(--text2);
+opacity: 0.6;
+text-align: center;
+pointer-events: none;
+z-index: 9998;
+line-height: 1.4;
+white-space: nowrap;
+text-shadow: 0 1px 3px rgba(0,0,0,0.8);
 }
 @media(max-width: 660px) {
-  .credits-watermark { bottom: calc(var(--bottom-nav-h) + 8px); font-size: 9px; }
+.credits-watermark { bottom: calc(var(--bottom-nav-h) + 8px); font-size: 9px; }
 }
 </style>
 </head>
@@ -497,7 +493,7 @@ body{overscroll-behavior:none;}
       <div class="feed-controls" id="feedControls">
         <div class="search-wrap">
           <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <input placeholder="Search animals, cities..." id="searchInput" oninput="renderPosts()" autocomplete="off">
+         <input placeholder="Search animals, cities..." id="searchInput" oninput="renderPosts()" autocomplete="off">
         </div>
         <div class="filter-row"> 
           <div class="fchip active" onclick="setFilter('all',this)" data-i18n="filter_all">All</div> 
@@ -554,10 +550,10 @@ body{overscroll-behavior:none;}
 <!-- ═══ NEW DRAGGABLE CIRCULAR MUSIC PLAYER ═══ -->
 <audio id="bgAudio" loop></audio>
 <div class="music-circular" id="musicCircular">
-  <button class="mc-btn" id="mcShuffleBtn" title="Shuffle">🔀</button>
-  <div class="mc-info" id="mcInfo">Loading...</div>
-  <button class="mc-btn" id="mcPlayBtn" title="Play / Pause">▶</button>
-  <input class="mc-vol" id="mcVol" type="range" min="0" max="1" step="0.05" value="0.4" title="Volume">
+<button class="mc-btn" id="mcShuffleBtn" title="Shuffle"></button>
+<div class="mc-info" id="mcInfo">Loading...</div>
+<button class="mc-btn" id="mcPlayBtn" title="Play / Pause">▶</button>
+<input class="mc-vol" id="mcVol" type="range" min="0" max="1" step="0.05" value="0.4" title="Volume">
 </div>
 
 <!-- RATING POPUP -->
@@ -581,10 +577,6 @@ body{overscroll-behavior:none;}
   </div>
 </div>
 
-<!-- FLOATING DONATE -->
-<button class="float-donate" onclick="openDonateModal()">
-  ❤️ <span data-i18n="donate_float">Donate</span>
-</button>
 
 <!-- ═══════════════ ADMIN SCREEN ═══════════════ -->
 <div id="adminScreen" class="admin-screen">
