@@ -1721,7 +1721,12 @@ function hideAdminBtn(){
   const sb = document.getElementById('sideAdminBtn');
   if(sb) sb.style.display = 'none';
 }
-
+function updateLogoutBtn(){
+  const btn = document.getElementById('sideLogoutBtn');
+  if(!btn) return;
+  if(currentUser) btn.classList.add('visible');
+  else btn.classList.remove('visible');
+}
 function updateUI(){
   const isSub = currentUser && currentUser.subscribed;
   const isAdmin = currentUser && currentUser.role==='admin';
@@ -2170,6 +2175,12 @@ function neverRate(){
   localStorage.setItem(RATING_KEY, 'never');
   window.removeEventListener('beforeunload', handlePageLeave);
   document.getElementById('ratingOverlay').classList.remove('open');
+}
+function updateLogoutBtn(){
+  const btn = document.getElementById('sideLogoutBtn');
+  if(!btn) return;
+  if(currentUser) btn.classList.add('visible');
+  else btn.classList.remove('visible');
 }
 
 const _origUpdateUI = updateUI;
