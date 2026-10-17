@@ -1489,21 +1489,26 @@ function doRegister(){
 }
 
 function doSubscribe(plan){
-  if(!currentUser){closeModal('subModal');openLoginModal();return;}
-  const exp=new Date();
-  if(plan==='weekly') exp.setDate(exp.getDate()+7);
-  else if(plan==='monthly') exp.setMonth(exp.getMonth()+1);
-  else if(plan==='quarterly') exp.setMonth(exp.getMonth()+3);
-  else exp.setFullYear(exp.getFullYear()+1);
-  currentUser.subscribed=true; currentUser.role='subscriber'; currentUser.subExpires=exp.toISOString().split('T')[0];
-  const u=db.users.find(x=>x.id===currentUser.id);
-  if(u){u.subscribed=true;u.role='subscriber';u.subExpires=currentUser.subExpires;}
-  localStorage.setItem('stp_user',JSON.stringify({id:currentUser.id}));
-  saveDB(db);
-  closeModal('subModal');
-  updateUI();
-  renderPosts();
-  showToast('Subscribed! Location data unlocked. 🔓','success');
+  if(!currentUser){ 
+    closeModal('subModal'); 
+    openLoginModal(); 
+    return; 
+  }
+  
+  // ⚠️ REPLACE THESE WITH YOUR ACTUAL STRIPE PAYMENT LINKS
+  const links = {
+    weekly: 'https://buy.stripe.com/fZucN4dlvfDI9D3d1t7g400',
+    monthly: 'https://buy.stripe.com/dRm6oG6X7bnsdTj4uX7g401',
+    quarterly: 'https://buy.stripe.com/aFa00i5T33V0g1rf9B7g404',
+    annual: 'https://buy.stripe.com/00w9ASdlv8bgaH74uX7g403'
+  };
+  
+  if(links[plan]) {
+    // Open Stripe securely in a new tab
+    window.open(links[plan], '_blank');
+    closeModal('subModal');
+    showToast('Redirecting to secure payment...', 'success');
+  }
 }
 
 function signOut(){
