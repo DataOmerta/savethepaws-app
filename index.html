@@ -493,7 +493,7 @@ text-shadow: 0 1px 3px rgba(0,0,0,0.8);
       <div class="feed-controls" id="feedControls">
         <div class="search-wrap">
           <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-         <input placeholder="Search animals, cities..." id="searchInput" oninput="renderPosts()" autocomplete="off">
+           <input placeholder="Search animals, cities..." id="searchInput" oninput="renderPosts()" autocomplete="off">
         </div>
         <div class="filter-row"> 
           <div class="fchip active" onclick="setFilter('all',this)" data-i18n="filter_all">All</div> 
@@ -1121,6 +1121,7 @@ window.onload = async function(){
   checkPendingNotif();
   if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
   applyLang();
+   checkWeekendWarrior();
 };
 
 function checkPendingNotif(){
@@ -1167,7 +1168,22 @@ function startGeo(){
     gs2.className = 'geo-status err';
   });
 }
-
+function checkWeekendWarrior() {
+  const today = new Date();
+  const day = today.getDay(); // 5 is Friday
+  const hour = today.getHours();
+  // Trigger on Friday after 2 PM, or Saturday/Sunday
+  if ((day === 5 && hour >= 14) || day === 6 || day === 0) {
+    const lastShown = localStorage.getItem('stp_weekend_warrior_shown');
+    const todayStr = today.toDateString();
+    if (lastShown !== todayStr) {
+      setTimeout(() => {
+        showToast('🗺️ Weekend Warrior: Unlock the live map for 48 hours!', 'success');
+        localStorage.setItem('stp_weekend_warrior_shown', todayStr);
+      }, 3000);
+    }
+  }
+}
 function renderStats(){
   const live = db.posts.filter(p=>p.status==='live');
   document.getElementById('statSaved').textContent = live.filter(p=>p.saved).length;
@@ -1255,12 +1271,14 @@ function renderPostCard(post, isSub, isReg){
   const savedWM = post.saved ? `<div class="saved-wm"><div class="wm">✓ Saved</div></div>` : '';
 
   const uploaderName = isSub ? post.uploader : `<span class="blurred-text" onclick="openSubModal()" title="Subscribe to see">${post.uploader}</span>`;
-  const urgencyText = !isSub ? `
-    <div style="color:var(--danger);font-size:12px;font-weight:700;margin-top:8px;animation:pulse 2s infinite;">
-      This ${post.animalType} has been waiting for ${fmtTime(post.timestamp).replace('ago', '')}. 
-      I could be there in minutes if I could just see the map.
-    </div>
-  ` : '';
+
+    const waitTime = fmtTime(post.timestamp).replace('ago', '');
+const urgencyText = !isSub ? `
+  <div style="color:var(--danger);font-size:12px;font-weight:700;margin-top:8px;animation:pulse 2s infinite; line-height:1.4;">
+    This ${post.animalType} has been waiting for ${waitTime}. 
+    I could be there in 5 minutes if I could just see the map.
+  </div>
+` : '';
   
   const coords = isSub
     ? `<span class="info-chip"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="10" r="3"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>${post.lat}, ${post.lon}</span>
@@ -1342,6 +1360,17 @@ function setMobileTab(tab){ switchTab(tab); }
 
 function setFilter(f, el){
   currentFilter = f;
+   if (f === 'injured') {
+  const trialSeen = localStorage.getItem('stp_urgent_trial_seen');
+  if (!trialSeen && !currentUser?.subscribed) {
+    setTimeout(() => {
+      if(confirm('This animal needs help NOW. Unlock the exact GPS location and uploader contact for 48 hours FREE?')) {
+        openSubModal();
+      }
+    }, 500);
+    localStorage.setItem('stp_urgent_trial_seen', 'true');
+  }
+}
   currentLocationMode = 'all';
   document.querySelectorAll('.fchip').forEach(c=>c.classList.remove('active'));
   el.classList.add('active');
