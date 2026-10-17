@@ -1967,5 +1967,123 @@ renderPosts();renderActivity();renderSidebarDonations();renderStats();updateUI()
 updateLogoutBtn();
 initRating();
 </script>
+   <!-- ═══════════════════════════════════════════
+     CLOUD BRIDGE: SUPABASE + SIGHTENGINE
+═══════════════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // 1. Initialize Supabase (REPLACE THE 2 LINES BELOW WITH YOUR KEYS)
+  const SUPABASE_URL = 'https://zqnwjdaxffsoglmhkqxc.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_wjWekEPeo6QXJD6s-7RO6Q_SLgvfKqF';
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // 2. OVERRIDE: The new, secure submitPost function
+  window.submitPost = async function() {
+    if(!currentUser){ showToast('Sign in to post','warn'); return; }
+    const desc = document.getElementById('animalDesc').value.trim();
+    const city = document.getElementById('animalCity').value.trim();
+    const country = document.getElementById('animalCountry').value.trim();
+    const type = document.getElementById('animalType').value;
+    const condition = document.getElementById('animalCondition').value;
+    const photoSrc = document.getElementById('photoPreview').src;
+    const hasPhoto = document.getElementById('photoPreview').style.display !== 'none' && photoSrc && photoSrc.startsWith('data:');
+
+    if(!city || !country){ showToast('Please enter city and country','warn'); return; }
+
+    const btn = document.getElementById('submitPostBtn');
+    btn.disabled = true; btn.textContent = '🔒 Scanning photo...';
+
+    // STEP 1: Sightengine AI Moderation Check
+    let isSafe = true;
+    if(hasPhoto) {
+      try {
+        const formData = new FormData();
+        formData.append('media', photoSrc);
+        formData.append('models', 'nudity-2.1,weapon,gore');
+        formData.append('api_user', '1622452775'); // REPLACE
+        formData.append('api_secret', '5DGESTpwGTFUntMYVjDbG6mo3mV9FqwH'); // REPLACE
+
+        const response = await fetch('https://api.sightengine.com/1.0/check.json', { method: 'POST', body: formData });
+        const data = await response.json();
+
+        if((data.nudity && data.nudity.raw > 0.6) || (data.weapon && data.weapon > 0.6) || (data.gore && data.gore > 0.6)) {
+          isSafe = false;
+        }
+      } catch(e) {
+        console.error("Moderation API error:", e);
+        isSafe = false; // Fail safe: if API is down, hold for manual review
+      }
+    }
+
+    if(!isSafe) {
+      btn.disabled = false; btn.textContent = '🐾 Submit Report';
+      showToast('⚠️ Upload blocked: Image does not meet safety guidelines.', 'danger');
+      return;
+    }
+
+    // STEP 2: Save to Supabase Cloud
+    btn.textContent = 'Uploading to Cloud...';
+    const newPost = {
+      uploader: currentUser.name,
+      animalType: type,
+      condition: condition,
+      desc: desc || 'No description provided.',
+      city: city,
+      country: country,
+      lat: window._geoLat || (40 + Math.random()*2).toFixed(4),
+      lon: window._geoLon || (22 + Math.random()*2).toFixed(4),
+      timestamp: Date.now(),
+      saved: false,
+      status: 'pending', // HELD FOR YOUR ADMIN REVIEW
+      photoData: hasPhoto ? photoSrc : null
+    };
+
+    const { error } = await supabase.from('posts').insert([newPost]);
+    btn.disabled = false; btn.textContent = '🐾 Submit Report';
+
+    if(error) {
+      showToast('Upload failed. Check internet.','danger');
+      console.error(error);
+    } else {
+      showToast('Report submitted! Pending admin review 🔍','success');
+      closeModal('uploadModal');
+      // Reset form
+      document.getElementById('animalDesc').value='';
+      document.getElementById('animalCity').value='';
+      document.getElementById('animalCountry').value='';
+      document.getElementById('photoPreview').style.display='none';
+      document.querySelector('#photoDrop .pd-icon').textContent='📷';
+      document.querySelector('#photoDrop p').textContent=LANG[currentLang].photo_drop;
+      
+      // Refresh feed from cloud
+      loadCloudPosts();
+    }
+  };
+
+  // 3. REAL-TIME FEED: Fetch posts from Supabase instead of localStorage
+  async function loadCloudPosts() {
+    const { data, error } = await supabase
+      .from('posts')
+      .select('*')
+      .order('timestamp', { ascending: false });
+    
+    if (!error && data) {
+      // Merge cloud posts into your existing db.posts array so your UI keeps working perfectly
+      db.posts = data; 
+      renderPosts();
+      renderStats();
+    }
+  }
+
+  // Load cloud posts on startup
+  loadCloudPosts();
+
+  // 4. REAL-TIME LISTENER: If someone else posts, the feed updates instantly
+  supabase.channel('public:posts')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, () => {
+      loadCloudPosts();
+    })
+    .subscribe();
+</script>
 </body>
 </html>
