@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
+    
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -10,7 +11,7 @@
 <link rel="manifest" href="./manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>SaveThePaws — Rescue Urban Animals</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 /* ═══════════════════════════════════════════
    THEME TOKENS
@@ -209,7 +210,11 @@ body{overscroll-behavior:none;}
 .bnav-fab{width:50px;height:50px;background:var(--accent);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 16px rgba(124,111,224,.5);transform:translateY(-8px);}
 .bnav-fab svg{width:22px;height:22px;color:#fff;}
 
-
+/* ═══════════════════════════════════════════
+   FLOATING DONATION BUTTON
+═══════════════════════════════════════════ */
+.float-donate{position:fixed;bottom:80px;right:16px;z-index:300;background:linear-gradient(135deg,#f59e0b,#ef4444);border:none;color:#fff;border-radius:50px;padding:11px 16px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(239,68,68,.4);display:flex;align-items:center;gap:6px;animation:pulse 2.5s infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 4px 20px rgba(239,68,68,.4)}50%{box-shadow:0 4px 28px rgba(239,68,68,.65)}}
 
 /* ═══════════════════════════════════════════
    MODALS
@@ -352,7 +357,7 @@ body{overscroll-behavior:none;}
   .bottom-nav{display:block;}
   .main-feed{padding:10px;padding-bottom:calc(var(--bottom-nav-h) + 20px);}
   .feed-controls{padding:10px 10px 0;}
-
+  .float-donate{bottom:calc(var(--bottom-nav-h) + 12px);}
   .admin-nav{display:none;}
   .admin-content{padding:12px;}
 }
@@ -383,9 +388,10 @@ body{overscroll-behavior:none;}
 .rating-skip{background:none;border:none;color:var(--text3);font-size:13px;cursor:pointer;padding:4px;}
 .rating-skip:hover{color:var(--text2);}
 
-@media(max-width:660px){}
-
-/* ═══════════════════════════════════════════
+@media(max-width:660px){
+  
+}
+    /* ═══════════════════════════════════════════
    DRAGGABLE CIRCULAR MUSIC PLAYER
 ═══════════════════════════════════════════ */
 .music-circular {
@@ -394,41 +400,48 @@ body{overscroll-behavior:none;}
   cursor: grab; z-index: 9999; box-shadow: 0 4px 20px rgba(124,111,224,0.5); transition: width 0.3s, height 0.3s, border-radius 0.3s;
 }
 .music-circular:active { cursor: grabbing; }
-.music-circular.expanded { width: 240px; height: 70px; border-radius: 35px; justify-content: space-between; padding: 0 15px; }
-.mc-btn { background: none; border: none; color: #fff; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; }
+.music-circular.expanded { width: 220px; height: 70px; border-radius: 35px; justify-content: space-between; padding: 0 15px; }
+.mc-btn { background: none; border: none; color: #fff; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; transition: background 0.2s; }
 .mc-btn:hover { background: rgba(255,255,255,0.2); }
 .mc-info { flex: 1; color: #fff; font-size: 12px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: none; }
 .mc-vol { width: 60px; accent-color: #fff; display: none; }
 .music-circular.expanded .mc-info, .music-circular.expanded .mc-vol { display: block; }
-@media(max-width:660px){ .music-circular { bottom: 90px; right: 20px; } }
 
-/* ═══════════════════════════════════════════
+@media(max-width:660px){
+  .music-circular { bottom: 90px; right: 20px; }
+}
+    /* ═══════════════════════════════════════════
    CREDITS WATERMARK
 ═══════════════════════════════════════════ */
 .credits-watermark {
-position: fixed;
-bottom: 8px;
-left: 50%;
-transform: translateX(-50%);
-font-size: 11px;
-color: var(--text2);
-opacity: 0.6;
-text-align: center;
-pointer-events: none;
-z-index: 9998;
-line-height: 1.4;
-white-space: nowrap;
-text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+  position: fixed;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: var(--text3);
+  opacity: 0.35; /* Very subtle */
+  text-align: center;
+  pointer-events: none; /* Allows clicking through it */
+  z-index: 5;
+  line-height: 1.4;
+  white-space: nowrap;
 }
+
+/* Push it above the bottom navigation bar on mobile */
 @media(max-width: 660px) {
-.credits-watermark { bottom: calc(var(--bottom-nav-h) + 8px); font-size: 9px; }
+  .credits-watermark {
+    bottom: calc(var(--bottom-nav-h) + 8px); 
+    font-size: 9px;
+  }
 }
 </style>
 </head>
-<body> 
+<body>
 
 <!-- ═══════════════ MAIN APP ═══════════════ -->
 <div id="mainScreen" class="screen active">
+
   <div class="topbar">
     <div class="logo" onclick="goToMain()">
       <span class="logo-icon">🐾</span>SaveThePaws
@@ -472,7 +485,6 @@ text-shadow: 0 1px 3px rgba(0,0,0,0.8);
       <div class="sidebar-role">
         <div class="r-label" data-i18n="your_role">Your Role</div>
         <div class="r-val" id="sideRole">Guest</div>
-        <div class="r-val" id="sideBadges" style="font-size:11px; color:var(--accent2); margin-top:6px; line-height:1.3;"></div>
       </div>
       <button id="sideAdminBtn" onclick="goToAdmin()" style="display:none;background:var(--warn-bg);border:1px solid var(--warn);color:var(--warn);border-radius:var(--radius);padding:10px;font-size:13px;font-weight:700;cursor:pointer;width:100%;">🛡 Admin Dashboard</button>
       <button class="logout-btn" id="sideLogoutBtn" onclick="signOut()">↩ Sign Out</button>
@@ -493,10 +505,9 @@ text-shadow: 0 1px 3px rgba(0,0,0,0.8);
       <div class="feed-controls" id="feedControls">
         <div class="search-wrap">
           <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-           <input placeholder="Search animals, cities..." id="searchInput" oninput="renderPosts()" autocomplete="off">
+          <input placeholder="Search animals, cities..." id="searchInput" oninput="renderPosts()">
         </div>
-        <div class="filter-row"> 
-          <div class="fchip active" onclick="setFilter('all',this)" data-i18n="filter_all">All</div> 
+      <div class="filter-row"> <div class="fchip active" onclick="setFilter('all',this)" data-i18n="filter_all">All</div> 
           <div class="fchip" onclick="setLocationFilter('near',this)">📍 Near Me (50km)</div>
           <div class="fchip" onclick="setLocationFilter('country',this)">🏙 My Country</div> 
           <div class="fchip" onclick="setLocationFilter('continent',this)">🌍 My Continent</div>
@@ -506,7 +517,7 @@ text-shadow: 0 1px 3px rgba(0,0,0,0.8);
           <div class="fchip" onclick="setFilter('rabbit',this)">🐰 Rabbits</div>
           <div class="fchip" onclick="setFilter('injured',this)">🚑 Injured</div>
           <div class="fchip" onclick="setFilter('saved',this)" data-i18n="filter_saved">✓ Saved</div> 
-        </div>
+      </div>
       </div>
 
       <!-- FEED VIEW -->
@@ -550,11 +561,11 @@ text-shadow: 0 1px 3px rgba(0,0,0,0.8);
 <!-- ═══ NEW DRAGGABLE CIRCULAR MUSIC PLAYER ═══ -->
 <audio id="bgAudio" loop></audio>
 <div class="music-circular" id="musicCircular">
-<button class="mc-btn" id="mcShuffleBtn" title="Shuffle"></button>
-<div class="mc-info" id="mcInfo">Loading...</div>
-<button class="mc-btn" id="mcPlayBtn" title="Play / Pause">▶</button>
-<input class="mc-vol" id="mcVol" type="range" min="0" max="1" step="0.05" value="0.4" title="Volume">
+  <button class="mc-btn" id="mcPlayBtn" title="Play / Pause">▶</button>
+  <div class="mc-info" id="mcInfo">Loading...</div>
+  <input class="mc-vol" id="mcVol" type="range" min="0" max="1" step="0.05" value="0.4" title="Volume">
 </div>
+
 
 <!-- RATING POPUP -->
 <div class="rating-overlay" id="ratingOverlay">
@@ -576,7 +587,10 @@ text-shadow: 0 1px 3px rgba(0,0,0,0.8);
     </div>
   </div>
 </div>
-
+<!-- FLOATING DONATE -->
+<button class="float-donate" onclick="openDonateModal()">
+  ❤️ <span data-i18n="donate_float">Donate</span>
+</button>
 
 <!-- ═══════════════ ADMIN SCREEN ═══════════════ -->
 <div id="adminScreen" class="admin-screen">
@@ -801,20 +815,22 @@ text-shadow: 0 1px 3px rgba(0,0,0,0.8);
     <h2 id="loginTitle">Sign In</h2>
     <p class="modal-sub" id="loginSub">Access your account to post reports and more.</p>
     <div id="loginForm">
-      <div class="fg"><label>Email</label><input type="email" id="loginEmail" placeholder="you@email.com" autocomplete="username"></div>
-      <div class="fg"><label>Password</label><input type="password" id="loginPass" placeholder="••••••••" autocomplete="new-password"></div>
+      <div class="fg"><label>Email</label><input type="email" id="loginEmail" placeholder="you@email.com"></div>
+      <div class="fg"><label>Password</label><input type="password" id="loginPass" placeholder="••••••••"></div>
       <button class="btn-primary" onclick="doLogin()">Sign In</button>
       <button class="btn-secondary" onclick="switchForm('register')">Create Free Account →</button>
+      <div style="text-align:center;margin-top:10px;font-size:11px;color:var(--text3);">Secure login.</div>
     </div>
     <div id="registerForm" style="display:none;">
       <div class="fg-row">
         <div class="fg"><label>First Name</label><input id="regFirst" placeholder="Alex"></div>
         <div class="fg"><label>Last Name</label><input id="regLast" placeholder="Smith"></div>
       </div>
-      <div class="fg"><label>Email</label><input type="email" id="regEmail" placeholder="you@email.com" autocomplete="username"></div>
-      <div class="fg"><label>Password (min 8 chars)</label><input type="password" id="regPass" placeholder="••••••••" autocomplete="new-password"></div>
+      <div class="fg"><label>Email</label><input type="email" id="regEmail" placeholder="you@email.com"></div>
+      <div class="fg"><label>Password (min 8 chars)</label><input type="password" id="regPass" placeholder="••••••••"></div>
       <button class="btn-primary" onclick="doRegister()">Create Account — Free</button>
       <button class="btn-secondary" onclick="switchForm('login')">← Back to Sign In</button>
+      <div style="font-size:11px;color:var(--text3);margin-top:10px;text-align:center;">Free accounts: post reports, edit descriptions. No cookies stored without subscription.</div>
     </div>
   </div>
 </div>
@@ -972,14 +988,18 @@ function initDB(){
   } catch(e){}
   
   const db = {
+    // KEEP: Required for you to log in as Admin right now
     users:[],
+    // EMPTY: We want ONLY real posts from Supabase
     posts: [], 
+    // KEEP: Ensures the Donate button and Ad slots work professionally on Day 1
     ads:[
       {id:'a1',type:'full',title:'Help Street Cats This Winter',desc:'Donate blankets, food, or funds to help feral cats survive the cold months.',media:'',link:'https://example.com/donate',freq:6,active:true}
     ],
     donors:[
       {id:'d1',name:'SaveThePaws Fund',icon:'🐾',desc:'All donations go directly to supporting stray animal rescue operations, veterinary care, and platform maintenance.',url:'https://paypal.me/JimOem'}
     ],
+    // EMPTY: We want the sidebar to only show REAL user activity
     activity: [], 
     notifications: [],
     settings: {adFreq:6, minKeywords:1, weeklyPrice:1.99, monthlyPrice:4.99, quarterlyPrice:11.99, annualPrice:29},
@@ -998,15 +1018,16 @@ function saveDB(d){
 }
 
 // ─── STATE ──────────────────────────────────
-   
+    // ─── SUPABASE INITIALIZATION (MOVED TO TOP FOR GLOBAL ACCESS) ───
 const SUPABASE_URL = 'https://zqnwjdaxffsoglmhkqxc.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_wjWekEPeo6QXJD6s-7R06Q_SLgvfKqF';
+const SUPABASE_KEY = 'sb_publishable_wjWekEPeo6QXJD6s-7R06Q_SLgvfKqF'; // Ensure this is a zero (0), not letter O
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let currentLocationMode = 'all';
+
+    let currentLocationMode = 'all'; // 'all', 'near', 'country', 'continent'
 let userCountry = null;
 let userContinent = null;
-let currentUser = null;
+    let currentUser = null;
 let currentFilter = 'all';
 let currentTab = 'feed';
 let claimTargetId = null;
@@ -1015,7 +1036,7 @@ let currentAdType = 'image_link';
 let themeMode = 'dark';
 
 const ANIMAL_KEYWORDS = ['cat','dog','bird','rabbit','animal','stray','injured','lost','paw','fur','feather','kitten','puppy','feral','rescue','adopt','pet','meow','bark','collar','vet','wounded','limping','hungry','scared','domestic','pigeon','parrot','hamster','turtle','ζώο','γάτα','σκύλος','πουλί','κουτάβι','γατάκι'];
-
+// ─── BADGE SYSTEM ──────────────────────────────────────────
 const BADGES = {
   scout: { name: 'Scout', icon: '🔍', requirement: 'Post 10 animals or refer friends' },
   guardian: { name: 'Guardian', icon: '🛡', requirement: 'Post 4 injured or 1 adoption + share' },
@@ -1024,13 +1045,11 @@ const BADGES = {
 };
 
 function getUserStats() {
-  if (!currentUser) return {posts:0, injured:0, adoptions:0, referrals:0};
   const statsKey = `stp_stats_${currentUser.id}`;
   return JSON.parse(localStorage.getItem(statsKey) || '{"posts":0,"injured":0,"adoptions":0,"referrals":0}');
 }
 
 function updateUserStats(action) {
-  if (!currentUser) return;
   const stats = getUserStats();
   if (action === 'post') stats.posts++;
   if (action === 'injured') stats.injured++;
@@ -1042,31 +1061,40 @@ function updateUserStats(action) {
 }
 
 function checkBadgeEligibility() {
-  if (!currentUser) return;
   const stats = getUserStats();
   const badgesKey = `stp_badges_${currentUser.id}`;
   const earnedBadges = JSON.parse(localStorage.getItem(badgesKey) || '[]');
   
+  // Scout: 10 posts OR 3 referrals
   if (!earnedBadges.includes('scout') && (stats.posts >= 10 || stats.referrals >= 3)) {
     earnedBadges.push('scout');
     showBadgeEarned('scout');
   }
+  
+  // Guardian: 4 injured OR (1 adoption + shared)
   if (!earnedBadges.includes('guardian') && (stats.injured >= 4 || stats.referrals >= 1)) {
     earnedBadges.push('guardian');
     showBadgeEarned('guardian');
   }
-  if (!earnedBadges.includes('hero') && currentUser.subscribed && (stats.adoptions >= 2 || stats.posts >= 15 || stats.injured >= 8)) {
+  
+  // Hero: 2 adoptions OR 15 posts OR 8 injured (subscribers only)
+  if (!earnedBadges.includes('hero') && currentUser.subscribed && 
+      (stats.adoptions >= 2 || stats.posts >= 15 || stats.injured >= 8)) {
     earnedBadges.push('hero');
     showBadgeEarned('hero');
   }
   
+  // Legend: 3 adoptions OR 12 injured OR 24 posts (all subscribers, limited to 9/year)
+  // This requires server-side tracking, so we'll implement it in Phase 5
+  
   localStorage.setItem(badgesKey, JSON.stringify(earnedBadges));
-  updateSidebarBadges();
 }
 
 function showBadgeEarned(badgeKey) {
   const badge = BADGES[badgeKey];
   showToast(`🎉 You earned the ${badge.name} badge!`, 'success');
+  
+  // Prompt to share
   setTimeout(() => {
     if (confirm(`Congratulations! You earned the ${badge.name} badge. Share it now?`)) {
       shareBadge(badgeKey);
@@ -1080,36 +1108,30 @@ function shareBadge(badgeKey) {
   const url = 'https://dataomerta.github.io/savethepaws-app/';
   
   if (navigator.share) {
-    navigator.share({ title: 'SaveThePaws Badge', text: text, url: url }).catch(()=>{});
-  } else {
+    navigator.share({
+      title: 'SaveThePaws Badge',
+      text: text,
+      url: url
+    });
+   } else {
     navigator.clipboard.writeText(`${text} ${url}`);
     showToast('Badge link copied to clipboard!', 'success');
-    updateUserStats('referral');
+    updateUserStats('referral'); // Correctly track this as a referral/share
   }
 }
-
-function updateSidebarBadges() {
-  if(!currentUser) return;
-  const earned = JSON.parse(localStorage.getItem(`stp_badges_${currentUser.id}`) || '[]');
-  const el = document.getElementById('sideBadges');
-  if (el) el.textContent = earned.length > 0 ? '🏆 ' + earned.map(b => BADGES[b].icon + ' ' + BADGES[b].name).join(', ') : 'No badges yet';
-}
-
 // ─── BOOT ───────────────────────────────────
 window.onload = async function(){
-  document.getElementById('searchInput').value = '';
-  if (supabase) {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) {
-      const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
-      currentUser = {
-        id: session.user.id,
-        name: profile?.name || session.user.email.split('@')[0],
-        email: session.user.email,
-        role: session.user.email === 'admin@savethepaws.app' ? 'admin' : (profile?.is_subscriber ? 'subscriber' : 'user'),
-        subscribed: profile?.is_subscriber || false
-      };
-    }
+  // 1. Check if user is already logged in via Supabase
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session) {
+    const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
+    currentUser = {
+      id: session.user.id,
+      name: profile?.name || session.user.email.split('@')[0],
+      email: session.user.email,
+      role: session.user.email === 'admin@savethepaws.app' ? 'admin' : (profile?.is_subscriber ? 'subscriber' : 'user'),
+      subscribed: profile?.is_subscriber || false
+    };
   }
 
   updateUI();
@@ -1121,7 +1143,6 @@ window.onload = async function(){
   checkPendingNotif();
   if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
   applyLang();
-   checkWeekendWarrior();
 };
 
 function checkPendingNotif(){
@@ -1135,6 +1156,7 @@ function checkPendingNotif(){
   }
 }
 
+// ─── THEME ──────────────────────────────────
 function toggleTheme(){
   themeMode = themeMode === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', themeMode);
@@ -1142,6 +1164,7 @@ function toggleTheme(){
   document.getElementById('metaTheme').content = themeMode === 'dark' ? '#1a1a2e' : '#f5f5fa';
 }
 
+// ─── GEO ────────────────────────────────────
 function startGeo(){
   const gs = document.getElementById('geoStatus');
   if(!navigator.geolocation){gs.textContent='GPS not supported — enter manually';gs.className='geo-status err';return;}
@@ -1153,37 +1176,25 @@ function startGeo(){
     window._geoLat = pos.coords.latitude.toFixed(6);
     window._geoLon = pos.coords.longitude.toFixed(6);
     
+    // Reverse geocoding to get country/continent (using a free, no-key API)
     fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${window._geoLat}&lon=${window._geoLon}`)
       .then(res => res.json())
       .then(data => {
         userCountry = data.address.country || 'Unknown';
+        // Simple continent mapping based on country (can be expanded)
         const country = userCountry.toLowerCase();
-        if(['greece','italy','spain','france','germany','uk','united kingdom'].some(c => country.includes(c))) userContinent = 'Europe';
-        else if(['usa','canada','mexico','united states'].some(c => country.includes(c))) userContinent = 'North America';
+        if(['greece','italy','spain','france','germany','uk'].some(c => country.includes(c))) userContinent = 'Europe';
+        else if(['usa','canada','mexico'].some(c => country.includes(c))) userContinent = 'North America';
         else userContinent = 'Global';
-      }).catch(()=>{});
+      });
   }, ()=>{
     const gs2 = document.getElementById('geoStatus');
     gs2.textContent = '⚠ GPS unavailable — enter city manually';
     gs2.className = 'geo-status err';
   });
 }
-function checkWeekendWarrior() {
-  const today = new Date();
-  const day = today.getDay(); // 5 is Friday
-  const hour = today.getHours();
-  // Trigger on Friday after 2 PM, or Saturday/Sunday
-  if ((day === 5 && hour >= 14) || day === 6 || day === 0) {
-    const lastShown = localStorage.getItem('stp_weekend_warrior_shown');
-    const todayStr = today.toDateString();
-    if (lastShown !== todayStr) {
-      setTimeout(() => {
-        showToast('🗺️ Weekend Warrior: Unlock the live map for 48 hours!', 'success');
-        localStorage.setItem('stp_weekend_warrior_shown', todayStr);
-      }, 3000);
-    }
-  }
-}
+
+// ─── STATS ──────────────────────────────────
 function renderStats(){
   const live = db.posts.filter(p=>p.status==='live');
   document.getElementById('statSaved').textContent = live.filter(p=>p.saved).length;
@@ -1194,6 +1205,7 @@ function renderStats(){
   if(pb) pb.textContent = pend;
 }
 
+// ─── ACTIVITY ───────────────────────────────
 function renderActivity(){
   document.getElementById('activityFeed').innerHTML = db.activity.slice(0,8).map(a=>`
     <div class="activity-item">
@@ -1202,6 +1214,7 @@ function renderActivity(){
     </div>`).join('');
 }
 
+// ─── SIDEBAR DONATIONS ──────────────────────
 function renderSidebarDonations(){
   document.getElementById('sidebarDonations').innerHTML = db.donors.slice(0,3).map(d=>`
     <div class="donate-org-item">
@@ -1210,6 +1223,7 @@ function renderSidebarDonations(){
     </div>`).join('');
 }
 
+// ─── POSTS RENDER ───────────────────────────
 function animalEmoji(t){return{cat:'🐱',dog:'🐶',bird:'🐦',rabbit:'🐰',other:'🐾'}[t]||'🐾';}
 function animalGrad(t){return{cat:'linear-gradient(135deg,#2d1f3d,#4a2d5a)',dog:'linear-gradient(135deg,#1f2d3d,#2d4a5a)',bird:'linear-gradient(135deg,#1f3d2d,#2d5a4a)',rabbit:'linear-gradient(135deg,#3d2d1f,#5a4a2d)',other:'linear-gradient(135deg,#2d2d3d,#3d3d5a)'}[t]||'linear-gradient(135deg,#2d2d3d,#3d3d5a)';}
 function fmtTime(ts){const d=Date.now()-ts;if(d<3600000)return Math.floor(d/60000)+' min ago';if(d<86400000)return Math.floor(d/3600000)+' hr ago';return Math.floor(d/86400000)+'d ago';}
@@ -1220,21 +1234,23 @@ function renderPosts(){
   const isReg = !!currentUser;
 
   let posts = db.posts.filter(p=>p.status==='live').slice().reverse();
-  if (currentLocationMode === 'near' && window._geoLat && window._geoLon) {
-    posts = posts.filter(p => {
-      const dist = getDistance(parseFloat(window._geoLat), parseFloat(window._geoLon), parseFloat(p.lat), parseFloat(p.lon));
-      return dist <= 50;
-    });
-  } else if (currentLocationMode === 'country' && userCountry) {
-    posts = posts.filter(p => p.country === userCountry);
-  }
-  
+// Apply location filter
+if (currentLocationMode === 'near' && window._geoLat && window._geoLon) {
+  posts = posts.filter(p => {
+    const dist = getDistance(parseFloat(window._geoLat), parseFloat(window._geoLon), parseFloat(p.lat), parseFloat(p.lon));
+    return dist <= 50; // 50km radius
+  });
+} else if (currentLocationMode === 'country' && userCountry) {
+  posts = posts.filter(p => p.country === userCountry);
+}
   if(currentFilter==='injured') posts=posts.filter(p=>p.condition==='injured');
   else if(currentFilter==='saved') posts=posts.filter(p=>p.saved);
   else if(currentFilter!=='all') posts=posts.filter(p=>p.animalType===currentFilter);
+
   
   if(q) posts=posts.filter(p=>p.description.toLowerCase().includes(q)||p.city.toLowerCase().includes(q)||p.animalType.includes(q));
 
+  // inject ads
   const adFreq = db.settings.adFreq||6;
   const activeAds = db.ads.filter(a=>a.active);
   let finalItems = [];
@@ -1271,15 +1287,14 @@ function renderPostCard(post, isSub, isReg){
   const savedWM = post.saved ? `<div class="saved-wm"><div class="wm">✓ Saved</div></div>` : '';
 
   const uploaderName = isSub ? post.uploader : `<span class="blurred-text" onclick="openSubModal()" title="Subscribe to see">${post.uploader}</span>`;
-
-    const waitTime = fmtTime(post.timestamp).replace('ago', '');
+  const uploaderDisplay = isSub ? post.uploader : '••••••';
+// Add urgency text for non-subscribers
 const urgencyText = !isSub ? `
-  <div style="color:var(--danger);font-size:12px;font-weight:700;margin-top:8px;animation:pulse 2s infinite; line-height:1.4;">
-    This ${post.animalType} has been waiting for ${waitTime}. 
-    I could be there in 5 minutes if I could just see the map.
+  <div style="color:var(--danger);font-size:12px;font-weight:700;margin-top:8px;animation:pulse 2s infinite;">
+    This ${post.animalType} has been waiting for ${fmtTime(post.timestamp).replace('ago', '')}. 
+    I could be there in minutes if I could just see the map.
   </div>
 ` : '';
-  
   const coords = isSub
     ? `<span class="info-chip"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="10" r="3"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>${post.lat}, ${post.lon}</span>
        <span class="info-chip"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>${post.city}, ${post.country}</span>`
@@ -1295,8 +1310,7 @@ const urgencyText = !isSub ? `
 
   const editBtn = isOwner ? `<button class="btn-edit" onclick="openEdit('${post.id}')" title="Edit description">✏️</button>` : '';
   const flagBtn = `<button class="btn-flag" onclick="flagPost('${post.id}')" title="Flag as inappropriate">⚑</button>`;
-  const shareBtn = `<button class="btn-edit" onclick="sharePost('${post.id}')" title="Share this post">📤</button>`;
-  
+const shareBtn = `<button class="btn-edit" onclick="sharePost('${post.id}')" title="Share this post">📤</button>`;
   return `
     <div class="post-card" id="post-${post.id}">
       <div class="pc-header">
@@ -1311,7 +1325,7 @@ const urgencyText = !isSub ? `
         </div>
       </div>
       <div class="pc-img-wrap">${photoContent}${savedWM}</div>
-      <div class="pc-desc">${post.description}${urgencyText}</div>
+  <div class="pc-desc">${post.description}${urgencyText}</div>
       <div class="pc-info">${coords}</div>
       <div class="pc-actions">${claimBtn}${editBtn}${flagBtn}${shareBtn}</div>
     </div>`;
@@ -1332,6 +1346,7 @@ function renderAdCard(ad){
   return `<div class="ad-card">${mediaHtml}<span class="ad-label">PROMOTED</span>${bodyHtml}</div>`;
 }
 
+// ─── MAP ────────────────────────────────────
 function renderMap(){
   const isSub = currentUser && currentUser.subscribed;
   if(!isSub) return;
@@ -1340,6 +1355,7 @@ function renderMap(){
     <div class="map-pin">${animalEmoji(p.animalType)} ${p.city} — ${p.animalType}</div>`).join('');
 }
 
+// ─── TABS ───────────────────────────────────
 function switchTab(tab, el){
   const isSub = currentUser && currentUser.subscribed;
   if(tab==='map' && !isSub){ openSubModal(); return; }
@@ -1358,20 +1374,14 @@ function switchTab(tab, el){
 }
 function setMobileTab(tab){ switchTab(tab); }
 
+// ─── FILTER ─────────────────────────────────
+
+    // ─── FILTER & LOCATION MODES ───────────────────────────────
+
+
 function setFilter(f, el){
   currentFilter = f;
-   if (f === 'injured') {
-  const trialSeen = localStorage.getItem('stp_urgent_trial_seen');
-  if (!trialSeen && !currentUser?.subscribed) {
-    setTimeout(() => {
-      if(confirm('This animal needs help NOW. Unlock the exact GPS location and uploader contact for 48 hours FREE?')) {
-        openSubModal();
-      }
-    }, 500);
-    localStorage.setItem('stp_urgent_trial_seen', 'true');
-  }
-}
-  currentLocationMode = 'all';
+  currentLocationMode = 'all'; // Reset location mode when changing animal filter
   document.querySelectorAll('.fchip').forEach(c=>c.classList.remove('active'));
   el.classList.add('active');
   renderPosts();
@@ -1379,6 +1389,7 @@ function setFilter(f, el){
 
 function setLocationFilter(mode, el){
   if (mode === 'near' && !window._geoLat) {
+    // Prompt for location
     if (confirm('Enable location to see animals near you?')) {
       startGeo();
       setTimeout(() => {
@@ -1394,23 +1405,26 @@ function setLocationFilter(mode, el){
     }
     return;
   }
+  
   currentLocationMode = mode;
   document.querySelectorAll('.fchip').forEach(c=>c.classList.remove('active'));
   el.classList.add('active');
   renderPosts();
 }
 
+// Helper function to calculate distance between two coordinates (Haversine formula)
 function getDistance(lat1, lon1, lat2, lon2) {
-  const R = 6371;
+  const R = 6371; // Earth's radius in km
   const dLat = (lat2 - lat1) * Math.PI / 180;
   const dLon = (lon2 - lon1) * Math.PI / 180;
   const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
             Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
             Math.sin(dLon/2) * Math.sin(dLon/2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-  return R * c;
+  return R * c; // Distance in km
 }
 
+// ─── POST SUBMISSION + SMART FILTER ─────────
 function handlePostBtn(){
   if(!currentUser){ showToast('Please register or sign in to post a report','warn'); openLoginModal(); return; }
   openModal('uploadModal');
@@ -1437,28 +1451,34 @@ function keywordCheck(desc, type){
   return ANIMAL_KEYWORDS.some(kw => text.includes(kw));
 }
 
+// ─── CLAIM ──────────────────────────────────
 function openClaim(postId){
   if(!currentUser||!currentUser.subscribed){openSubModal();return;}
   claimTargetId=postId;
   document.getElementById('claimNote').value='';
   openModal('claimModal');
 }
-
 function confirmClaim(){
-  const today = new Date().toDateString();
-  const claimKey = `stp_claims_${currentUser.id}_${today}`;
-  const todayClaims = parseInt(localStorage.getItem(claimKey) || '0');
+    // ─── DAILY CLAIM LIMIT CHECK ───────────────────────────────
+const today = new Date().toDateString();
+const claimKey = `stp_claims_${currentUser.id}_${today}`;
+const todayClaims = parseInt(localStorage.getItem(claimKey) || '0');
 
-  if (todayClaims >= 3) {
-    showToast('You have reached your daily claim limit. Every rescue counts!', 'warn');
-    return;
-  }
+if (todayClaims >= 3) {
+  showToast('You have reached your daily claim limit. Every rescue counts!', 'warn');
+  return;
+}
   const post=db.posts.find(p=>p.id===claimTargetId);
   if(!post)return;
   post.saved=true; post.savedBy=currentUser.name; post.savedAt=Date.now();
-  updateUserStats('adoption');
-  if (navigator.vibrate) navigator.vibrate(200);
-  localStorage.setItem(claimKey, (todayClaims + 1).toString());
+    // Update stats
+updateUserStats('adoption');
+    // Haptic feedback for claim
+if (navigator.vibrate) {
+  navigator.vibrate(200); // Single sharp vibration
+}
+    // Increment today's claim count
+localStorage.setItem(claimKey, (todayClaims + 1).toString());
   db.activity.unshift({type:'saved',text:post.animalType+' in '+post.city+' claimed by '+currentUser.name,time:'just now'});
   saveDB(db);
   closeModal('claimModal');
@@ -1466,6 +1486,7 @@ function confirmClaim(){
   showToast('Animal marked as Saved! 🏠','success');
 }
 
+// ─── EDIT ───────────────────────────────────
 function openEdit(postId){
   editTargetId=postId;
   const post=db.posts.find(p=>p.id===postId);
@@ -1473,19 +1494,19 @@ function openEdit(postId){
   document.getElementById('editDesc').value=post.description;
   openModal('editModal');
 }
-
 function saveEdit(){
   const post=db.posts.find(p=>p.id===editTargetId);
   if(!post)return;
   const newDesc=document.getElementById('editDesc').value.trim();
   if(!newDesc){showToast('Description cannot be empty','warn');return;}
-  post.description=newDesc;
+ post.description=newDesc;
   saveDB(db);
   closeModal('editModal');
   renderPosts();
   showToast('Description updated','success');
 }
 
+// ─── FLAG ───────────────────────────────────
 function flagPost(postId){
   const post=db.posts.find(p=>p.id===postId);
   if(!post)return;
@@ -1496,26 +1517,30 @@ function flagPost(postId){
   renderPosts();renderStats();
   showToast('Post flagged for admin review','warn');
 }
-
 function sharePost(postId) {
   const post = db.posts.find(p => p.id === postId);
   if (!post) return;
+  
   const text = `Check out this ${post.animalType} in ${post.city} on SaveThePaws!`;
   const url = 'https://dataomerta.github.io/savethepaws-app/';
+  
   if (navigator.share) {
-    navigator.share({ title: 'SaveThePaws', text: text, url: url }).catch(()=>{});
+    navigator.share({
+      title: 'SaveThePaws',
+      text: text,
+      url: url
+    });
   } else {
     navigator.clipboard.writeText(`${text} ${url}`);
     showToast('Post link copied to clipboard!', 'success');
   }
 }
-
+// ─── AUTH ───────────────────────────────────
 function handleAccountBtn(){
   if(currentUser){
     if(confirm('Sign out of '+currentUser.name+'?')) signOut();
   } else { openLoginModal(); }
 }
-
 function mobileAccountMenu(){
   if(!currentUser){ openLoginModal(); return; }
   if(currentUser.role==='admin'){
@@ -1525,8 +1550,11 @@ function mobileAccountMenu(){
     if(confirm('Sign out of '+currentUser.name+'?')) signOut();
   }
 }
-
 function openLoginModal(){ openModal('loginModal'); }
+
+
+
+
 
 function doSubscribe(plan){
   if(!currentUser){ 
@@ -1534,12 +1562,8 @@ function doSubscribe(plan){
     openLoginModal(); 
     return; 
   }
-  if(currentUser.subscribed) { 
-    showToast('You are already a subscriber!', 'success'); 
-    closeModal('subModal'); 
-    return; 
-  }
   
+  // ⚠️ REPLACE THESE WITH YOUR ACTUAL STRIPE PAYMENT LINKS
   const links = {
     weekly: 'https://buy.stripe.com/fZucN4dlvfDI9D3d1t7g400',
     monthly: 'https://buy.stripe.com/dRm6oG6X7bnsdTj4uX7g401',
@@ -1548,14 +1572,21 @@ function doSubscribe(plan){
   };
   
   if(links[plan]) {
+    // Open Stripe securely in a new tab
     window.open(links[plan], '_blank');
-    if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 300, 50, 100]);
+      // Rhythmic vibration for new subscriber
+if (navigator.vibrate) {
+  navigator.vibrate([100, 50, 100, 50, 300, 50, 100]);
+}
     closeModal('subModal');
     showToast('Redirecting to secure payment...', 'success');
   }
 }
 
-// ─── SCALABILITY TRIO: COMPRESSION, INFINITE SCROLL, OFFLINE QUEUE ───
+
+    // ─── SCALABILITY TRIO: COMPRESSION, INFINITE SCROLL, OFFLINE QUEUE ───
+
+// 1. IMAGE COMPRESSION (Shrinks 50MP photos to ~150KB)
 function compressImage(file, maxWidth = 1080, quality = 0.7) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -1583,6 +1614,7 @@ function compressImage(file, maxWidth = 1080, quality = 0.7) {
   });
 }
 
+// 2. OFFLINE QUEUE (Saves posts when internet is lost)
 const OFFLINE_QUEUE_KEY = 'stp_offline_queue';
 function getOfflineQueue() { return JSON.parse(localStorage.getItem(OFFLINE_QUEUE_KEY) || '[]'); }
 function saveToOfflineQueue(postData) {
@@ -1604,6 +1636,7 @@ async function processOfflineQueue() {
 }
 window.addEventListener('online', processOfflineQueue);
 
+// 3. INFINITE SCROLL (Loads 20 posts at a time)
 let currentPage = 0;
 const pageSize = 20;
 let isLoadingPosts = false;
@@ -1647,7 +1680,6 @@ window.addEventListener('scroll', () => {
     loadCloudPosts(true);
   }
 });
-
 // ─── SECURE CLOUD LOGIN ───────────────────────────
 async function doLogin() {
   const email = document.getElementById('loginEmail').value.trim();
@@ -1663,8 +1695,10 @@ async function doLogin() {
     return;
   }
 
+  // Fetch user profile from database
   const { data: profile } = await supabase.from('profiles').select('*').eq('id', data.user.id).single();
   
+  // Set current user (Check if email matches admin)
   currentUser = {
     id: data.user.id,
     name: profile?.name || email.split('@')[0],
@@ -1679,6 +1713,7 @@ async function doLogin() {
   loadCloudPosts();
 }
 
+// ─── SECURE CLOUD REGISTRATION ────────────────────
 async function doRegister() {
   const first = document.getElementById('regFirst').value.trim();
   const last = document.getElementById('regLast').value.trim();
@@ -1691,7 +1726,9 @@ async function doRegister() {
   const { data, error } = await supabase.auth.signUp({
     email: email,
     password: pass,
-    options: { data: { name: first + (last ? ' ' + last : '') } }
+    options: {
+      data: { name: first + (last ? ' ' + last : '') }
+    }
   });
 
   if (error) {
@@ -1703,6 +1740,7 @@ async function doRegister() {
   closeModal('loginModal');
 }
 
+// ─── SECURE LOGOUT ────────────────────────────────
 async function signOut() {
   await supabase.auth.signOut();
   currentUser = null;
@@ -1728,16 +1766,14 @@ function updateUI(){
   document.getElementById('loginBtnTop').textContent = currentUser ? ('👤 '+currentUser.name.split(' ')[0]) : 'Sign in';
   document.getElementById('sideRole').textContent = isAdmin?'Admin':isSub?'Subscriber':currentUser?'Registered':'Guest';
   document.getElementById('sideRole').style.color = isAdmin?'var(--warn)':isSub?'var(--success)':currentUser?'var(--text2)':'var(--text3)';
-  updateSidebarBadges();
   const subBanner = document.getElementById('subBanner');
   if(subBanner) subBanner.style.display = isSub||isAdmin ? 'none' : 'flex';
   const themeBtn = document.getElementById('themeBtn');
   if(isSub||isAdmin) themeBtn.classList.add('visible'); else themeBtn.classList.remove('visible');
   const ml = document.getElementById('mapLock');
   if(ml) ml.style.display = isSub||isAdmin?'none':'inline';
+  // admin button visibility
   if(isAdmin) showAdminBtn(); else hideAdminBtn();
-  const btn = document.getElementById('sideLogoutBtn');
-  if(btn) { if(currentUser) btn.classList.add('visible'); else btn.classList.remove('visible'); }
 }
 
 function switchForm(to){
@@ -1746,6 +1782,7 @@ function switchForm(to){
   document.getElementById('loginTitle').textContent = to==='login'?'Sign In':'Create Account';
 }
 
+// ─── DONATIONS ──────────────────────────────
 function openDonateModal(){
   renderDonateList();
   openModal('donateModal');
@@ -1764,6 +1801,7 @@ function renderDonateList(){
     </div>`).join('');
 }
 
+// ─── NOTIFICATIONS ──────────────────────────
 function showNotifBanner(msg){
   document.getElementById('notifBannerText').textContent=msg;
   document.getElementById('notifBanner').classList.add('show');
@@ -1774,27 +1812,36 @@ function closeNotifBanner(){
   document.getElementById('notifDot').classList.remove('show');
 }
 function openNotifPanel(){ showToast('No new notifications'); }
+
+// ─── SUBSCRIBE MODAL ────────────────────────
 function openSubModal(){ openModal('subModal'); }
 
+// ─── MODALS ─────────────────────────────────
 function openModal(id){ document.getElementById(id).classList.add('open'); }
 function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 document.querySelectorAll('.modal-overlay').forEach(m=>{
   m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});
 });
 
+// ─── TOAST ──────────────────────────────────
+// ─── TOAST WITH CUSTOM SOUND ───────────────────────────────
 const mewSound = new Audio('./mew.mp3');
-mewSound.volume = 0.3;
+mewSound.volume = 0.3; // Keep it subtle
 
 function showToast(msg,type=''){
   const t=document.getElementById('toast');
   t.textContent=msg; t.className='toast show '+(type||'');
+  
+  // Play mew sound for notifications
   if (type === 'success' || type === 'warn') {
     mewSound.currentTime = 0;
     mewSound.play().catch(e => console.log('Audio play failed:', e));
   }
+  
   setTimeout(()=>t.className='toast',2800);
 }
 
+// ─── ADMIN ──────────────────────────────────
 function goToAdmin(){
   if(!currentUser||currentUser.role!=='admin'){showToast('Admin access only','warn');return;}
   document.getElementById('mainScreen').classList.remove('active');
@@ -1853,6 +1900,7 @@ function renderAdminData(){
       </td>
     </tr>`).join('');
     
+  // Load real users from Supabase
   loadAdminUsers();
 }
 
@@ -1880,10 +1928,9 @@ async function grantSubSupabase(uid) {
   const { error } = await supabase.from('profiles').update({ is_subscriber: true }).eq('id', uid);
   if (!error) {
     showToast('Subscription granted!', 'success');
-    loadAdminUsers();
+    loadAdminUsers();//refresh the list
   }
 }
-
 function renderPending(){
   const pend=db.posts.filter(p=>p.status==='pending');
   const list=document.getElementById('pendingList');
@@ -1908,7 +1955,7 @@ async function approvePost(id){
   const { error } = await supabase.from('posts').update({ status: 'live', flagReason: '' }).eq('id', id);
   if(!error) {
     showToast('Post approved','success');
-    loadCloudPosts();
+    loadCloudPosts(); // Refreshes the whole app instantly
     renderPending();
   } else {
     showToast('Failed to approve','danger');
@@ -1924,7 +1971,6 @@ async function deletePost(id){
     renderPending();
   }
 }
-
 function makeAdmin(uid){
   if(!confirm('Grant admin to this user?'))return;
   const u=db.users.find(x=>x.id===uid);
@@ -1940,6 +1986,7 @@ function removeUser(uid){
   saveDB(db);renderAdminData();showToast('User removed');
 }
 
+// ─── ADS ────────────────────────────────────
 function setAdType(type,el){
   currentAdType=type;
   document.querySelectorAll('.ad-type-btn').forEach(b=>b.classList.remove('active'));
@@ -1983,6 +2030,7 @@ function renderAdsList(){
 function toggleAd(id){const a=db.ads.find(x=>x.id===id);if(a){a.active=!a.active;saveDB(db);renderAdsList();renderPosts();}}
 function deleteAd(id){db.ads=db.ads.filter(a=>a.id!==id);saveDB(db);renderAdsList();renderPosts();}
 
+// ─── NOTIFICATIONS ──────────────────────────
 function sendNotification(){
   const msg=document.getElementById('notifMsg').value.trim();
   if(!msg){showToast('Message required','warn');return;}
@@ -2005,6 +2053,7 @@ function sendNotification(){
   showToast('Notification sent','success');
 }
 
+// ─── DONOR ADMIN ────────────────────────────
 function addDonor(){
   const name=document.getElementById('donorName').value.trim();
   const url=document.getElementById('donorUrl').value.trim();
@@ -2029,36 +2078,29 @@ function renderDonorList(){
     </div>`).join('');
 }
 function removeDonor(id){db.donors=db.donors.filter(d=>d.id!==id);saveDB(db);renderDonorList();renderSidebarDonations();}
+
+// ─── SETTINGS ───────────────────────────────
 function saveSettings(){showToast('Settings saved','success');}
 
 // ─── DRAGGABLE CIRCULAR MUSIC PLAYER ───────────────────────────
-const tracks = ['Free Soul.mp3', 'Purify.mp3', 'Fairytale.mp3'];
+const tracks = ['Free Soul.mp3', 'Purify.mp3', 'Fairytale.mp3']; // Your exact filenames
 let currentTrackIndex = 0;
 let isPlaying = false;
 const audio = document.getElementById('bgAudio');
 const mcCircular = document.getElementById('musicCircular');
 const mcPlayBtn = document.getElementById('mcPlayBtn');
-const mcShuffleBtn = document.getElementById('mcShuffleBtn');
 const mcInfo = document.getElementById('mcInfo');
 const mcVol = document.getElementById('mcVol');
 
-function loadTrack(index) {
-  currentTrackIndex = index;
+function loadRandomTrack() {
+  currentTrackIndex = Math.floor(Math.random() * tracks.length);
   audio.src = tracks[currentTrackIndex];
+  // Clean up the filename for display (removes .mp3)
   mcInfo.textContent = tracks[currentTrackIndex].replace('.mp3', '');
 }
 
-if (mcShuffleBtn) {
-  mcShuffleBtn.addEventListener('click', () => {
-    let newIndex;
-    do { newIndex = Math.floor(Math.random() * tracks.length); } while (newIndex === currentTrackIndex && tracks.length > 1);
-    loadTrack(newIndex);
-    if (isPlaying) audio.play().catch(()=>{});
-  });
-}
-
 mcPlayBtn.addEventListener('click', () => {
-  if (!audio.src) loadTrack(0);
+  if (!audio.src) loadRandomTrack();
   if (isPlaying) {
     audio.pause(); isPlaying = false; mcPlayBtn.textContent = '▶';
   } else {
@@ -2066,64 +2108,58 @@ mcPlayBtn.addEventListener('click', () => {
   }
 });
 
+// Auto-shuffle when a track ends
 audio.addEventListener('ended', () => { 
-  let newIndex;
-  do { newIndex = Math.floor(Math.random() * tracks.length); } while (newIndex === currentTrackIndex && tracks.length > 1);
-  loadTrack(newIndex);
-  if(isPlaying) audio.play().catch(()=>{});
+  loadRandomTrack(); 
+  if(isPlaying) audio.play(); 
 });
 
 mcVol.addEventListener('input', (e) => { audio.volume = e.target.value; });
 
+// Draggable Logic
 let isDragging = false, startX, startY, initialX, initialY;
-
-function startDrag(e) {
-  isDragging = true;
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-  startX = clientX; startY = clientY;
+mcCircular.addEventListener('mousedown', (e) => {
+  isDragging = true; startX = e.clientX; startY = e.clientY;
   const rect = mcCircular.getBoundingClientRect();
   initialX = rect.left; initialY = rect.top;
   mcCircular.style.transition = 'none';
-}
-
-function onDrag(e) {
+});
+document.addEventListener('mousemove', (e) => {
   if (!isDragging) return;
-  e.preventDefault();
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-  mcCircular.style.left = `${initialX + (clientX - startX)}px`;
-  mcCircular.style.top = `${initialY + (clientY - startY)}px`;
+  mcCircular.style.left = `${initialX + (e.clientX - startX)}px`;
+  mcCircular.style.top = `${initialY + (e.clientY - startY)}px`;
   mcCircular.style.right = 'auto'; mcCircular.style.bottom = 'auto';
-}
-
-function endDrag(e) {
-  if (!isDragging) return;
-  isDragging = false;
+});
+document.addEventListener('mouseup', (e) => {
+  if (!isDragging) return; 
+  isDragging = false; 
   mcCircular.style.transition = 'width 0.3s, height 0.3s, border-radius 0.3s';
-  const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
-  const clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
-  if (Math.abs(clientX - startX) < 10 && Math.abs(clientY - startY) < 10) {
+  // Expand on click if not dragged far
+  if (Math.abs(e.clientX - startX) < 5 && Math.abs(e.clientY - startY) < 5) {
     mcCircular.classList.toggle('expanded');
   }
+});
+
+// ─── LOGOUT ─────────────────────────────────
+function updateLogoutBtn(){
+  const btn = document.getElementById('sideLogoutBtn');
+  if(!btn) return;
+  if(currentUser) btn.classList.add('visible');
+  else btn.classList.remove('visible');
 }
 
-mcCircular.addEventListener('mousedown', startDrag);
-mcCircular.addEventListener('touchstart', startDrag, {passive: false});
-document.addEventListener('mousemove', onDrag);
-document.addEventListener('touchmove', onDrag, {passive: false});
-document.addEventListener('mouseup', endDrag);
-document.addEventListener('touchend', endDrag);
-
 // ─── RATING POPUP ───────────────────────────
+// Google Play URL — update com.savethepaws.app once live on Play Store
 const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.savethepaws.app&reviewId=0';
 let selectedStars = 0;
 const RATING_KEY = 'stp_rating_state';
 
 function initRating(){
   const state = localStorage.getItem(RATING_KEY);
-  if(state === 'never') return;
+  if(state === 'never') return; // user said don't ask again
+  // Show rating popup on beforeunload (page close/navigate away)
   window.addEventListener('beforeunload', handlePageLeave);
+  // Also show after 3 minutes of use
   setTimeout(()=>{
     const s = localStorage.getItem(RATING_KEY);
     if(!s || s === 'later') showRatingPopup();
@@ -2133,7 +2169,9 @@ function initRating(){
 function handlePageLeave(e){
   const state = localStorage.getItem(RATING_KEY);
   if(state === 'never' || state === 'rated') return;
+  // Show the popup before leave
   showRatingPopup();
+  // Standard beforeunload prompt (some browsers require returnValue)
   e.preventDefault();
   e.returnValue = '';
 }
@@ -2171,13 +2209,8 @@ function neverRate(){
   window.removeEventListener('beforeunload', handlePageLeave);
   document.getElementById('ratingOverlay').classList.remove('open');
 }
-function updateLogoutBtn(){
-  const btn = document.getElementById('sideLogoutBtn');
-  if(!btn) return;
-  if(currentUser) btn.classList.add('visible');
-  else btn.classList.remove('visible');
-}
 
+// ─── PATCH updateUI to include logout btn ───
 const _origUpdateUI = updateUI;
 updateUI = function(){
   _origUpdateUI();
@@ -2188,197 +2221,141 @@ updateUI = function(){
 renderPosts();renderActivity();renderSidebarDonations();renderStats();updateUI();applyLang();
 updateLogoutBtn();
 initRating();
-
-   const tracks = ['Free Soul.mp3', 'Purify.mp3', 'Fairytale.mp3'];
-let currentTrackIndex = 0, isPlaying = false;
-const audio = document.getElementById('bgAudio');
-const mcCircular = document.getElementById('musicCircular');
-const mcPlayBtn = document.getElementById('mcPlayBtn');
-const mcShuffleBtn = document.getElementById('mcShuffleBtn');
-const mcInfo = document.getElementById('mcInfo');
-const mcVol = document.getElementById('mcVol');
-
-function loadTrack(index) { currentTrackIndex = index; audio.src = tracks[currentTrackIndex]; mcInfo.textContent = tracks[currentTrackIndex].replace('.mp3', ''); }
-if (mcShuffleBtn) {
-  mcShuffleBtn.addEventListener('click', () => {
-    let newIndex;
-    do { newIndex = Math.floor(Math.random() * tracks.length); } while (newIndex === currentTrackIndex && tracks.length > 1);
-    loadTrack(newIndex);
-    if (isPlaying) audio.play().catch(()=>{});
-  });
-}
-mcPlayBtn.addEventListener('click', () => {
-  if (!audio.src) loadTrack(0);
-  if (isPlaying) { audio.pause(); isPlaying = false; mcPlayBtn.textContent = '▶'; } 
-  else { audio.play().catch(()=>{}); isPlaying = true; mcPlayBtn.textContent = '⏸'; }
-});
-audio.addEventListener('ended', () => { 
-  let newIndex;
-  do { newIndex = Math.floor(Math.random() * tracks.length); } while (newIndex === currentTrackIndex && tracks.length > 1);
-  loadTrack(newIndex);
-  if(isPlaying) audio.play().catch(()=>{});
-});
-mcVol.addEventListener('input', (e) => { audio.volume = e.target.value; });
-
-let isDragging = false, startX, startY, initialX, initialY;
-function startDrag(e) {
-  isDragging = true;
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-  startX = clientX; startY = clientY;
-  const rect = mcCircular.getBoundingClientRect();
-  initialX = rect.left; initialY = rect.top;
-  mcCircular.style.transition = 'none';
-}
-function onDrag(e) {
-  if (!isDragging) return;
-  e.preventDefault();
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-  mcCircular.style.left = `${initialX + (clientX - startX)}px`;
-  mcCircular.style.top = `${initialY + (clientY - startY)}px`;
-  mcCircular.style.right = 'auto'; mcCircular.style.bottom = 'auto';
-}
-function endDrag(e) {
-  if (!isDragging) return;
-  isDragging = false;
-  mcCircular.style.transition = 'width 0.3s, height 0.3s, border-radius 0.3s';
-  const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
-  const clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
-  if (Math.abs(clientX - startX) < 10 && Math.abs(clientY - startY) < 10) mcCircular.classList.toggle('expanded');
-}
-mcCircular.addEventListener('mousedown', startDrag);
-mcCircular.addEventListener('touchstart', startDrag, {passive: false});
-document.addEventListener('mousemove', onDrag);
-document.addEventListener('touchmove', onDrag, {passive: false});
-document.addEventListener('mouseup', endDrag);
-document.addEventListener('touchend', endDrag);
 </script>
-
-<!-- ═══════════════════════════════════════════
+   <!-- ═══════════════════════════════════════════
      CLOUD BRIDGE: SUPABASE + SIGHTENGINE
 ═══════════════════════════════════════════ -->
+
 <script>
-window.submitPost = async function() {
-  if(!currentUser){ showToast('Sign in to post','warn'); return; }
-  
-  const today = new Date().toDateString();
-  const uploadKey = `stp_uploads_${currentUser.id}_${today}`;
-  const todayUploads = parseInt(localStorage.getItem(uploadKey) || '0');
 
-  if (todayUploads >= 7) {
-    showToast('Amazing work today! Your daily limit is reached. Rest up, rescuer.', 'warn');
-    return;
-  }
 
-  const desc = document.getElementById('animalDesc').value.trim();
-  const city = document.getElementById('animalCity').value.trim();
-  const country = document.getElementById('animalCountry').value.trim();
-  const type = document.getElementById('animalType').value;
-  const condition = document.getElementById('animalCondition').value;
-  
-  if(!city || !country){ showToast('Please enter city and country','warn'); return; }
+  // 2. OVERRIDE: The new, secure submitPost function
+    window.submitPost = async function() {
+    if(!currentUser){ showToast('Sign in to post','warn'); return; }
+    
+    const today = new Date().toDateString();
+    const uploadKey = `stp_uploads_${currentUser.id}_${today}`;
+    const todayUploads = parseInt(localStorage.getItem(uploadKey) || '0');
 
-  const fileInput = document.getElementById('photoInput');
-  const file = fileInput.files[0];
-  const hasPhoto = file && file.type.startsWith('image/');
-
-  const btn = document.getElementById('submitPostBtn');
-  btn.disabled = true; 
-  btn.textContent = hasPhoto ? '🔄 Optimizing Image...' : '☁️ Uploading to Cloud...';
-
-  let compressedPhotoData = null;
-  if(hasPhoto) {
-    try {
-      compressedPhotoData = await compressImage(file, 1080, 0.7);
-    } catch(e) {
-      showToast('Image processing failed', 'danger');
-      btn.disabled = false; btn.textContent = '🐾 Submit Report';
+    if (todayUploads >= 7) {
+      showToast('Amazing work today! Your daily limit is reached. Rest up, rescuer.', 'warn');
       return;
     }
-  }
 
-  let isSafe = true;
-  if(hasPhoto && compressedPhotoData) {
-    btn.textContent = '🔒 Scanning photo...';
-    try {
-      const formData = new FormData();
-      formData.append('media', compressedPhotoData);
-      formData.append('models', 'nudity-2.1,weapon,gore');
-      formData.append('api_user', '1622452775'); 
-      formData.append('api_secret', '5DGESTpwGTFUntMYVjDbG6mo3mV9FqwH'); 
+    const desc = document.getElementById('animalDesc').value.trim();
+    const city = document.getElementById('animalCity').value.trim();
+    const country = document.getElementById('animalCountry').value.trim();
+    const type = document.getElementById('animalType').value;
+    const condition = document.getElementById('animalCondition').value;
+    
+    if(!city || !country){ showToast('Please enter city and country','warn'); return; }
 
-      const response = await fetch('https://api.sightengine.com/1.0/check.json', { method: 'POST', body: formData });
-      const data = await response.json();
-      if((data.nudity && data.nudity.raw > 0.6) || (data.weapon && data.weapon > 0.6) || (data.gore && data.gore > 0.6)) {
-        isSafe = false;
+    const fileInput = document.getElementById('photoInput');
+    const file = fileInput.files[0];
+    const hasPhoto = file && file.type.startsWith('image/');
+
+    const btn = document.getElementById('submitPostBtn');
+    btn.disabled = true; 
+    btn.textContent = hasPhoto ? '🔄 Optimizing Image...' : '☁️ Uploading to Cloud...';
+
+    let compressedPhotoData = null;
+    if(hasPhoto) {
+      try {
+        compressedPhotoData = await compressImage(file, 1080, 0.7);
+      } catch(e) {
+        showToast('Image processing failed', 'danger');
+        btn.disabled = false; btn.textContent = '🐾 Submit Report';
+        return;
       }
-    } catch(e) {
-      console.error("Moderation API error:", e);
-      isSafe = false; 
     }
-  }
 
-  if(!isSafe) {
+    let isSafe = true;
+    if(hasPhoto && compressedPhotoData) {
+      btn.textContent = '🔒 Scanning photo...';
+      try {
+        const formData = new FormData();
+        formData.append('media', compressedPhotoData);
+        formData.append('models', 'nudity-2.1,weapon,gore');
+        formData.append('api_user', '1622452775'); 
+        formData.append('api_secret', '5DGESTpwGTFUntMYVjDbG6mo3mV9FqwH'); 
+
+        const response = await fetch('https://api.sightengine.com/1.0/check.json', { method: 'POST', body: formData });
+        const data = await response.json();
+        if((data.nudity && data.nudity.raw > 0.6) || (data.weapon && data.weapon > 0.6) || (data.gore && data.gore > 0.6)) {
+          isSafe = false;
+        }
+      } catch(e) {
+        console.error("Moderation API error:", e);
+        isSafe = false; 
+      }
+    }
+
+    if(!isSafe) {
+      btn.disabled = false; btn.textContent = '🐾 Submit Report';
+      showToast('⚠️ Upload blocked: Image does not meet safety guidelines.', 'danger');
+      return;
+    }
+
+    btn.textContent = '☁️ Uploading to Cloud...';
+    const newPost = {
+      uploader: currentUser.name,
+      animalType: type,
+      condition: condition,
+      description: desc || 'No description provided.',
+      city: city,
+      country: country,
+      lat: window._geoLat || (40 + Math.random()*2).toFixed(4),
+      lon: window._geoLon || (22 + Math.random()*2).toFixed(4),
+      timestamp: Date.now(),
+      saved: false,
+      status: 'pending',
+      photoData: hasPhoto ? compressedPhotoData : null
+    };
+
+    const { error } = await supabase.from('posts').insert([newPost]);
     btn.disabled = false; btn.textContent = '🐾 Submit Report';
-    showToast('⚠️ Upload blocked: Image does not meet safety guidelines.', 'danger');
-    return;
-  }
 
-  btn.textContent = '☁️ Uploading to Cloud...';
-  const newPost = {
-    uploader: currentUser.name,
-    animalType: type,
-    condition: condition,
-    description: desc || 'No description provided.',
-    city: city,
-    country: country,
-    lat: window._geoLat || (40 + Math.random()*2).toFixed(4),
-    lon: window._geoLon || (22 + Math.random()*2).toFixed(4),
-    timestamp: Date.now(),
-    saved: false,
-    status: 'pending',
-    photoData: hasPhoto ? compressedPhotoData : null
+    if(error) {
+      if (!navigator.onLine) {
+        saveToOfflineQueue(newPost);
+      } else {
+        showToast('Upload failed. Check internet.','danger');
+        console.error(error);
+      }
+    } else {
+      localStorage.setItem(uploadKey, (todayUploads + 1).toString());
+      updateUserStats('post');
+      if (condition === 'injured') updateUserStats('injured');
+      
+      showToast('Report submitted! Pending admin review 🔍','success');
+      closeModal('uploadModal');
+      
+      document.getElementById('animalDesc').value='';
+      document.getElementById('animalCity').value='';
+      document.getElementById('animalCountry').value='';
+      document.getElementById('photoPreview').style.display='none';
+      document.querySelector('#photoDrop .pd-icon').textContent='📷';
+      document.querySelector('#photoDrop p').textContent=LANG[currentLang].photo_drop;
+      fileInput.value = '';
+      
+      loadCloudPosts();
+    }
   };
 
-  const { error } = await supabase.from('posts').insert([newPost]);
-  btn.disabled = false; btn.textContent = '🐾 Submit Report';
 
-  if(error) {
-    if (!navigator.onLine) {
-      saveToOfflineQueue(newPost);
-    } else {
-      showToast('Upload failed. Check internet.','danger');
-      console.error(error);
-    }
-  } else {
-    localStorage.setItem(uploadKey, (todayUploads + 1).toString());
-    updateUserStats('post');
-    if (condition === 'injured') updateUserStats('injured');
-    
-    showToast('Report submitted! Pending admin review 🔍','success');
-    closeModal('uploadModal');
-    
-    document.getElementById('animalDesc').value='';
-    document.getElementById('animalCity').value='';
-    document.getElementById('animalCountry').value='';
-    document.getElementById('photoPreview').style.display='none';
-    document.querySelector('#photoDrop .pd-icon').textContent='📷';
-    document.querySelector('#photoDrop p').textContent=LANG[currentLang].photo_drop;
-    fileInput.value = '';
-    
-    loadCloudPosts();
-  }
-};
-
-const chimeSound = new Audio('./chime.mp3');
+  // 4. REAL-TIME LISTENER: If someone else posts, the feed updates instantly
+// ─── PROXIMITY NOTIFICATION SYSTEM ─────────────────────────
+const chimeSound = new Audio('./chime.mp3'); // You need to add chime.mp3 to your repo
 chimeSound.volume = 0.4;
 
 function playProximityAlert() {
+  // Play chime 4 times
   for (let i = 0; i < 4; i++) {
     setTimeout(() => {
       chimeSound.currentTime = 0;
       chimeSound.play().catch(e => console.log('Chime play failed:', e));
+      
+      // Vibrate rhythmically: short-short-long-short
       if (navigator.vibrate) {
         navigator.vibrate([100, 50, 100, 50, 300, 50, 100]);
       }
@@ -2386,27 +2363,26 @@ function playProximityAlert() {
   }
 }
 
+// 4. REAL-TIME LISTENER with proximity check
 supabase.channel('public:posts')
   .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, (payload) => {
     const newPost = payload.new;
+    
+    // Check if post is within 5km-50km
     if (window._geoLat && window._geoLon && newPost.status === 'live') {
       const dist = getDistance(parseFloat(window._geoLat), parseFloat(window._geoLon), parseFloat(newPost.lat), parseFloat(newPost.lon));
+      
       if (dist >= 5 && dist <= 50) {
         playProximityAlert();
         showToast(`New animal reported ${Math.round(dist)}km away!`, 'success');
       }
     }
+    
     loadCloudPosts();
   })
   .subscribe();
 </script>
-<audio id="bgAudio" loop></audio>
-<div class="music-circular" id="musicCircular">
-  <button class="mc-btn" id="mcShuffleBtn" title="Shuffle">🔀</button>
-  <div class="mc-info" id="mcInfo">Loading...</div>
-  <button class="mc-btn" id="mcPlayBtn" title="Play / Pause">▶</button>
-  <input class="mc-vol" id="mcVol" type="range" min="0" max="1" step="0.05" value="0.4" title="Volume">
-</div>
+
 <!-- ═══ CREDITS WATERMARK ═══ -->
 <div class="credits-watermark">
   Sound/Art Direction by Bill Melachrinos &nbsp;•&nbsp; Planning/Development Dimitris Paraschidis &nbsp;•&nbsp; Communication/Advertising Aneta Conic
