@@ -418,22 +418,20 @@ body{overscroll-behavior:none;}
   bottom: 8px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 10px;
-  color: var(--text3);
-  opacity: 0.35; /* Very subtle */
+  font-size: 11px;
+  color: var(--text2);
+  opacity: 0.6;
   text-align: center;
-  pointer-events: none; /* Allows clicking through it */
-  z-index: 5;
+  pointer-events: none;
+  z-index: 9998;
   line-height: 1.4;
   white-space: nowrap;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+}
+@media(max-width: 660px) {
+  .credits-watermark { bottom: calc(var(--bottom-nav-h) + 8px); font-size: 9px; }
 }
 
-/* Push it above the bottom navigation bar on mobile */
-@media(max-width: 660px) {
-  .credits-watermark {
-    bottom: calc(var(--bottom-nav-h) + 8px); 
-    font-size: 9px;
-  }
 }
 </style>
 </head>
@@ -505,7 +503,7 @@ body{overscroll-behavior:none;}
       <div class="feed-controls" id="feedControls">
         <div class="search-wrap">
           <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <input placeholder="Search animals, cities..." id="searchInput" oninput="renderPosts()">
+         <input placeholder="Search animals, cities..." id="searchInput" oninput="renderPosts()" autocomplete="off">
         </div>
       <div class="filter-row"> <div class="fchip active" onclick="setFilter('all',this)" data-i18n="filter_all">All</div> 
           <div class="fchip" onclick="setLocationFilter('near',this)">📍 Near Me (50km)</div>
@@ -560,12 +558,12 @@ body{overscroll-behavior:none;}
 
 <!-- ═══ NEW DRAGGABLE CIRCULAR MUSIC PLAYER ═══ -->
 <audio id="bgAudio" loop></audio>
-<div class="music-circular" id="musicCircular">
-  <button class="mc-btn" id="mcPlayBtn" title="Play / Pause">▶</button>
-  <div class="mc-info" id="mcInfo">Loading...</div>
-  <input class="mc-vol" id="mcVol" type="range" min="0" max="1" step="0.05" value="0.4" title="Volume">
-</div>
-
+   <div class="music-circular" id="musicCircular">
+     <button class="mc-btn" id="mcShuffleBtn" title="Shuffle">🔀</button>
+     <div class="mc-info" id="mcInfo">Loading...</div>
+     <button class="mc-btn" id="mcPlayBtn" title="Play / Pause">▶</button>
+     <input class="mc-vol" id="mcVol" type="range" min="0" max="1" step="0.05" value="0.4" title="Volume">
+   </div>
 
 <!-- RATING POPUP -->
 <div class="rating-overlay" id="ratingOverlay">
@@ -588,9 +586,6 @@ body{overscroll-behavior:none;}
   </div>
 </div>
 <!-- FLOATING DONATE -->
-<button class="float-donate" onclick="openDonateModal()">
-  ❤️ <span data-i18n="donate_float">Donate</span>
-</button>
 
 <!-- ═══════════════ ADMIN SCREEN ═══════════════ -->
 <div id="adminScreen" class="admin-screen">
@@ -2083,38 +2078,90 @@ function removeDonor(id){db.donors=db.donors.filter(d=>d.id!==id);saveDB(db);ren
 function saveSettings(){showToast('Settings saved','success');}
 
 // ─── DRAGGABLE CIRCULAR MUSIC PLAYER ───────────────────────────
-const tracks = ['Free Soul.mp3', 'Purify.mp3', 'Fairytale.mp3']; // Your exact filenames
-let currentTrackIndex = 0;
-let isPlaying = false;
-const audio = document.getElementById('bgAudio');
-const mcCircular = document.getElementById('musicCircular');
-const mcPlayBtn = document.getElementById('mcPlayBtn');
-const mcInfo = document.getElementById('mcInfo');
-const mcVol = document.getElementById('mcVol');
+   // ─── DRAGGABLE CIRCULAR MUSIC PLAYER ───────────────────────────
+   const tracks = ['Free Soul.mp3', 'Purify.mp3', 'Fairytale.mp3'];
+   let currentTrackIndex = 0;
+   let isPlaying = false;
+   const audio = document.getElementById('bgAudio');
+   const mcCircular = document.getElementById('musicCircular');
+   const mcPlayBtn = document.getElementById('mcPlayBtn');
+   const mcShuffleBtn = document.getElementById('mcShuffleBtn');
+   const mcInfo = document.getElementById('mcInfo');
+   const mcVol = document.getElementById('mcVol');
 
-function loadRandomTrack() {
-  currentTrackIndex = Math.floor(Math.random() * tracks.length);
-  audio.src = tracks[currentTrackIndex];
-  // Clean up the filename for display (removes .mp3)
-  mcInfo.textContent = tracks[currentTrackIndex].replace('.mp3', '');
-}
+   function loadTrack(index) {
+     currentTrackIndex = index;
+     audio.src = tracks[currentTrackIndex];
+     mcInfo.textContent = tracks[currentTrackIndex].replace('.mp3', '');
+   }
 
-mcPlayBtn.addEventListener('click', () => {
-  if (!audio.src) loadRandomTrack();
-  if (isPlaying) {
-    audio.pause(); isPlaying = false; mcPlayBtn.textContent = '▶';
-  } else {
-    audio.play().catch(()=>{}); isPlaying = true; mcPlayBtn.textContent = '⏸';
-  }
-});
+   if (mcShuffleBtn) {
+     mcShuffleBtn.addEventListener('click', () => {
+       let newIndex;
+       do { newIndex = Math.floor(Math.random() * tracks.length); } while (newIndex === currentTrackIndex && tracks.length > 1);
+       loadTrack(newIndex);
+       if (isPlaying) audio.play().catch(()=>{});
+     });
+   }
 
-// Auto-shuffle when a track ends
-audio.addEventListener('ended', () => { 
-  loadRandomTrack(); 
-  if(isPlaying) audio.play(); 
-});
+   mcPlayBtn.addEventListener('click', () => {
+     if (!audio.src) loadTrack(0);
+     if (isPlaying) {
+       audio.pause(); isPlaying = false; mcPlayBtn.textContent = '▶';
+     } else {
+       audio.play().catch(()=>{}); isPlaying = true; mcPlayBtn.textContent = '⏸';
+     }
+   });
 
-mcVol.addEventListener('input', (e) => { audio.volume = e.target.value; });
+   audio.addEventListener('ended', () => { 
+     let newIndex;
+     do { newIndex = Math.floor(Math.random() * tracks.length); } while (newIndex === currentTrackIndex && tracks.length > 1);
+     loadTrack(newIndex);
+     if(isPlaying) audio.play().catch(()=>{});
+   });
+
+   mcVol.addEventListener('input', (e) => { audio.volume = e.target.value; });
+
+   // Draggable Logic (Mouse + Touch)
+   let isDragging = false, startX, startY, initialX, initialY;
+
+   function startDrag(e) {
+     isDragging = true;
+     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+     startX = clientX; startY = clientY;
+     const rect = mcCircular.getBoundingClientRect();
+     initialX = rect.left; initialY = rect.top;
+     mcCircular.style.transition = 'none';
+   }
+
+   function onDrag(e) {
+     if (!isDragging) return;
+     e.preventDefault();
+     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+     mcCircular.style.left = `${initialX + (clientX - startX)}px`;
+     mcCircular.style.top = `${initialY + (clientY - startY)}px`;
+     mcCircular.style.right = 'auto'; mcCircular.style.bottom = 'auto';
+   }
+
+   function endDrag(e) {
+     if (!isDragging) return;
+     isDragging = false;
+     mcCircular.style.transition = 'width 0.3s, height 0.3s, border-radius 0.3s';
+     const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+     const clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
+     if (Math.abs(clientX - startX) < 10 && Math.abs(clientY - startY) < 10) {
+       mcCircular.classList.toggle('expanded');
+     }
+   }
+
+   mcCircular.addEventListener('mousedown', startDrag);
+   mcCircular.addEventListener('touchstart', startDrag, {passive: false});
+   document.addEventListener('mousemove', onDrag);
+   document.addEventListener('touchmove', onDrag, {passive: false});
+   document.addEventListener('mouseup', endDrag);
+   document.addEventListener('touchend', endDrag);
 
 // Draggable Logic
 let isDragging = false, startX, startY, initialX, initialY;
