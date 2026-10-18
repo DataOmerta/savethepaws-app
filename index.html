@@ -962,9 +962,8 @@ function applyLang(){
 }
 
 function initDB(){
-  // We no longer store users or passwords here. Supabase handles authentication securely.
-  // This object is now only used for temporary client-side caching of non-sensitive data.
   const db = {
+    users: [], 
     posts: [],
     ads: [
       {id:'a1',type:'full',title:'Help Street Cats This Winter',description:'Donate blankets, food, or funds to help feral cats survive the cold months.',media:'',link:'https://example.com/donate',freq:6,active:true}
@@ -1681,7 +1680,7 @@ function doSubscribe(plan){
     currentUser.role = 'subscriber'; 
     currentUser.subExpires = exp.toISOString().split('T')[0];
     
-    const u = db.users.find(x => x.id === currentUser.id);
+        const u = (db.users || []).find(x => x.id === currentUser.id);
     if(u) { 
       u.subscribed = true; 
       u.role = 'subscriber'; 
@@ -1850,7 +1849,7 @@ function renderAdminData(){
   const live=db.posts.filter(p=>p.status==='live');
   const saved=live.filter(p=>p.saved).length;
   const pend=db.posts.filter(p=>p.status==='pending').length;
-  const subs=db.users.filter(u=>u.subscribed).length;
+    const subs = (db.users || []).filter(u => u.subscribed).length;
   document.getElementById('adminStatGrid').innerHTML=[
     {l:'Total Posts',v:live.length,s:pend+' pending'},
     {l:'Animals Saved',v:saved,s:Math.round(saved/(live.length||1)*100)+'% save rate'},
