@@ -961,15 +961,17 @@ function applyLang(){
   });
 }
 
-// ─── DB ─────────────────────────────────────
-const DB_KEY = 'savethepaws_db_v2';
 function initDB(){
   try {
     const raw = localStorage.getItem(DB_KEY);
     if(raw) return JSON.parse(raw);
   } catch(e){}
   const db = {
-    users:[],
+    users: [
+      {id:'u0', name:'Admin', email:'admin@savethepaws.app', password:'admin123', role:'admin', subscribed:true, subExpires:'2027-12-31', joined:'2025-01-01', posts:0}
+    ],
+    posts: [],
+    // ... rest of the db object remains the same
     posts:[],
     ads:[
       {id:'a1',type:'full',title:'Help Street Cats This Winter',description:'Donate blankets, food, or funds to help feral cats survive the cold months.',media:'',link:'https://example.com/donate',freq:6,active:true}
@@ -1584,7 +1586,7 @@ function handleAccountBtn(){
 function mobileAccountMenu(){
   if(!currentUser){ openLoginModal(); return; }
   if(currentUser.role==='admin'){
-    const choice = confirm('Go to Admin Dashboard?\n\nOK = Admin Dashboard\nCancel = Sign Out');
+    const choice = confirm('Go to Admin Dashboard?\nOK = Admin Dashboard\nCancel = Sign Out');
     if(choice) goToAdmin(); else if(confirm('Sign out?')) signOut();
   } else {
     if(confirm('Sign out of '+currentUser.name+'?')) signOut();
