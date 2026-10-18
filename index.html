@@ -962,37 +962,36 @@ function applyLang(){
 }
 
 function initDB(){
-  try {
-    const raw = localStorage.getItem(DB_KEY);
-    if(raw) return JSON.parse(raw);
-  } catch(e){}
+  // We no longer store users or passwords here. Supabase handles authentication securely.
+  // This object is now only used for temporary client-side caching of non-sensitive data.
   const db = {
-    users: [
-      {id:'u0', name:'Admin', email:'admin@savethepaws.app', password:'admin123', role:'admin', subscribed:true, subExpires:'2027-12-31', joined:'2025-01-01', posts:0}
-    ],
     posts: [],
-    // ... rest of the db object remains the same
-    posts:[],
-    ads:[
+    ads: [
       {id:'a1',type:'full',title:'Help Street Cats This Winter',description:'Donate blankets, food, or funds to help feral cats survive the cold months.',media:'',link:'https://example.com/donate',freq:6,active:true}
     ],
-    donors:[
+    donors: [
       {id:'d1',name:'SaveThePaws Fund',icon:'🐾',description:'All donations go directly to supporting stray animal rescue operations, veterinary care, and platform maintenance.',url:'https://paypal.me/JimOem'}
     ],
-    activity:[],
-    notifications:[],
-    settings:{adFreq:6,minKeywords:1,weeklyPrice:1.99,monthlyPrice:4.99,quarterlyPrice:11.99,annualPrice:29},
-    pendingNotif:null
+    activity: [],
+    notifications: [],
+    settings: {adFreq:6, minKeywords:1, weeklyPrice:1.99, monthlyPrice:4.99, quarterlyPrice:11.99, annualPrice:29},
+    pendingNotif: null
   };
-  saveDB(db);
   return db;
 }
 let db = initDB();
+
 function saveDB(d){
-  try{
-    if(currentUser && currentUser.subscribed) localStorage.setItem(DB_KEY, JSON.stringify(d));
-    else sessionStorage.setItem(DB_KEY+'_s', JSON.stringify(d));
-  }catch(e){}
+  // Only cache non-sensitive data locally. Never cache passwords or user credentials.
+  try {
+    const safeCache = {
+      posts: d.posts,
+      ads: d.ads,
+      donors: d.donors,
+      settings: d.settings
+    };
+    localStorage.setItem(DB_KEY, JSON.stringify(safeCache));
+  } catch(e) {}
 }
 // ─── STATE ──────────────────────────────────
 // 1. Initialize Supabase Client
@@ -1593,75 +1592,77 @@ function mobileAccountMenu(){
   }
 }
 function openLoginModal(){ openModal('loginModal'); }
-
 // ─── SECURE CLOUD LOGIN ───────────────────────────
 async function doLogin() {
-    const email = document.getElementById('loginEmail').value.trim();
-    const pass = document.getElementById('loginPass').value;
-    
-    const { data, error } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: pass
-    });
-    
-    if (error) {
-        showToast('Invalid email or password', 'warn');
-        return;
-    }
-    
-    // Get profile data
-    const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', data.user.id)
-        .single();
-    
-    currentUser = {
-        id: data.user.id,
-        name: profile?.name || email.split('@')[0],
-        email: data.user.email,
-        role: data.user.email === 'admin@savethepaws.app' ? 'admin' : (profile?.is_subscriber ? 'subscriber' : 'user'),
-        subscribed: profile?.is_subscriber || false
-    };
-    
-    updateUI();
-    closeModal('loginModal');
-    showToast('Welcome back! 👋', 'success');
-    loadCloudPosts(false);
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: email,
+    password: pass
+  });
+  
+  if (error) {
+    showToast('Invalid email or password', 'warn');
+    return;
+  }
+  
+  // Fetch the user's profile from Supabase
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', data.user.id)
+    .single();
+  
+  currentUser = {
+    id: data.user.id,
+    name: profile?.name || email.split('@')[0],
+    email: data.user.email,
+    role: profile?.role || 'user', // Assumes you have a 'role' column in your profiles table
+    subscribed: profile?.is_subscribed || false
+  };
+  
+  updateUI();
+  closeModal('loginModal');
+  showToast('Welcome back, ' + currentUser.name + '! 👋', 'success');
+  loadCloudPosts(false);
 }
+
 // ─── SECURE CLOUD REGISTRATION ────────────────────
 async function doRegister() {
-    const first = document.getElementById('regFirst').value.trim();
-    const last = document.getElementById('regLast').value.trim();
-    const email = document.getElementById('regEmail').value.trim();
-    const pass = document.getElementById('regPass').value;
-    
-    if(!first || !email || !pass) {
-        showToast('Fill in all fields', 'warn');
-        return;
+  const first = document.getElementById('regFirst').value.trim();
+  const last = document.getElementById('regLast').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const pass = document.getElementById('regPass').value;
+  
+  if(!first || !email || !pass) {
+    showToast('Fill in all fields', 'warn');
+    return;
+  }
+  if(pass.length < 8) {
+    showToast('Password must be 8+ characters', 'warn');
+    return;
+  }
+  
+  const { data, error } = await supabase.auth.signUp({
+    email: email,
+    password: pass,
+    options: {
+      data: {
+        name: first + (last ? ' ' + last : ''),
+        role: 'user',
+        is_subscribed: false
+      }
     }
-    if(pass.length < 8) {
-        showToast('Password must be 8+ characters', 'warn');
-        return;
-    }
-    
-    const { data, error } = await supabase.auth.signUp({
-        email: email,
-        password: pass,
-        options: {
-            data: {
-                name: first + (last ? ' ' + last : '')
-            }
-        }
-    });
-    
-    if (error) {
-        showToast(error.message, 'warn');
-        return;
-    }
-    
-    showToast('Account created! Please check your email to verify.', 'success');
-    closeModal('loginModal');
+  });
+  
+  if (error) {
+    showToast(error.message, 'warn');
+    return;
+  }
+  
+  showToast('Account created! Please check your email to verify.', 'success');
+  closeModal('loginModal');
 }
 
 function doSubscribe(plan){
