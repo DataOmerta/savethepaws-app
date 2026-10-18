@@ -526,12 +526,12 @@ body{overscroll-behavior:none;}
 
 <!-- MUSIC PLAYER -->
 <audio id="bgAudio" loop></audio>
-   <div class="music-circular" id="musicCircular">
-     <button class="mc-btn" id="mcShuffleBtn" title="Shuffle">🔀</button>
-     <div class="mc-info" id="mcInfo">Loading...</div>
-     <button class="mc-btn" id="mcPlayBtn" title="Play / Pause">▶</button>
-     <input class="mc-vol" id="mcVol" type="range" min="0" max="1" step="0.05" value="0.4" title="Volume">
-   </div>
+<div class="music-circular" id="musicCircular">
+  <button class="mc-btn" id="mcShuffleBtn" title="Shuffle">🔀</button>
+  <div class="mc-info" id="mcInfo">Loading...</div>
+  <button class="mc-btn" id="mcPlayBtn" title="Play / Pause">▶</button>
+  <input class="mc-vol" id="mcVol" type="range" min="0" max="1" step="0.05" value="0.4" title="Volume">
+</div>
 
 <!-- RATING POPUP -->
 <div class="rating-overlay" id="ratingOverlay">
@@ -2203,6 +2203,46 @@ function playProximityAlert() {
     }
   }
 }
+ // ─── MUSIC PLAYER FUNCTIONALITY ───────────────
+const tracks = ['Free Soul.mp3', 'Purify.mp3', 'Fairytale.mp3'];
+let currentTrackIndex = 0;
+let isPlaying = false;
+const audio = document.getElementById('bgAudio');
+const mcCircular = document.getElementById('musicCircular');
+const mcPlayBtn = document.getElementById('mcPlayBtn');
+const mcShuffleBtn = document.getElementById('mcShuffleBtn');
+const mcInfo = document.getElementById('mcInfo');
+const mcVol = document.getElementById('mcVol');
+
+function loadTrack(index) { 
+  currentTrackIndex = index; 
+  audio.src = tracks[currentTrackIndex]; 
+  mcInfo.textContent = tracks[currentTrackIndex].replace('.mp3', ''); 
+}
+
+if (mcShuffleBtn) {
+  mcShuffleBtn.addEventListener('click', () => {
+    let newIndex;
+    do { newIndex = Math.floor(Math.random() * tracks.length); } while (newIndex === currentTrackIndex && tracks.length > 1);
+    loadTrack(newIndex);
+    if (isPlaying) audio.play().catch(()=>{});
+  });
+}
+
+mcPlayBtn.addEventListener('click', () => {
+  if (!audio.src) loadTrack(0);
+  if (isPlaying) { audio.pause(); isPlaying = false; mcPlayBtn.textContent = '▶'; } 
+  else { audio.play().catch(()=>{}); isPlaying = true; mcPlayBtn.textContent = '⏸'; }
+});
+
+audio.addEventListener('ended', () => { 
+  let newIndex;
+  do { newIndex = Math.floor(Math.random() * tracks.length); } while (newIndex === currentTrackIndex && tracks.length > 1);
+  loadTrack(newIndex);
+  if(isPlaying) audio.play().catch(()=>{});
+});
+
+mcVol.addEventListener('input', (e) => { audio.volume = e.target.value; });  
 </script>
    <div class="credits-watermark">
   Sound/Art Direction by Bill Melachrinos &nbsp;•&nbsp; Planning/Development Dimitris Paraschidis &nbsp;•&nbsp; Communication/Advertising Aneta Conic
