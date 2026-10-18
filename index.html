@@ -1042,10 +1042,39 @@ window.onload = async function(){
         loadCloudPosts(false);
     }
 };
-     // Initialize cloud posts
-  if (typeof supabase !== 'undefined') {
-    loadCloudPosts(false);
-  }
+    window.onload = async function(){
+    // 1. Check if user is already logged in via Supabase
+    if (typeof supabase !== 'undefined') {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', session.user.id)
+                .single();
+            
+            currentUser = {
+                id: session.user.id,
+                name: profile?.name || session.user.email.split('@')[0],
+                email: session.user.email,
+                role: session.user.email === 'admin@savethepaws.app' ? 'admin' : (profile?.is_subscriber ? 'subscriber' : 'user'),
+                subscribed: profile?.is_subscriber || false
+            };
+        }
+    }
+    
+    updateUI();
+    renderPosts();
+    renderActivity();
+    renderSidebarDonations();
+    renderStats();
+    startGeo();
+    checkPendingNotif();
+    if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
+    applyLang();
+    initRating();
+    
+    console.log("✅ SaveThePaws System Initialized Successfully");
 };
 
 function checkPendingNotif(){
