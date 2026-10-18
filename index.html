@@ -1004,8 +1004,12 @@ function saveDB(d){
     else sessionStorage.setItem(DB_KEY+'_s', JSON.stringify(d));
   }catch(e){}
 }
-
 // ─── STATE ──────────────────────────────────
+// 1. Initialize Supabase Client
+const SUPABASE_URL = 'https://zqnwjdaxffsoglmhkqxc.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxbndqZGF4ZmZzb2dsbWhrcXhjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxODQwODYsImV4cCI6MjEwNzc2MDA4Nn0.KfvfbcwZYdaVVebPiqLDIDgjdkqxd2Q_sPNCT91ad84';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 let currentUser = null;
 let currentFilter = 'all';
 let currentTab = 'feed';
@@ -1339,21 +1343,45 @@ async function submitPost(){
   btn.disabled = true; 
   btn.textContent = hasPhoto ? '🔄 Compressing Image...' : '☁️ Uploading to Cloud...';
 
-  let compressedPhotoData = null;
+  let photoUrl = null;
+  let base64ForModeration = null;
+
   if(hasPhoto) {
     try {
-      compressedPhotoData = await compressImage(fileInput.files[0], 1080, 0.7);
+      btn.textContent = '🔄 Compressing Image...';
+      base64ForModeration = await compressImage(fileInput.files[0], 1080, 0.7);
+      
+      // Convert base64 to Blob for Supabase Storage upload
+      const res = await fetch(base64ForModeration);
+      const blob = await res.blob();
+      const fileName = `post_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.jpg`;
+      
+      btn.textContent = '☁️ Uploading to Storage...';
+      // Uploads to a bucket named 'photos'
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('photos')
+        .upload(fileName, blob, { contentType: 'image/jpeg', upsert: false });
+        
+      if (uploadError) {
+        console.error("Storage upload error:", uploadError);
+        throw uploadError;
+      }
+      
+      // Get the public URL to save in the database
+      const { data: { publicUrl } } = supabase.storage.from('photos').getPublicUrl(uploadData.path);
+      photoUrl = publicUrl;
+      
     } catch(e) {
-      showToast('Image processing failed', 'danger');
+      showToast('Image upload failed. Check storage settings.', 'danger');
       btn.disabled = false; btn.textContent = '🐾 Submit Report';
       return;
     }
   }
 
   let isSafe = true;
-  if(hasPhoto && compressedPhotoData) {
+  if(hasPhoto && base64ForModeration) {
     btn.textContent = '🔒 Scanning photo...';
-    isSafe = await sightengineCheck(compressedPhotoData);
+    isSafe = await sightengineCheck(base64ForModeration);
   }
 
   if(!isSafe) {
@@ -1362,7 +1390,7 @@ async function submitPost(){
     return;
   }
 
-  btn.textContent = '☁️ Saving to Database...';
+  btn.textContent = '💾 Saving to Database...';
   const newPost = {
     uploader: currentUser.name,
     animalType: type,
@@ -1376,7 +1404,7 @@ async function submitPost(){
     timestamp: Date.now(),
     saved: false,
     status: 'pending',
-    photoData: hasPhoto ? compressedPhotoData : null
+    photoData: photoUrl // NOW SAVES THE URL, NOT THE MASSIVE BASE64 STRING!
   };
 
   const { error } = await supabase.from('posts').insert([newPost]);
