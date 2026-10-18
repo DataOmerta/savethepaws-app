@@ -360,28 +360,6 @@ body{overscroll-behavior:none;}
   .admin-content{padding:12px;}
 }
 @media(max-width:380px){.plans-grid{grid-template-columns:1fr;}}
-/* ═══════════════════════════════════════════
-   MUSIC PLAYER
-═══════════════════════════════════════════ */
-.music-player{position:fixed;bottom:calc(var(--bottom-nav-h) + 60px);left:16px;z-index:301;background:linear-gradient(135deg,rgba(26,26,46,0.97),rgba(34,34,58,0.97));border:1px solid var(--accent);border-radius:50px;padding:7px 14px 7px 10px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 24px rgba(124,111,224,0.3);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);min-width:200px;transition:all .3s;}
-.music-player.collapsed{min-width:unset;padding:7px 10px;}
-.music-play-btn{width:36px;height:36px;border-radius:50%;background:var(--accent);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;transition:all .2s;}
-.music-play-btn:hover{background:var(--accent2);transform:scale(1.08);}
-.music-info{flex:1;min-width:0;overflow:hidden;}
-.music-title{font-size:11px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;animation:marquee 12s linear infinite;}
-@keyframes marquee{0%{transform:translateX(0)}50%{transform:translateX(-30%)}100%{transform:translateX(0)}}
-.music-sub{font-size:10px;color:var(--text3);margin-top:1px;}
-.music-bars{display:flex;align-items:flex-end;gap:2px;height:16px;flex-shrink:0;}
-.music-bar{width:3px;background:var(--accent2);border-radius:2px;animation:bar 0.8s ease infinite alternate;}
-.music-bar:nth-child(1){height:6px;animation-delay:0s;}
-.music-bar:nth-child(2){height:12px;animation-delay:0.15s;}
-.music-bar:nth-child(3){height:8px;animation-delay:0.3s;}
-.music-bar:nth-child(4){height:14px;animation-delay:0.1s;}
-.music-bar:nth-child(5){height:5px;animation-delay:0.25s;}
-.music-bars.paused .music-bar{animation-play-state:paused;}
-@keyframes bar{from{transform:scaleY(0.4)}to{transform:scaleY(1)}}
-.music-vol{width:50px;accent-color:var(--accent);cursor:pointer;}
-.music-collapse-btn{background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;padding:2px;flex-shrink:0;}
 
 /* ═══════════════════════════════════════════
    LOGOUT BUTTON
@@ -407,11 +385,23 @@ body{overscroll-behavior:none;}
 .rating-go-btn:hover{opacity:.9;}
 .rating-skip{background:none;border:none;color:var(--text3);font-size:13px;cursor:pointer;padding:4px;}
 .rating-skip:hover{color:var(--text2);}
-
-@media(max-width:660px){
-  .music-player{bottom:calc(var(--bottom-nav-h) + 70px);left:10px;}
-  .music-vol{display:none;}
+   
+/* ═══════════════════════════════════════════
+   MUSIC PLAYER
+═══════════════════════════════════════════ */
+.music-circular {
+  position: fixed; bottom: 100px; right: 30px; width: 60px; height: 60px;
+  background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  cursor: grab; z-index: 9999; box-shadow: 0 4px 20px rgba(124,111,224,0.5); transition: width 0.3s, height 0.3s, border-radius 0.3s;
 }
+.music-circular:active { cursor: grabbing; }
+.music-circular.expanded { width: 240px; height: 70px; border-radius: 35px; justify-content: space-between; padding: 0 15px; }
+.mc-btn { background: none; border: none; color: #fff; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; }
+.mc-btn:hover { background: rgba(255,255,255,0.2); }
+.mc-info { flex: 1; color: #fff; font-size: 12px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: none; }
+.mc-vol { width: 60px; accent-color: #fff; display: none; }
+.music-circular.expanded .mc-info, .music-circular.expanded .mc-vol { display: block; }
+@media(max-width:660px){ .music-circular { bottom: 90px; right: 20px; } }
 </style>
 </head>
 <body>
@@ -462,6 +452,7 @@ body{overscroll-behavior:none;}
       <div class="sidebar-role">
         <div class="r-label" data-i18n="your_role">Your Role</div>
         <div class="r-val" id="sideRole">Guest</div>
+<div class="r-val" id="sideBadges" style="font-size:11px; color:var(--accent2); margin-top:6px;"></div>
       </div>
       <button id="sideAdminBtn" onclick="goToAdmin()" style="display:none;background:var(--warn-bg);border:1px solid var(--warn);color:var(--warn);border-radius:var(--radius);padding:10px;font-size:13px;font-weight:700;cursor:pointer;width:100%;">🛡 Admin Dashboard</button>
       <button class="logout-btn" id="sideLogoutBtn" onclick="signOut()">↩ Sign Out</button>
@@ -482,7 +473,7 @@ body{overscroll-behavior:none;}
       <div class="feed-controls" id="feedControls">
         <div class="search-wrap">
           <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <input placeholder="Search animals, cities..." id="searchInput" oninput="renderPosts()">
+          <input placeholder="Search animals, cities..." id="searchInput" oninput="renderPosts()" autocomplete="off">
         </div>
         <div class="filter-row">
           <div class="fchip active" onclick="setFilter('all',this)" data-i18n="filter_all">All</div>
@@ -533,28 +524,14 @@ body{overscroll-behavior:none;}
   </div>
 </div>
 
-<!-- FLOATING DONATE -->
-<!-- AUDIO ELEMENT -->
-<audio id="bgMusic" loop preload="auto">
-  <source id="bgMusicSrc" src="" type="audio/mpeg">
-</audio>
-
 <!-- MUSIC PLAYER -->
-<div class="music-player" id="musicPlayer">
-  <button class="music-play-btn" id="musicPlayBtn" onclick="toggleMusic()" title="Play / Pause">▶</button>
-  <div class="music-info" id="musicInfo">
-    <div class="music-title">Fairytale For Your Child</div>
-    <div class="music-sub">SaveThePaws ♪ Background</div>
-  </div>
-  <div class="music-bars paused" id="musicBars">
-    <div class="music-bar"></div>
-    <div class="music-bar"></div>
-    <div class="music-bar"></div>
-    <div class="music-bar"></div>
-    <div class="music-bar"></div>
-  </div>
-  <input class="music-vol" id="musicVol" type="range" min="0" max="1" step="0.05" value="0.4" oninput="setVolume(this.value)" title="Volume">
-  <button class="music-collapse-btn" onclick="collapseMusic()" title="Minimise">✕</button>
+<audio id="bgAudio" loop></audio>
+   <div class="music-circular" id="musicCircular">
+     <button class="mc-btn" id="mcShuffleBtn" title="Shuffle">🔀</button>
+     <div class="mc-info" id="mcInfo">Loading...</div>
+     <button class="mc-btn" id="mcPlayBtn" title="Play / Pause">▶</button>
+     <input class="mc-vol" id="mcVol" type="range" min="0" max="1" step="0.05" value="0.4" title="Volume">
+   </div>
 </div>
 
 <!-- RATING POPUP -->
@@ -578,9 +555,7 @@ body{overscroll-behavior:none;}
   </div>
 </div>
 
-<button class="float-donate" onclick="openDonateModal()">
-  ❤️ <span data-i18n="donate_float">Donate</span>
-</button>
+
 
 <!-- ═══════════════ ADMIN SCREEN ═══════════════ -->
 <div id="adminScreen" class="admin-screen">
@@ -806,18 +781,17 @@ body{overscroll-behavior:none;}
     <p class="modal-sub" id="loginSub">Access your account to post reports and more.</p>
     <div id="loginForm">
       <div class="fg"><label>Email</label><input type="email" id="loginEmail" placeholder="you@email.com"></div>
-      <div class="fg"><label>Password</label><input type="password" id="loginPass" placeholder="••••••••"></div>
+      <div class="fg"><label>Password</label><input type="password" id="regPass" placeholder="••••••••" autocomplete="new-password"></div>
       <button class="btn-primary" onclick="doLogin()">Sign In</button>
       <button class="btn-secondary" onclick="switchForm('register')">Create Free Account →</button>
-      <div style="text-align:center;margin-top:10px;font-size:11px;color:var(--text3);">Admin: admin@savethepaws.app / admin123</div>
-    </div>
+          </div>
     <div id="registerForm" style="display:none;">
       <div class="fg-row">
         <div class="fg"><label>First Name</label><input id="regFirst" placeholder="Alex"></div>
         <div class="fg"><label>Last Name</label><input id="regLast" placeholder="Smith"></div>
       </div>
       <div class="fg"><label>Email</label><input type="email" id="regEmail" placeholder="you@email.com"></div>
-      <div class="fg"><label>Password (min 8 chars)</label><input type="password" id="regPass" placeholder="••••••••"></div>
+      <div class="fg"><label>Password (min 8 chars)</label><input type="password" id="regPass" placeholder="••••••••" autocomplete="new-password"></div>
       <button class="btn-primary" onclick="doRegister()">Create Account — Free</button>
       <button class="btn-secondary" onclick="switchForm('login')">← Back to Sign In</button>
       <div style="font-size:11px;color:var(--text3);margin-top:10px;text-align:center;">Free accounts: post reports, edit descriptions. No cookies stored without subscription.</div>
@@ -868,6 +842,18 @@ body{overscroll-behavior:none;}
           <li>Early features</li>
         </ul>
         <button class="plan-btn">Choose 3-Month</button>
+      </div>
+             <div class="plan-card" onclick="doSubscribe('weekend')" style="border-color: var(--orange);">
+        <div class="plan-badge" style="background:var(--orange);">WEEKEND HERO</div>
+        <div class="plan-name">Weekend Hero</div>
+        <div class="plan-price">Free</div>
+        <div class="plan-period">48-hour access</div>
+        <ul class="plan-perks">
+          <li>Full live map access</li>
+          <li>Near Me & Country modes</li>
+          <li>Claim animals</li>
+        </ul>
+        <button class="plan-btn" style="background:var(--orange);">Activate Weekend</button>
       </div>
       <div class="plan-card featured" onclick="doSubscribe('annual')">
         <div class="plan-badge" style="background:var(--success);">BEST VALUE</div>
@@ -924,8 +910,13 @@ body{overscroll-behavior:none;}
 <!-- ═══════════════════════════════════════════
      JAVASCRIPT
 ═══════════════════════════════════════════ -->
+   
 <script>
 // ─── i18n ───────────────────────────────────
+   const mewSound = new Audio('./mew.mp3');
+const chimeSound = new Audio('./chime.mp3');
+mewSound.volume = 0.3;
+chimeSound.volume = 0.4;
 const LANG = {
   en: {
     report_btn:'Report Animal',saved_label:'Animals Saved',posted_label:'Total Reports',
@@ -1070,7 +1061,8 @@ function startGeo(){
     gs2.textContent = '✓ GPS: '+pos.coords.latitude.toFixed(4)+', '+pos.coords.longitude.toFixed(4);
     gs2.className = 'geo-status ok';
     window._geoLat = pos.coords.latitude.toFixed(6);
-    window._geoLon = pos.coords.longitude.toFixed(6);
+   window._geoLon = pos.coords.longitude.toFixed(6);
+    window._userCountry = 'Greece'; // Matches your mock data country
   }, ()=>{
     const gs2 = document.getElementById('geoStatus');
     gs2.textContent = '⚠ GPS unavailable — enter city manually';
@@ -1117,9 +1109,18 @@ function renderPosts(){
   const isSub = currentUser && currentUser.subscribed;
   const isReg = !!currentUser;
 
-  let posts = db.posts.filter(p=>p.status==='live').slice().reverse();
+    let posts = db.posts.filter(p=>p.status==='live').slice().reverse();
 
-  if(currentFilter==='injured') posts=posts.filter(p=>p.condition==='injured');
+  // Location Funnel
+  if (currentLocationMode === 'near' && window._geoLat && window._geoLon) {
+    posts = posts.filter(p => {
+      const dist = getDistance(parseFloat(window._geoLat), parseFloat(window._geoLon), parseFloat(p.lat), parseFloat(p.lon));
+      return dist <= 50;
+    });
+  } else if (currentLocationMode === 'country' && window._userCountry) {
+    posts = posts.filter(p => p.country === window._userCountry);
+  }
+if(currentFilter==='injured') posts=posts.filter(p=>p.condition==='injured');
   else if(currentFilter==='saved') posts=posts.filter(p=>p.saved);
   else if(currentFilter!=='all') posts=posts.filter(p=>p.animalType===currentFilter);
 
@@ -1161,8 +1162,11 @@ function renderPostCard(post, isSub, isReg){
 
   const savedWM = post.saved ? `<div class="saved-wm"><div class="wm">✓ Saved</div></div>` : '';
 
-  const uploaderName = isSub ? post.uploader : `<span class="blurred-text" onclick="openSubModal()" title="Subscribe to see">${post.uploader}</span>`;
+   const uploaderName = isSub ? post.uploader : `<span class="blurred-text" onclick="openSubModal()" title="Subscribe to see">${post.uploader}</span>`;
   const uploaderDisplay = isSub ? post.uploader : '••••••';
+  
+  const waitTime = fmtTime(post.timestamp).replace('ago', '');
+  const urgencyText = !isSub ? `<div style="color:var(--danger);font-size:12px;font-weight:700;margin-top:8px;animation:pulse 2s infinite; line-height:1.4;">This ${post.animalType} has been waiting for ${waitTime}. I could be there in 5 minutes if I could just see the map.</div>` : '';
 
   const coords = isSub
     ? `<span class="info-chip"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="10" r="3"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>${post.lat}, ${post.lon}</span>
@@ -1194,9 +1198,9 @@ function renderPostCard(post, isSub, isReg){
         </div>
       </div>
       <div class="pc-img-wrap">${photoContent}${savedWM}</div>
-      <div class="pc-desc">${post.desc}</div>
+           <div class="pc-desc">${post.desc}${urgencyText}</div>
       <div class="pc-info">${coords}</div>
-      <div class="pc-actions">${claimBtn}${editBtn}${flagBtn}</div>
+      <div class="pc-actions">${claimBtn}${editBtn}${flagBtn}<button class="btn-edit" onclick="sharePost('${post.id}')" title="Share this post">📤</button></div>
     </div>`;
 }
 
@@ -1307,6 +1311,13 @@ async function claudeImageCheck(imageData, desc){
 }
 
 async function submitPost(){
+   const today = new Date().toDateString();
+const uploadKey = `stp_uploads_${currentUser.id}_${today}`;
+const todayUploads = parseInt(localStorage.getItem(uploadKey) || '0');
+if (todayUploads >= 7) { 
+  showToast('Amazing work today! Your daily limit is reached. Rest up, rescuer.', 'warn'); 
+  return; 
+}
   if(!currentUser){ showToast('Sign in to post','warn'); return; }
   const desc = document.getElementById('animalDesc').value.trim();
   const city = document.getElementById('animalCity').value.trim();
@@ -1368,6 +1379,7 @@ async function submitPost(){
   if(status==='live'){
     db.activity.unshift({type:'new',text:'New '+type+' reported in '+city,time:'just now'});
     showToast('Report posted successfully! 🐾','success');
+     localStorage.setItem(uploadKey, (todayUploads + 1).toString());
   } else {
     showToast('Post submitted — pending admin review 🔍','warn');
   }
@@ -1396,13 +1408,21 @@ function openClaim(postId){
   openModal('claimModal');
 }
 function confirmClaim(){
+   const today = new Date().toDateString();
+const claimKey = `stp_claims_${currentUser.id}_${today}`;
+const todayClaims = parseInt(localStorage.getItem(claimKey) || '0');
+if (todayClaims >= 3) { 
+  showToast('You have reached your daily claim limit. Every rescue counts!', 'warn'); 
+  return; 
+}
   const post=db.posts.find(p=>p.id===claimTargetId);
   if(!post)return;
   post.saved=true; post.savedBy=currentUser.name; post.savedAt=Date.now();
   db.activity.unshift({type:'saved',text:post.animalType+' in '+post.city+' claimed by '+currentUser.name,time:'just now'});
+   localStorage.setItem(claimKey, (todayClaims + 1).toString());
   saveDB(db);
   closeModal('claimModal');
-  renderPosts();renderActivity();renderStats();
+  renderPosts();renderActivity();renderStats();checkBadges();
   showToast('Animal marked as Saved! 🏠','success');
 }
 
@@ -1438,6 +1458,48 @@ function flagPost(postId){
   showToast('Post flagged for admin review','warn');
 }
 
+   // ─── SHARE ───────────────────────────────────
+function sharePost(postId) {
+  const post = db.posts.find(p => p.id === postId);
+  if (!post) return;
+  const text = `Check out this ${post.animalType} in ${post.city} on SaveThePaws, the world's first real-time animal rescue network!`;
+  const url = window.location.href;
+  if (navigator.share) {
+    navigator.share({ title: 'SaveThePaws', text: text, url: url }).catch(()=>{});
+  } else {
+    navigator.clipboard.writeText(`${text} ${url}`);
+    showToast('Post link copied to clipboard!', 'success');
+  }
+}
+   // ─── BADGE SYSTEM ───────────────────────────
+function checkBadges() {
+  if (!currentUser) return;
+  const badgesKey = `stp_badges_${currentUser.id}`;
+  const earnedBadges = JSON.parse(localStorage.getItem(badgesKey) || '[]');
+  
+  const userClaims = db.posts.filter(p => p.savedBy === currentUser.name).length;
+
+  const userStats = getUserStats(); // Define it first!
+  if (!earnedBadges.includes('scout') && (userStats.posts >= 10 || userClaims >= 1)) {
+    earnedBadges.push('scout');
+    showToast('🎉 You earned the Scout badge!', 'success');
+  }
+  if (!earnedBadges.includes('guardian') && userClaims >= 5) {
+    earnedBadges.push('guardian');
+    showToast('🎉 You earned the Guardian badge!', 'success');
+  }
+  if (!earnedBadges.includes('hero') && userClaims >= 10) {
+    earnedBadges.push('hero');
+    showToast('🎉 You earned the Hero badge!', 'success');
+  }
+  
+  localStorage.setItem(badgesKey, JSON.stringify(earnedBadges));
+  
+  const sideBadges = document.getElementById('sideBadges');
+  if (sideBadges && earnedBadges.length > 0) {
+    sideBadges.textContent = '🏆 ' + earnedBadges.map(b => b.charAt(0).toUpperCase() + b.slice(1)).join(', ');
+  }
+}
 // ─── AUTH ───────────────────────────────────
 function handleAccountBtn(){
   if(currentUser){
@@ -1493,7 +1555,9 @@ function doSubscribe(plan){
   if(plan==='weekly') exp.setDate(exp.getDate()+7);
   else if(plan==='monthly') exp.setMonth(exp.getMonth()+1);
   else if(plan==='quarterly') exp.setMonth(exp.getMonth()+3);
+  else if(plan==='weekend') exp.setDate(exp.getDate()+2); // 2 days for Weekend Hero
   else exp.setFullYear(exp.getFullYear()+1);
+  
   currentUser.subscribed=true; currentUser.role='subscriber'; currentUser.subExpires=exp.toISOString().split('T')[0];
   const u=db.users.find(x=>x.id===currentUser.id);
   if(u){u.subscribed=true;u.role='subscriber';u.subExpires=currentUser.subExpires;}
@@ -1811,73 +1875,80 @@ function removeDonor(id){db.donors=db.donors.filter(d=>d.id!==id);saveDB(db);ren
 function saveSettings(){showToast('Settings saved','success');}
 
 // ─── MUSIC PLAYER ───────────────────────────
-let musicPlaying = false;
-let musicLoaded = false;
-let musicCollapsed = false;
+const tracks = ['Free Soul.mp3', 'Purify.mp3', 'Fairytale.mp3'];
+let currentTrackIndex = 0;
+let isPlaying = false;
+const audio = document.getElementById('bgAudio');
+const mcCircular = document.getElementById('musicCircular');
+const mcPlayBtn = document.getElementById('mcPlayBtn');
+const mcShuffleBtn = document.getElementById('mcShuffleBtn');
+const mcInfo = document.getElementById('mcInfo');
+const mcVol = document.getElementById('mcVol');
 
-function loadMusicIfNeeded(){
-  if(musicLoaded) return;
-  // Load the audio from the hosted file (same directory as index.html)
-  const audio = document.getElementById('bgMusic');
-  audio.src = './Fairytale_For_Your_Child.mp3';
-  audio.volume = parseFloat(document.getElementById('musicVol').value);
-  musicLoaded = true;
+function loadTrack(index) { 
+  currentTrackIndex = index; 
+  audio.src = tracks[currentTrackIndex]; 
+  mcInfo.textContent = tracks[currentTrackIndex].replace('.mp3', ''); 
 }
 
-function toggleMusic(){
-  loadMusicIfNeeded();
-  const audio = document.getElementById('bgMusic');
-  const btn = document.getElementById('musicPlayBtn');
-  const bars = document.getElementById('musicBars');
-  const info = document.getElementById('musicInfo');
-  if(musicPlaying){
-    audio.pause();
-    musicPlaying = false;
-    btn.textContent = '▶';
-    bars.classList.add('paused');
-  } else {
-    audio.play().catch(()=>{});
-    musicPlaying = true;
-    btn.textContent = '⏸';
-    bars.classList.remove('paused');
-    if(musicCollapsed) expandMusic();
-  }
+if (mcShuffleBtn) {
+  mcShuffleBtn.addEventListener('click', () => {
+    let newIndex;
+    do { newIndex = Math.floor(Math.random() * tracks.length); } while (newIndex === currentTrackIndex && tracks.length > 1);
+    loadTrack(newIndex);
+    if (isPlaying) audio.play().catch(()=>{});
+  });
 }
 
-function setVolume(v){
-  const audio = document.getElementById('bgMusic');
-  audio.volume = parseFloat(v);
-}
+mcPlayBtn.addEventListener('click', () => {
+  if (!audio.src) loadTrack(0);
+  if (isPlaying) { audio.pause(); isPlaying = false; mcPlayBtn.textContent = '▶'; } 
+  else { audio.play().catch(()=>{}); isPlaying = true; mcPlayBtn.textContent = '⏸'; }
+});
 
-function collapseMusic(){
-  const player = document.getElementById('musicPlayer');
-  const info = document.getElementById('musicInfo');
-  const bars = document.getElementById('musicBars');
-  const vol = document.getElementById('musicVol');
-  const colBtn = document.querySelector('.music-collapse-btn');
-  musicCollapsed = true;
-  info.style.display = 'none';
-  bars.style.display = 'none';
-  vol.style.display = 'none';
-  colBtn.textContent = '♪';
-  colBtn.onclick = expandMusic;
-  player.classList.add('collapsed');
-}
+audio.addEventListener('ended', () => { 
+  let newIndex;
+  do { newIndex = Math.floor(Math.random() * tracks.length); } while (newIndex === currentTrackIndex && tracks.length > 1);
+  loadTrack(newIndex);
+  if(isPlaying) audio.play().catch(()=>{});
+});
 
-function expandMusic(){
-  const player = document.getElementById('musicPlayer');
-  const info = document.getElementById('musicInfo');
-  const bars = document.getElementById('musicBars');
-  const vol = document.getElementById('musicVol');
-  const colBtn = document.querySelector('.music-collapse-btn');
-  musicCollapsed = false;
-  info.style.display = '';
-  bars.style.display = '';
-  vol.style.display = '';
-  colBtn.textContent = '✕';
-  colBtn.onclick = collapseMusic;
-  player.classList.remove('collapsed');
+mcVol.addEventListener('input', (e) => { audio.volume = e.target.value; });
+
+// Draggable Logic
+let isDragging = false, startX, startY, initialX, initialY;
+function startDrag(e) {
+  isDragging = true;
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  startX = clientX; startY = clientY;
+  const rect = mcCircular.getBoundingClientRect();
+  initialX = rect.left; initialY = rect.top;
+  mcCircular.style.transition = 'none';
 }
+function onDrag(e) {
+  if (!isDragging) return;
+  e.preventDefault();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  mcCircular.style.left = `${initialX + (clientX - startX)}px`;
+  mcCircular.style.top = `${initialY + (clientY - startY)}px`;
+  mcCircular.style.right = 'auto'; mcCircular.style.bottom = 'auto';
+}
+function endDrag(e) {
+  if (!isDragging) return;
+  isDragging = false;
+  mcCircular.style.transition = 'width 0.3s, height 0.3s, border-radius 0.3s';
+  const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+  const clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
+  if (Math.abs(clientX - startX) < 10 && Math.abs(clientY - startY) < 10) { mcCircular.classList.toggle('expanded'); }
+}
+mcCircular.addEventListener('mousedown', startDrag);
+mcCircular.addEventListener('touchstart', startDrag, {passive: false});
+document.addEventListener('mousemove', onDrag);
+document.addEventListener('touchmove', onDrag, {passive: false});
+document.addEventListener('mouseup', endDrag);
+document.addEventListener('touchend', endDrag);
 
 // ─── LOGOUT ─────────────────────────────────
 function updateLogoutBtn(){
@@ -1961,5 +2032,8 @@ renderPosts();renderActivity();renderSidebarDonations();renderStats();updateUI()
 updateLogoutBtn();
 initRating();
 </script>
+   <div class="credits-watermark">
+  Sound/Art Direction by Bill Melachrinos &nbsp;•&nbsp; Planning/Development Dimitris Paraschidis &nbsp;•&nbsp; Communication/Advertising Aneta Conic
+</div>
 </body>
 </html>
