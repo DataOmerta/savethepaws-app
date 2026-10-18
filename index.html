@@ -1008,18 +1008,40 @@ let currentLocationMode = 'all'; // 'all', 'near', or 'country'
 const ANIMAL_KEYWORDS = ['cat','dog','bird','rabbit','animal','stray','injured','lost','paw','fur','feather','kitten','puppy','feral','rescue','adopt','pet','meow','bark','collar','vet','wounded','limping','hungry','scared','domestic','pigeon','parrot','hamster','turtle','ζώο','γάτα','σκύλος','πουλί','κουτάβι','γατάκι'];
 
 // ─── BOOT ───────────────────────────────────
-window.onload = function(){
-  const saved = localStorage.getItem('stp_user');
-  if(saved){try{const u=JSON.parse(saved);const found=db.users.find(x=>x.id===u.id);if(found){currentUser=found;}}catch(e){}}
-  updateUI();
-  renderPosts();
-  renderActivity();
-  renderSidebarDonations();
-  renderStats();
-  startGeo();
-  checkPendingNotif();
-  if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
-  applyLang();
+window.onload = async function(){
+    // Check if user is already logged in via Supabase
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+        
+        currentUser = {
+            id: session.user.id,
+            name: profile?.name || session.user.email.split('@')[0],
+            email: session.user.email,
+            role: session.user.email === 'admin@savethepaws.app' ? 'admin' : (profile?.is_subscriber ? 'subscriber' : 'user'),
+            subscribed: profile?.is_subscriber || false
+        };
+    }
+    
+    updateUI();
+    renderPosts();
+    renderActivity();
+    renderSidebarDonations();
+    renderStats();
+    startGeo();
+    checkPendingNotif();
+    if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
+    applyLang();
+    
+    // Initialize cloud posts
+    if (typeof supabase !== 'undefined') {
+        loadCloudPosts(false);
+    }
+};
      // Initialize cloud posts
   if (typeof supabase !== 'undefined') {
     loadCloudPosts(false);
@@ -1168,12 +1190,12 @@ function renderPostCard(post, isSub, isReg){
   const waitTime = fmtTime(post.timestamp).replace('ago', '');
   const urgencyText = !isSub ? `<div style="color:var(--danger);font-size:12px;font-weight:700;margin-top:8px;animation:pulse 2s infinite; line-height:1.4;">This ${post.animalType} has been waiting for ${waitTime}. I could be there in 5 minutes if I could just see the map.</div>` : '';
 
-  const coords = isSub
-    ? `<span class="info-chip"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="10" r="3"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>${post.lat}, ${post.lon}</span>
+    const coords = isSub
+    ? `<span class="info-chip" onclick="openMapModal('${post.lat}', '${post.lon}', '${post.city}')" style="cursor: pointer; font-weight: 600;"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="10" r="3"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg> View Exact Map</span>
        <span class="info-chip"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>${post.city}, ${post.country}</span>`
     : `<span class="info-chip blurred-chip" onclick="openSubModal()">📍 ${post.lat}, ${post.lon}</span>
        <span class="info-chip blurred-chip" onclick="openSubModal()">🏙 ${post.city}, ${post.country}</span>
-       <span class="lock-pill" onclick="openSubModal()">🔒 Subscribe to unlock</span>`;
+       <span class="lock-pill" onclick="openSubModal()">🔒 Subscribe to unlock map</span>`;
 
   const claimBtn = post.saved
     ? `<button class="btn-claim claimed" disabled>✓ Adopted</button>`
@@ -1573,36 +1595,74 @@ function mobileAccountMenu(){
 }
 function openLoginModal(){ openModal('loginModal'); }
 
-function doLogin(){
-  const email=document.getElementById('loginEmail').value.trim();
-  const pass=document.getElementById('loginPass').value;
-  const user=db.users.find(u=>u.email===email&&u.password===pass);
-  if(!user){showToast('Invalid email or password','warn');return;}
-  currentUser=user;
-  if(user.subscribed) localStorage.setItem('stp_user',JSON.stringify({id:user.id}));
-  updateUI();
-  closeModal('loginModal');
-  showToast('Welcome back, '+user.name+'! 👋','success');
-  renderPosts();renderStats();
-  if(user.role==='admin') showAdminBtn();
+// ─── SECURE CLOUD LOGIN ───────────────────────────
+async function doLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const pass = document.getElementById('loginPass').value;
+    
+    const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: pass
+    });
+    
+    if (error) {
+        showToast('Invalid email or password', 'warn');
+        return;
+    }
+    
+    // Get profile data
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', data.user.id)
+        .single();
+    
+    currentUser = {
+        id: data.user.id,
+        name: profile?.name || email.split('@')[0],
+        email: data.user.email,
+        role: data.user.email === 'admin@savethepaws.app' ? 'admin' : (profile?.is_subscriber ? 'subscriber' : 'user'),
+        subscribed: profile?.is_subscriber || false
+    };
+    
+    updateUI();
+    closeModal('loginModal');
+    showToast('Welcome back! 👋', 'success');
+    loadCloudPosts(false);
 }
-
-function doRegister(){
-  const first=document.getElementById('regFirst').value.trim();
-  const last=document.getElementById('regLast').value.trim();
-  const email=document.getElementById('regEmail').value.trim();
-  const pass=document.getElementById('regPass').value;
-  if(!first||!email||!pass){showToast('Fill in all fields','warn');return;}
-  if(pass.length<8){showToast('Password must be 8+ characters','warn');return;}
-  if(db.users.find(u=>u.email===email)){showToast('Email already registered','warn');return;}
-  const u={id:'u'+Date.now(),name:first+(last?' '+last:''),email,password:pass,role:'user',subscribed:false,subExpires:null,joined:new Date().toISOString().split('T')[0],posts:0};
-  db.users.push(u);
-  currentUser=u;
-  saveDB(db);
-  updateUI();
-  closeModal('loginModal');
-  showToast('Account created! Welcome, '+first+'!','success');
-  renderPosts();
+// ─── SECURE CLOUD REGISTRATION ────────────────────
+async function doRegister() {
+    const first = document.getElementById('regFirst').value.trim();
+    const last = document.getElementById('regLast').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const pass = document.getElementById('regPass').value;
+    
+    if(!first || !email || !pass) {
+        showToast('Fill in all fields', 'warn');
+        return;
+    }
+    if(pass.length < 8) {
+        showToast('Password must be 8+ characters', 'warn');
+        return;
+    }
+    
+    const { data, error } = await supabase.auth.signUp({
+        email: email,
+        password: pass,
+        options: {
+            data: {
+                name: first + (last ? ' ' + last : '')
+            }
+        }
+    });
+    
+    if (error) {
+        showToast(error.message, 'warn');
+        return;
+    }
+    
+    showToast('Account created! Please check your email to verify.', 'success');
+    closeModal('loginModal');
 }
 
 function doSubscribe(plan){
@@ -1625,12 +1685,13 @@ function doSubscribe(plan){
   showToast('Subscribed! Location data unlocked. 🔓','success');
 }
 
-function signOut(){
-  currentUser=null;
-  localStorage.removeItem('stp_user');
-  updateUI();
-  renderPosts();
-  showToast('Signed out');
+// ─── SECURE LOGOUT ────────────────────────────────
+async function signOut() {
+    await supabase.auth.signOut();
+    currentUser = null;
+    updateUI();
+    loadCloudPosts(false);
+    showToast('Signed out');
 }
 
 function showAdminBtn(){
@@ -1699,7 +1760,29 @@ function openNotifPanel(){ showToast('No new notifications'); }
 
 // ─── SUBSCRIBE MODAL ────────────────────────
 function openSubModal(){ openModal('subModal'); }
-
+function openMapModal(lat, lon, city) {
+  // SECURITY CHECK: Only subscribers can view the exact map
+  if (!currentUser || !currentUser.subscribed) {
+    openSubModal();
+    return;
+  }
+  
+  const container = document.getElementById('mapFrameContainer');
+  
+  // OpenStreetMap Embed URL (tight bounding box for maximum accuracy, centered on marker)
+  const latNum = parseFloat(lat);
+  const lonNum = parseFloat(lon);
+  const offset = 0.002; // Roughly ~200 meters, keeps the map tightly zoomed on the exact pin
+  const osmEmbedUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${lonNum-offset},${latNum-offset},${lonNum+offset},${latNum+offset}&layer=mapnik&marker=${latNum},${lonNum}`;
+  
+  container.innerHTML = `<iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="${osmEmbedUrl}" style="border: 0;"></iframe>`;
+  
+  // Set external navigation links for maximum accuracy
+  document.getElementById('gmapsLink').href = `https://www.google.com/maps?q=${latNum},${lonNum}`;
+  document.getElementById('osmLink').href = `https://www.openstreetmap.org/?mlat=${latNum}&mlon=${lonNum}#map=19/${latNum}/${lonNum}`;
+  
+  openModal('mapModal');
+}
 // ─── MODALS ─────────────────────────────────
 function openModal(id){ document.getElementById(id).classList.add('open'); }
 function closeModal(id){ document.getElementById(id).classList.remove('open'); }
@@ -2128,6 +2211,22 @@ function playProximityAlert() {
 </script>
    <div class="credits-watermark">
   Sound/Art Direction by Bill Melachrinos &nbsp;•&nbsp; Planning/Development Dimitris Paraschidis &nbsp;•&nbsp; Communication/Advertising Aneta Conic
+</div>
+   <!-- MAP POPUP MODAL -->
+<div class="modal-overlay" id="mapModal">
+  <div class="modal" style="max-width: 600px; padding: 0; overflow: hidden;">
+    <div style="padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border);">
+      <h3 style="margin: 0; font-size: 16px;">📍 Exact Rescue Location</h3>
+      <button class="modal-close" onclick="closeModal('mapModal')" style="position: static; margin: 0;">✕</button>
+    </div>
+    <div id="mapFrameContainer" style="width: 100%; height: 400px; background: var(--bg3);">
+      <!-- Interactive map iframe will be injected here -->
+    </div>
+    <div style="padding: 15px; display: flex; gap: 10px; justify-content: center; background: var(--card);">
+      <a id="gmapsLink" href="#" target="_blank" class="btn-primary" style="text-align: center; text-decoration: none; display: inline-block; width: auto; flex: 1;">Open in Google Maps</a>
+      <a id="osmLink" href="#" target="_blank" class="btn-secondary" style="text-align: center; text-decoration: none; display: inline-block; width: auto; flex: 1;">Open in OpenStreetMap</a>
+    </div>
+  </div>
 </div>
 </body>
 </html>
