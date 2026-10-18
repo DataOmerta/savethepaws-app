@@ -1128,7 +1128,7 @@ if(currentFilter==='injured') posts=posts.filter(p=>p.condition==='injured');
   else if(currentFilter==='saved') posts=posts.filter(p=>p.saved);
   else if(currentFilter!=='all') posts=posts.filter(p=>p.animalType===currentFilter);
 
-  if(q) posts=posts.filter(p=>p.desc.toLowerCase().includes(q)||p.city.toLowerCase().includes(q)||p.animalType.includes(q));
+  if(q) posts=posts.filter(p=>(p.description || '').toLowerCase().includes(q)||p.city.toLowerCase().includes(q)||p.animalType.includes(q));
 
   // inject ads
   const adFreq = db.settings.adFreq||6;
@@ -1198,7 +1198,7 @@ function renderPostCard(post, isSub, isReg){
         </div>
       </div>
       <div class="pc-img-wrap">${photoContent}${savedWM}</div>
-           <div class="pc-desc">${post.desc}${urgencyText}</div>
+           <div class="pc-desc">${post.description || ''}${urgencyText}</div>
       <div class="pc-info">${coords}</div>
       <div class="pc-actions">${claimBtn}${editBtn}${flagBtn}<button class="btn-edit" onclick="sharePost('${post.id}')" title="Share this post">📤</button></div>
     </div>`;
@@ -1337,23 +1337,17 @@ async function submitPost(){
       btn.textContent = '🔄 Compressing Image...';
       base64ForModeration = await compressImage(fileInput.files[0], 1080, 0.7);
       
-      // Convert base64 to Blob for Supabase Storage upload
       const res = await fetch(base64ForModeration);
       const blob = await res.blob();
       const fileName = `post_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.jpg`;
       
       btn.textContent = '☁️ Uploading to Storage...';
-      // Uploads to a bucket named 'photos'
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('photos')
         .upload(fileName, blob, { contentType: 'image/jpeg', upsert: false });
         
-      if (uploadError) {
-        console.error("Storage upload error:", uploadError);
-        throw uploadError;
-      }
+      if (uploadError) throw uploadError;
       
-      // Get the public URL to save in the database
       const { data: { publicUrl } } = supabase.storage.from('photos').getPublicUrl(uploadData.path);
       photoUrl = publicUrl;
       
@@ -1366,7 +1360,7 @@ async function submitPost(){
 
   let isSafe = true;
   if(hasPhoto && base64ForModeration) {
-    btn.textContent = '🔒 Scanning photo...';
+    btn.textContent = ' Scanning photo...';
     isSafe = await sightengineCheck(base64ForModeration);
   }
 
@@ -1382,7 +1376,6 @@ async function submitPost(){
     animalType: type,
     condition: condition,
     description: desc || 'No description provided.',
-    description: desc || 'No description provided.',
     city: city,
     country: country,
     lat: window._geoLat || (40 + Math.random()*2).toFixed(4),
@@ -1390,7 +1383,7 @@ async function submitPost(){
     timestamp: Date.now(),
     saved: false,
     status: 'pending',
-    photoData: photoUrl // NOW SAVES THE URL, NOT THE MASSIVE BASE64 STRING!
+    photoData: photoUrl
   };
 
   const { error } = await supabase.from('posts').insert([newPost]);
@@ -1410,7 +1403,6 @@ async function submitPost(){
     document.querySelector('#photoDrop .pd-icon').textContent='📷';
     document.querySelector('#photoDrop p').textContent=LANG[currentLang].photo_drop;
     fileInput.value = '';
-    
     loadCloudPosts(false);
   }
 }
@@ -1446,7 +1438,7 @@ function openEdit(postId){
   editTargetId=postId;
   const post=db.posts.find(p=>p.id===postId);
   if(!post)return;
-  document.getElementById('editDesc').value=post.desc;
+  document.getElementById('editDesc').value= post.description;
   openModal('editModal');
 }
 function saveEdit(){
@@ -1454,7 +1446,7 @@ function saveEdit(){
   if(!post)return;
   const newDesc=document.getElementById('editDesc').value.trim();
   if(!newDesc){showToast('Description cannot be empty','warn');return;}
-  post.desc=newDesc;
+   post.description=newDesc;
   saveDB(db);
   closeModal('editModal');
   renderPosts();
@@ -1808,7 +1800,7 @@ function renderPending(){
       ${p.photoData?`<img src="${p.photoData}" alt="Animal">`:`<div class="pci-placeholder">${animalEmoji(p.animalType)}</div>`}
       <div class="pending-info">
         <h4>${animalEmoji(p.animalType)} ${p.animalType} — ${p.city}, ${p.country}</h4>
-        <p>${p.desc}</p>
+        <p>${p.description || ''}</p>
         ${p.flagReason?`<div class="pi-reason">⚠ ${p.flagReason}</div>`:''}
         <div class="pending-actions">
           <button class="abtn green" onclick="approvePost('${p.id}')">✓ Approve</button>
