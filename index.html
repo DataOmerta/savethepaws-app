@@ -2235,52 +2235,9 @@ function playProximityAlert() {
     }
   }
 }
- // ─── MUSIC PLAYER FUNCTIONALITY ───────────────
-const tracks = ['Free Soul.mp3', 'Purify.mp3', 'Fairytale.mp3'];
-let currentTrackIndex = 0;
-let isPlaying = false;
-const audio = document.getElementById('bgAudio');
-const mcCircular = document.getElementById('musicCircular');
-const mcPlayBtn = document.getElementById('mcPlayBtn');
-const mcShuffleBtn = document.getElementById('mcShuffleBtn');
-const mcInfo = document.getElementById('mcInfo');
-const mcVol = document.getElementById('mcVol');
 
-function loadTrack(index) { 
-  currentTrackIndex = index; 
-  audio.src = tracks[currentTrackIndex]; 
-  mcInfo.textContent = tracks[currentTrackIndex].replace('.mp3', ''); 
-}
 
-if (mcShuffleBtn) {
-  mcShuffleBtn.addEventListener('click', () => {
-    let newIndex;
-    do { newIndex = Math.floor(Math.random() * tracks.length); } while (newIndex === currentTrackIndex && tracks.length > 1);
-    loadTrack(newIndex);
-    if (isPlaying) audio.play().catch(()=>{});
-  });
-}
-
-mcPlayBtn.addEventListener('click', () => {
-  if (!audio.src) loadTrack(0);
-  if (isPlaying) { audio.pause(); isPlaying = false; mcPlayBtn.textContent = '▶'; } 
-  else { audio.play().catch(()=>{}); isPlaying = true; mcPlayBtn.textContent = '⏸'; }
-});
-
-audio.addEventListener('ended', () => { 
-  let newIndex;
-  do { newIndex = Math.floor(Math.random() * tracks.length); } while (newIndex === currentTrackIndex && tracks.length > 1);
-  loadTrack(newIndex);
-  if(isPlaying) audio.play().catch(()=>{});
-});
-
-mcVol.addEventListener('input', (e) => { audio.volume = e.target.value; });  
-</script>
-   <div class="credits-watermark">
-  Sound/Art Direction by Bill Melachrinos &nbsp;•&nbsp; Planning/Development Dimitris Paraschidis &nbsp;•&nbsp; Communication/Advertising Aneta Conic
-</div>
-
-<!-- MAP POPUP MODAL -->
+   <!-- MAP POPUP MODAL -->
 <div class="modal-overlay" id="mapModal">
   <div class="modal" style="max-width: 600px; padding: 0; overflow: hidden;">
     <div style="padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border);">
@@ -2296,6 +2253,14 @@ mcVol.addEventListener('input', (e) => { audio.volume = e.target.value; });
     </div>
   </div>
 </div>
+
+    <div class="credits-watermark">
+  Sound/Art Direction by Bill Melachrinos &nbsp;•&nbsp; Planning/Development Dimitris Paraschidis &nbsp;•&nbsp; Communication/Advertising Aneta Conic
+</div>
+</script>
+  
+
+
 
 </body>
 </html>
