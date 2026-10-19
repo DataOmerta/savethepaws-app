@@ -1027,7 +1027,7 @@ window.onload = async function(){
                 id: session.user.id,
                 name: profile?.name || session.user.email.split('@')[0],
                 email: session.user.email,
-                role: session.user.email === 'admin@savethepaws.app' ? 'admin' : (profile?.is_subscriber ? 'subscriber' : 'user'),
+                role: profile?.role === 'admin' ? 'admin' : (profile?.is_subscriber ? 'subscriber' : 'user'),
                 subscribed: profile?.is_subscriber || false
             };
         }
@@ -1364,12 +1364,12 @@ async function submitPost(){
       
       btn.textContent = '☁️ Uploading to Storage...';
             const { data: uploadData, error: uploadError } = await sb.storage
-.from('photos')
+.from('PHOTOS')
         .upload(fileName, blob, { contentType: 'image/jpeg', upsert: false });
         
       if (uploadError) throw uploadError;
       
-      const { data: { publicUrl } } = sb.storage.from('photos').getPublicUrl(uploadData.path);
+      const { data: { publicUrl } } = sb.storage.from('PHOTOS').getPublicUrl(uploadData.path);
       photoUrl = publicUrl;
       
     } catch(e) {
@@ -1731,7 +1731,7 @@ async function signOut() {
 function hideAdminBtn(){
   document.getElementById('adminBtnTop').style.display = 'none';
   const sideBtn = document.getElementById('sideAdminBtn');
-  if(sb) sb.style.display = 'none';
+  if(sideBtn) sideBtn.style.display = 'none';
 }
 
 function updateUI(){
