@@ -1373,7 +1373,8 @@ async function submitPost(){
       photoUrl = publicUrl;
       
     } catch(e) {
-      showToast('Image upload failed. Check storage settings.', 'danger');
+console.error("UPLOAD ERROR DETAILS:", e);
+showToast('Image upload failed. Check storage settings.', 'danger');
       btn.disabled = false; btn.textContent = '🐾 Submit Report';
       return;
     }
@@ -1557,7 +1558,6 @@ const { data, error } = await sb
   .from('posts')
   .select('*')
   .eq('status', 'live')
-  .or('saved.eq.false,saved_at.gt.' + twoDaysAgo)
   .order('timestamp', { ascending: false })
   .range(start, end);
 
