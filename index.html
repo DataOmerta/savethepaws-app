@@ -1551,13 +1551,15 @@ async function loadCloudPosts(isAppend = false) {
   isLoadingPosts = true;
   const start = currentPage * pageSize;
   const end = start + pageSize - 1;
+const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString();
 
-  const { data, error } = await sb
-    .from('posts')
-    .select('*')
-    .eq('status', 'live')
-    .order('timestamp', { ascending: false })
-    .range(start, end);
+const { data, error } = await sb
+  .from('posts')
+  .select('*')
+  .eq('status', 'live')
+  .or('saved.eq.false,saved_at.gt.' + twoDaysAgo)
+  .order('timestamp', { ascending: false })
+  .range(start, end);
 
   if (!error && data) {
     if (isAppend) db.posts = [...db.posts, ...data];
