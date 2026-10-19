@@ -1000,7 +1000,6 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 // Create the Supabase client as 'sb' (which you use throughout the code)
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-
 let currentUser = null;
 let currentFilter = 'all';
 let currentTab = 'feed';
@@ -1370,7 +1369,7 @@ async function submitPost(){
         
       if (uploadError) throw uploadError;
       
-      const { data: { publicUrl } } = sb.storage..from('photos').getPublicUrl(uploadData.path);
+      const { data: { publicUrl } } = sb.storage.from('photos').getPublicUrl(uploadData.path);
       photoUrl = publicUrl;
       
     } catch(e) {
@@ -1722,11 +1721,10 @@ async function signOut() {
     loadCloudPosts(false);
     showToast('Signed out');
 }
-
-function showAdminBtn(){
+   function showAdminBtn(){
   document.getElementById('adminBtnTop').style.display = 'flex';
-  const sb = document.getElementById('sideAdminBtn');
-  if(sb) sb.style.display = 'block';
+  const sideBtn = document.getElementById('sideAdminBtn');  // ← Use different name
+  if(sideBtn) sideBtn.style.display = 'block';
 }
 function hideAdminBtn(){
   document.getElementById('adminBtnTop').style.display = 'none';
