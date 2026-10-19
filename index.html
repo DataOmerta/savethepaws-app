@@ -1588,7 +1588,7 @@ function handleAccountBtn(){
 function mobileAccountMenu(){
   if(!currentUser){ openLoginModal(); return; }
   if(currentUser.role==='admin'){
-    const choice = confirm('Go to Admin Dashboard?\nOK = Admin Dashboard\nCancel = Sign Out');
+    const choice = confirm('Go to Admin Dashboard?\nOK = Admin Dashboard\nCancel = Sign Out\n');
     if(choice) goToAdmin(); else if(confirm('Sign out?')) signOut();
   } else {
     if(confirm('Sign out of '+currentUser.name+'?')) signOut();
@@ -1730,7 +1730,7 @@ async function signOut() {
 }
 function hideAdminBtn(){
   document.getElementById('adminBtnTop').style.display = 'none';
-  const sb = document.getElementById('sideAdminBtn');
+  const sideBtn = document.getElementById('sideAdminBtn');
   if(sb) sb.style.display = 'none';
 }
 
