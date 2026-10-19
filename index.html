@@ -997,11 +997,9 @@ function saveDB(d){
 const SUPABASE_URL = 'https://zqnwjdaxffsoglmhkqxc.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxbndqZGF4ZmZzb2dsbWhrcXhjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxODQwODYsImV4cCI6MjEwNzc2MDA4Nn0.KfvfbcwZYdaVVebPiqLDIDgjdkqxd2Q_sPNCT91ad84';
 
-// Check if supabase already exists to prevent duplicate declaration
-if (typeof supabase === 'undefined') {
 // Create the Supabase client as 'sb' (which you use throughout the code)
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-}
+
 
 let currentUser = null;
 let currentFilter = 'all';
