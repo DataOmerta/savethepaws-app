@@ -1365,12 +1365,12 @@ async function submitPost(){
       
       btn.textContent = '☁️ Uploading to Storage...';
             const { data: uploadData, error: uploadError } = await sb.storage
-        .from('photos')
+.from('PHOTOS')
         .upload(fileName, blob, { contentType: 'image/jpeg', upsert: false });
         
       if (uploadError) throw uploadError;
       
-      const { data: { publicUrl } } = sb.storage.from('photos').getPublicUrl(uploadData.path);
+      const { data: { publicUrl } } = sb.storage..from('PHOTOS').getPublicUrl(uploadData.path);
       photoUrl = publicUrl;
       
     } catch(e) {
