@@ -992,12 +992,15 @@ function saveDB(d){
     localStorage.setItem(DB_KEY, JSON.stringify(safeCache));
   } catch(e) {}
 }
-// ─── STATE ──────────────────────────────────
-
+// ─── STATE ─────────────────────────────────
 // 1. Initialize Supabase Client
 const SUPABASE_URL = 'https://zqnwjdaxffsoglmhkqxc.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxbndqZGF4ZmZzb2dsbWhrcXhjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxODQwODYsImV4cCI6MjEwNzc2MDA4Nn0.KfvfbcwZYdaVVebPiqLDIDgjdkqxd2Q_sPNCT91ad84';
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// Check if supabase already exists to prevent duplicate declaration
+if (typeof supabase === 'undefined') {
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+}
 
 let currentUser = null;
 let currentFilter = 'all';
