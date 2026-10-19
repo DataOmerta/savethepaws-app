@@ -993,10 +993,11 @@ function saveDB(d){
   } catch(e) {}
 }
 // ─── STATE ──────────────────────────────────
+
 // 1. Initialize Supabase Client
 const SUPABASE_URL = 'https://zqnwjdaxffsoglmhkqxc.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxbndqZGF4ZmZzb2dsbWhrcXhjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxODQwODYsImV4cCI6MjEwNzc2MDA4Nn0.KfvfbcwZYdaVVebPiqLDIDgjdkqxd2Q_sPNCT91ad84';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let currentUser = null;
 let currentFilter = 'all';
@@ -1012,10 +1013,10 @@ const ANIMAL_KEYWORDS = ['cat','dog','bird','rabbit','animal','stray','injured',
 // ─── BOOT ───────────────────────────────────
 window.onload = async function(){
     // 1. Check if user is already logged in via Supabase
-    if (typeof supabase !== 'undefined') {
-        const { data: { session } } = await supabase.auth.getSession();
+    if (typeof window.supabase !== 'undefined') {
+        const { data: { session } } = await sb.auth.getSession();
         if (session) {
-            const { data: profile } = await supabase
+                        const { data: profile } = await sb
                 .from('profiles')
                 .select('*')
                 .eq('id', session.user.id)
@@ -1361,13 +1362,13 @@ async function submitPost(){
       const fileName = `post_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.jpg`;
       
       btn.textContent = '☁️ Uploading to Storage...';
-      const { data: uploadData, error: uploadError } = await supabase.storage
+            const { data: uploadData, error: uploadError } = await sb.storage
         .from('photos')
         .upload(fileName, blob, { contentType: 'image/jpeg', upsert: false });
         
       if (uploadError) throw uploadError;
       
-      const { data: { publicUrl } } = supabase.storage.from('photos').getPublicUrl(uploadData.path);
+      const { data: { publicUrl } } = sb.storage.from('photos').getPublicUrl(uploadData.path);
       photoUrl = publicUrl;
       
     } catch(e) {
@@ -1405,7 +1406,7 @@ async function submitPost(){
     photoData: photoUrl
   };
 
-  const { error } = await supabase.from('posts').insert([newPost]);
+    const { error } = await sb.from('posts').insert([newPost]);
   btn.disabled = false; btn.textContent = '🐾 Submit Report';
 
   if(error) {
@@ -1550,7 +1551,7 @@ async function loadCloudPosts(isAppend = false) {
   const start = currentPage * pageSize;
   const end = start + pageSize - 1;
 
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from('posts')
     .select('*')
     .eq('status', 'live')
@@ -1596,7 +1597,7 @@ async function doLogin() {
   const email = document.getElementById('loginEmail').value.trim();
   const pass = document.getElementById('loginPass').value;
   
-  const { data, error } = await supabase.auth.signInWithPassword({
+  const { data, error } = await sb.auth.signInWithPassword({
     email: email,
     password: pass
   });
@@ -1607,7 +1608,7 @@ async function doLogin() {
   }
   
   // Fetch the user's profile from Supabase
-  const { data: profile } = await supabase
+  const { data: profile } = await sb
     .from('profiles')
     .select('*')
     .eq('id', data.user.id)
@@ -1643,7 +1644,7 @@ async function doRegister() {
     return;
   }
   
-  const { data, error } = await supabase.auth.signUp({
+  const { data, error } = await sb.auth.signUp({
     email: email,
     password: pass,
     options: {
@@ -1713,7 +1714,7 @@ function doSubscribe(plan){
 
 // ─── SECURE LOGOUT ────────────────────────────────
 async function signOut() {
-    await supabase.auth.signOut();
+    await sb.auth.signOut();
     currentUser = null;
     updateUI();
     loadCloudPosts(false);
@@ -1920,7 +1921,7 @@ function renderPending(){
 }
 
 async function approvePost(id){
-  const { error } = await supabase.from('posts').update({ status: 'live', flagReason: '' }).eq('id', id);
+    const { error } = await sb.from('posts').update({ status: 'live', flagReason: '' }).eq('id', id);
   if(!error) {
     showToast('Post approved','success');
     loadCloudPosts(false);
@@ -1931,7 +1932,7 @@ async function approvePost(id){
 }
 async function deletePost(id){
   if(!confirm('Delete this post?')) return;
-  const { error } = await supabase.from('posts').delete().eq('id', id);
+    const { error } = await sb.from('posts').delete().eq('id', id);
   if(!error) {
     showToast('Post deleted','success');
     loadCloudPosts(false);
@@ -2207,8 +2208,8 @@ renderPosts();renderActivity();renderSidebarDonations();renderStats();updateUI()
 updateLogoutBtn();
 initRating();
    // ─── REAL-TIME CLOUD LISTENER ────────────────
-if (typeof supabase !== 'undefined') {
-  supabase.channel('public:posts')
+if (typeof window.supabase !== 'undefined') {
+  sb.channel('public:posts')
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, (payload) => {
       const newPost = payload.new;
       if (window._geoLat && window._geoLon && newPost.status === 'live') {
