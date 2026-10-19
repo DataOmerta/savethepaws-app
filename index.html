@@ -1027,7 +1027,7 @@ window.onload = async function(){
                 id: session.user.id,
                 name: profile?.name || session.user.email.split('@')[0],
                 email: session.user.email,
-                role: profile?.role === 'admin' ? 'admin' : (profile?.is_subscriber ? 'subscriber' : 'user'),
+               role: profile?.role === 'admin' ? 'admin' : (profile?.is_subscriber ? 'subscriber' : 'user'),
                 subscribed: profile?.is_subscriber || false
             };
         }
@@ -1363,9 +1363,9 @@ async function submitPost(){
       const fileName = `post_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.jpg`;
       
       btn.textContent = '☁️ Uploading to Storage...';
-            const { data: uploadData, error: uploadError } = await sb.storage
+         const { data: uploadData, error: uploadError } = await sb.storage
 .from('PHOTOS')
-        .upload(fileName, blob, { contentType: 'image/jpeg', upsert: false });
+.upload(fileName, blob, { contentType: 'image/jpeg', upsert: false });
         
       if (uploadError) throw uploadError;
       
@@ -1729,9 +1729,9 @@ async function signOut() {
   if(sideBtn) sideBtn.style.display = 'block';
 }
 function hideAdminBtn(){
-  document.getElementById('adminBtnTop').style.display = 'none';
-  const sideBtn = document.getElementById('sideAdminBtn');
-  if(sideBtn) sideBtn.style.display = 'none';
+document.getElementById('adminBtnTop').style.display = 'none';
+const sideBtn = document.getElementById('sideAdminBtn');
+if(sideBtn) sideBtn.style.display = 'none';
 }
 
 function updateUI(){
