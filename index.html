@@ -999,7 +999,8 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 
 // Check if supabase already exists to prevent duplicate declaration
 if (typeof supabase === 'undefined') {
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// Create the Supabase client as 'sb' (which you use throughout the code)
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 }
 
 let currentUser = null;
