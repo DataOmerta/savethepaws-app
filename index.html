@@ -99,7 +99,7 @@ body{overscroll-behavior:none;}
 .main-feed{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth;}
 .main-feed::-webkit-scrollbar{width:3px;}
 .main-feed::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
-
+<button class="refresh-btn-bottom" onclick="loadCloudPosts(false)" title="Refresh Feed">🔄</button>
 /* MAP VIEW */
 .map-view{flex:1;display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;}
 .map-view.active{display:flex;}
@@ -108,6 +108,90 @@ body{overscroll-behavior:none;}
 .map-pins{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;justify-content:center;}
 .map-pin{background:var(--card);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:8px 12px;font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px;}
 
+
+
+
+
+
+
+
+   /*Pull-to-Refresh Logic*/
+let ptrStartY = 0;
+let ptrIsRefreshing = false;
+
+document.addEventListener('touchstart', (e) => {
+  if (window.scrollY === 0) {
+    ptrStartY = e.touches[0].clientY;
+  }
+}, {passive: true});
+
+document.addEventListener('touchmove', (e) => {
+  if (ptrStartY && window.scrollY === 0) {
+    const currentY = e.touches[0].clientY;
+    const diff = currentY - ptrStartY;
+    if (diff > 100) {
+      document.getElementById('ptrIndicator').classList.add('show');
+      document.getElementById('ptrIndicator').classList.add('refreshing');
+    }
+  }
+}, {passive: true});
+
+document.addEventListener('touchend', () => {
+  if (document.getElementById('ptrIndicator').classList.contains('show') && !ptrIsRefreshing) {
+    ptrIsRefreshing = true;
+    loadCloudPosts(false).then(() => {
+      document.getElementById('ptrIndicator').classList.remove('show', 'refreshing');
+      ptrIsRefreshing = false;
+    });
+  }
+  ptrStartY = 0;
+});
+
+
+
+
+
+   
+   /* Pull-to-Refresh Indicator */
+.ptr-indicator {
+  position: fixed;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--accent);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  gap: 8px;
+  box-shadow: var(--shadow);
+}
+.ptr-indicator.show { display: flex; }
+.ptr-indicator.refreshing { animation: pulse 1s infinite; }
+
+.refresh-btn-bottom {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 300;
+  box-shadow: var(--shadow);
+  font-size: 20px;
+}
 /* SEARCH + FILTERS */
 .feed-controls{padding:12px 14px 0;background:var(--bg);flex-shrink:0;}
 .search-wrap{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border2);border-radius:40px;padding:8px 14px;margin-bottom:10px;}
@@ -466,42 +550,59 @@ body{overscroll-behavior:none;}
   </div>
 
   <div class="layout">
-    <!-- LEFT SIDEBAR -->
-    <div class="sidebar-left">
-      <button class="post-btn" onclick="handlePostBtn()">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12l7-7 7 7"/></svg>
-        <span data-i18n="report_btn">Report Animal</span>
-      </button>
-      <div class="stat-card">
-        <div class="s-label" data-i18n="saved_label">Animals Saved</div>
-        <div class="s-num" id="statSaved">0</div>
-        <div class="s-sub" data-i18n="adopted">adopted / claimed</div>
-      </div>
-      <div class="stat-card">
-        <div class="s-label" data-i18n="posted_label">Total Reports</div>
-        <div class="s-num" id="statTotal">0</div>
-        <div class="s-sub" data-i18n="all_posts">all community posts</div>
-      </div>
-    <div class="stat-card" id="pendingStatCard" style="display:none;">
-  <div class="s-label" data-i18n="pending_label">Pending Review</div>
-  <div class="s-num" id="statPending" style="color:var(--orange);">0</div>
-  <div class="s-sub" data-i18n="awaiting">awaiting moderation</div>
-</div>
-      <div class="sidebar-role">
-        <div class="r-label" data-i18n="your_role">Your Role</div>
-        <div class="r-val" id="sideRole">Guest</div>
-<div class="r-val" id="sideBadges" style="font-size:11px; color:var(--accent2); margin-top:6px;"></div>
-      </div>
-      <button id="sideAdminBtn" onclick="goToAdmin()" style="display:none;background:var(--warn-bg);border:1px solid var(--warn);color:var(--warn);border-radius:var(--radius);padding:10px;font-size:13px;font-weight:700;cursor:pointer;width:100%;">🛡 Admin Dashboard</button>
-      <button class="logout-btn" id="sideLogoutBtn" onclick="signOut()">↩ Sign Out</button>
+<!-- LEFT SIDEBAR -->
+<div class="sidebar-left">
+  <button class="post-btn" onclick="handlePostBtn()">
+    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12l7-7 7 7"/></svg>
+    <span data-i18n="report_btn">Report Animal</span>
+  </button>
+  
+  <!-- A: Weekend Hero Box -->
+  <div class="stat-card" style="border-color: var(--orange);">
+    <div class="s-label" style="color: var(--orange);">🏆 Weekend Hero</div>
+    <div style="font-size: 11px; color: var(--text2); line-height: 1.5; margin-top: 6px;">
+      Free 36-hour access every weekend<br>
+      Sat 11AM - Sun 11PM<br>
+      <button onclick="doSubscribe('weekend')" style="background: var(--orange); color: #fff; border: none; border-radius: 4px; padding: 4px 8px; font-size: 11px; margin-top: 6px; cursor: pointer; width: 100%;">Activate Now</button>
     </div>
-<div class="stat-card" style="border-color: var(--orange);">
-  <div class="s-label" style="color: var(--orange);">🏆 Weekend Hero</div>
-  <div style="font-size: 11px; color: var(--text2); line-height: 1.5; margin-top: 6px;">
-    Free 36-hour access every weekend<br>
-    Sat 11AM - Sun 11PM<br>
-    <button onclick="doSubscribe('weekend')" style="background: var(--orange); color: #fff; border: none; border-radius: 4px; padding: 4px 8px; font-size: 11px; margin-top: 6px; cursor: pointer;">Activate Now</button>
   </div>
+  
+  <!-- B: Rules/Badges Box -->
+  <div class="stat-card">
+    <div class="s-label">📋 Badge Rewards</div>
+    <div style="font-size: 10px; color: var(--text2); line-height: 1.6; margin-top: 6px;">
+      <div style="margin-bottom: 6px;"><strong style="color: var(--accent2);"> Scout</strong><br><small>Post 10 reports OR claim 1 animal</small></div>
+      <div style="margin-bottom: 6px;"><strong style="color: var(--success);">🛡️ Guardian</strong><br><small>Claim 5 animals</small></div>
+      <div><strong style="color: var(--warn);">🦸 Hero</strong><br><small>Claim 10 animals</small></div>
+    </div>
+  </div>
+  
+  <div class="stat-card">
+    <div class="s-label" data-i18n="saved_label">Animals Saved</div>
+    <div class="s-num" id="statSaved">0</div>
+    <div class="s-sub" data-i18n="adopted">adopted / claimed</div>
+  </div>
+  
+  <div class="stat-card">
+    <div class="s-label" data-i18n="posted_label">Total Reports</div>
+    <div class="s-num" id="statTotal">0</div>
+    <div class="s-sub" data-i18n="all_posts">all community posts</div>
+  </div>
+  
+  <div class="stat-card" id="pendingStatCard" style="display:none;">
+    <div class="s-label" data-i18n="pending_label">Pending Review</div>
+    <div class="s-num" id="statPending" style="color:var(--orange);">0</div>
+    <div class="s-sub" data-i18n="awaiting">awaiting moderation</div>
+  </div>
+  
+  <div class="sidebar-role">
+    <div class="r-label" data-i18n="your_role">Your Role</div>
+    <div class="r-val" id="sideRole">Guest</div>
+    <div class="r-val" id="sideBadges" style="font-size:11px; color:var(--accent2); margin-top:6px;"></div>
+  </div>
+  
+  <button id="sideAdminBtn" onclick="goToAdmin()" style="display:none;background:var(--warn-bg);border:1px solid var(--warn);color:var(--warn);border-radius:var(--radius);padding:10px;font-size:13px;font-weight:700;cursor:pointer;width:100%;">🛡 Admin Dashboard</button>
+  <button class="logout-btn" id="sideLogoutBtn" onclick="signOut()"> Sign Out</button>
 </div>
     <!-- MAIN AREA -->
     <div class="main-area">
@@ -520,6 +621,10 @@ body{overscroll-behavior:none;}
           <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           <input placeholder="Search animals, cities..." id="searchInput" oninput="renderPosts()" autocomplete="off">
         </div>
+         <div class="ptr-indicator" id="ptrIndicator">
+  <span>🔄</span>
+  <span>Refreshing...</span>
+</div>
 <div class="filter-row">
   <div class="fchip active" onclick="setFilter('all',this)" data-i18n="filter_all">All</div>
   <div class="fchip" onclick="setFilter('cat',this)">🐱 Cats</div>
@@ -795,7 +900,12 @@ body{overscroll-behavior:none;}
     <h2>📷 <span data-i18n="report_title">Report an Animal</span></h2>
     <p class="modal-sub" data-i18n="report_sub">Photo + description only. Location is collected automatically. Your identity is private.</p>
     <div class="photo-drop" id="photoDrop">
-      <input type="file" accept="image/*" capture="environment" id="photoInput" onchange="previewPhoto(this)">
+      <input type="file" accept="image/*" capture="environment" id="photoInput" onchange="previewPhoto(this)" style="display:none;">
+       <div class="photo-drop" id="photoDrop" onclick="document.getElementById('photoInput').click()">
+  <div class="pd-icon"></div>
+  <p data-i18n="photo_drop">Tap to take photo or upload from gallery</p>
+  <input type="file" accept="image/*" capture="environment" id="photoInput" onchange="previewPhoto(this)" style="display:none;">
+</div>
       <div class="pd-icon">📷</div>
       <p data-i18n="photo_drop">Tap to take photo or upload from gallery</p>
     </div>
@@ -1094,6 +1204,7 @@ const ANIMAL_KEYWORDS = ['cat','dog','bird','rabbit','animal','stray','injured',
 
 // ─── BOOT ───────────────────────────────────
 window.onload = async function(){
+   
     // 1. Check if user is already logged in via Supabase
     if (typeof window.supabase !== 'undefined') {
         const { data: { session } } = await sb.auth.getSession();
@@ -1133,6 +1244,7 @@ setInterval(() => {
     loadCloudPosts(false);
   }
 }, 30000); // 30 seconds
+   
 function checkPendingNotif(){
   if(db.pendingNotif && currentUser){
     const n = db.pendingNotif;
@@ -1300,7 +1412,7 @@ function renderPostCard(post, isSub, isReg){
           <div class="pc-time">${fmtTime(post.timestamp)}</div>
         </div>
         <div class="pc-tags">
-          <span class="atag">${post.animal_type.charAt(0).toUpperCase()+post.animal_type.slice(1)}</span>
+        <span class="atag">${(post.animalType || 'animal').charAt(0).toUpperCase()+(post.animalType || 'animal').slice(1)}</span>
           ${condTag}${savedTag}
         </div>
       </div>
@@ -1982,7 +2094,101 @@ function closeNotifBanner(){
 function openNotifPanel(){ showToast('No new notifications'); }
 
 // ─── SUBSCRIBE MODAL ────────────────────────
-function openSubModal(){ openModal('subModal'); }
+function openSubModal(){
+  const isSub = currentUser && currentUser.subscribed;
+  if(isSub) { showToast('You already have an active subscription!', 'warn'); return; }
+  
+  const modalContent = document.querySelector('#subModal .modal');
+  modalContent.innerHTML = `
+    <button class="modal-close" onclick="closeModal('subModal')">✕</button>
+    <h2>🔓 Unlock SaveThePaws</h2>
+    <p class="modal-sub">Subscribe to see GPS locations, contact uploaders, view the live map, and claim animals for rescue or adoption.</p>
+    <div class="plans-grid" style="grid-template-columns: repeat(2, 1fr); gap: 12px;">
+      <!-- Row 1: Weekly + Monthly -->
+      <div class="plan-card" onclick="doSubscribe('weekly')">
+        <div class="plan-name">Weekly</div>
+        <div class="plan-price">€1.99</div>
+        <div class="plan-period">per week</div>
+        <ul class="plan-perks">
+          <li>GPS & location data</li>
+          <li>Contact uploaders</li>
+          <li>Live map access</li>
+          <li>Claim animals</li>
+        </ul>
+        <button class="plan-btn" style="background:var(--bg3);color:var(--text2);border:1px solid var(--border2);">Start Weekly</button>
+      </div>
+      
+      <div class="plan-card" onclick="doSubscribe('monthly')">
+        <div class="plan-name">Monthly</div>
+        <div class="plan-price">€4.99</div>
+        <div class="plan-period">per month · save 37%</div>
+        <ul class="plan-perks">
+          <li>GPS & location data</li>
+          <li>Contact uploaders</li>
+          <li>Live map access</li>
+          <li>Claim animals</li>
+          <li>Theme switcher</li>
+        </ul>
+        <button class="plan-btn">Choose Monthly</button>
+      </div>
+      
+      <!-- Row 2: 3-Month + Annual -->
+      <div class="plan-card" onclick="doSubscribe('quarterly')">
+        <div class="plan-badge">POPULAR</div>
+        <div class="plan-name">3 Months</div>
+        <div class="plan-price">€11.99</div>
+        <div class="plan-period">per quarter · save 46%</div>
+        <ul class="plan-perks">
+          <li>Everything in Monthly</li>
+          <li>Priority support</li>
+          <li>Early features</li>
+        </ul>
+        <button class="plan-btn">Choose 3-Month</button>
+      </div>
+      
+      <div class="plan-card featured" onclick="doSubscribe('annual')">
+        <div class="plan-badge" style="background:var(--success);">BEST VALUE</div>
+        <div class="plan-name">Annual</div>
+        <div class="plan-price">€29</div>
+        <div class="plan-period">per year · save 71%</div>
+        <ul class="plan-perks">
+          <li>Everything included</li>
+          <li>Priority support</li>
+          <li>Rescue org badge</li>
+          <li>Download your reports</li>
+          <li>Ad-free experience</li>
+        </ul>
+        <button class="plan-btn" style="background:var(--success);">Best Value</button>
+      </div>
+      
+      <!-- Row 3: Weekend Hero + Badge System (side by side) -->
+      <div class="plan-card" onclick="doSubscribe('weekend')" style="border-color: var(--orange);">
+        <div class="plan-badge" style="background:var(--orange);">WEEKEND HERO</div>
+        <div class="plan-name">Weekend Hero</div>
+        <div class="plan-price" style="color: var(--orange);">Free</div>
+        <div class="plan-period">36-hour access</div>
+        <ul class="plan-perks">
+          <li>Full live map access</li>
+          <li>Near Me & Country modes</li>
+          <li>Claim animals</li>
+        </ul>
+        <button class="plan-btn" style="background:var(--orange); border:none;">Activate Weekend</button>
+      </div>
+      
+      <div class="plan-card" style="border-color: var(--accent); cursor: default;">
+        <div class="plan-name">🏆 Badge Rewards</div>
+        <div style="font-size:11px; color:var(--text2); text-align:left; padding:8px; line-height:1.6;">
+          <div style="margin-bottom:6px;"><strong style="color:var(--accent2);">🥉 Scout</strong><br><small>Post 10 reports OR claim 1</small></div>
+          <div style="margin-bottom:6px;"><strong style="color:var(--success);">🛡️ Guardian</strong><br><small>Claim 5 animals</small></div>
+          <div><strong style="color:var(--warn);">🦸 Hero</strong><br><small>Claim 10 animals</small></div>
+        </div>
+        <button class="plan-btn" style="background:var(--bg3); border:1px solid var(--border2); cursor:default;">Learn More</button>
+      </div>
+    </div>
+  `;
+  
+  openModal('subModal');
+}
 function openMapModal(lat, lon, city) {
   // SECURITY CHECK: Only subscribers can view the exact map
   if (!currentUser || !currentUser.subscribed) {
@@ -2022,13 +2228,16 @@ function showToast(msg,type=''){
 
 // ─── ADMIN ──────────────────────────────────
 function goToAdmin(){ 
-   // Allow access if role is admin OR if it's your specific email
-   const isAdmin = currentUser && (currentUser.role === 'admin' || currentUser.email === 'gds_gr@hotmail.gr');
-   if(!isAdmin){showToast('Admin access only','warn');return;} 
-   document.getElementById('mainScreen').classList.remove('active');
-   document.getElementById('adminScreen').classList.add('active');
-   document.getElementById('adminUserLabel').textContent = currentUser.name;
-   renderAdminData(); }
+  const isAdmin = currentUser && (currentUser.role === 'admin' || currentUser.email === 'gds_gr@hotmail.gr');
+  if(!isAdmin){
+    showToast('Admin access only','warn');
+    return;
+  }
+  document.getElementById('mainScreen').classList.remove('active');
+  document.getElementById('adminScreen').classList.add('active');
+  document.getElementById('adminUserLabel').textContent = currentUser.name;
+  renderAdminData();
+}
    
 function goToMain(){
   document.getElementById('adminScreen').classList.remove('active');
