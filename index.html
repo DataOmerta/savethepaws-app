@@ -855,7 +855,26 @@ body{overscroll-behavior:none;}
           <li>Claim animals</li>
         </ul>
         <button class="plan-btn" style="background:var(--orange);">Activate Weekend</button>
-      </div>
+     
+   <!-- Add this AFTER the Weekend Hero card, BEFORE the Annual card -->
+<div class="plan-card" style="border-color: var(--accent); cursor: default;">
+  <div class="plan-name">🏆 Badge Rewards System</div>
+  <div style="font-size:12px;color:var(--text2);text-align:left;padding:10px;line-height:1.6;">
+    <div style="margin-bottom:8px;"><strong style="color:var(--accent2);">🥉 Scout</strong><br>
+    <small>Post 10 reports OR claim 1 animal<br>→ Priority support access</small></div>
+    
+    <div style="margin-bottom:8px;"><strong style="color:var(--success);"> Guardian</strong><br>
+    <small>Claim 5 animals<br>→ Rescue org badge on profile</small></div>
+    
+    <div style="margin-bottom:8px;"><strong style="color:var(--warn);"> Hero</strong><br>
+    <small>Claim 10 animals<br>→ Featured rescuer spotlight</small></div>
+    
+    <div><strong style="color:var(--danger);">👑 Legend</strong><br>
+    <small>Claim 25 animals<br>→ Lifetime premium access</small></div>
+  </div>
+  <button class="plan-btn" style="background:var(--bg3);color:var(--text2);border:1px solid var(--border2);cursor:default;">Learn More</button>
+</div>          
+             </div>
       <div class="plan-card featured" onclick="doSubscribe('annual')">
         <div class="plan-badge" style="background:var(--success);">BEST VALUE</div>
         <div class="plan-name">Annual</div>
@@ -1727,32 +1746,64 @@ function doSubscribe(plan){
     return;
   }
 
-  // Handle the free Weekend Hero trial locally
+  // Handle Weekend Hero (36 hours: Sat 11AM - Sun 11PM)
   if(plan === 'weekend') {
-    const exp = new Date();
-    exp.setDate(exp.getDate() + 2); // 2 days for Weekend Hero
+    const now = new Date();
+    const day = now.getDay(); // 0=Sunday, 6=Saturday
+    const hour = now.getHours();
     
-    currentUser.subscribed = true; 
-    currentUser.role = 'subscriber'; 
-    currentUser.subExpires = exp.toISOString().split('T')[0];
+    // Calculate next Saturday 11:00 AM
+    const nextSaturday = new Date(now);
+    nextSaturday.setDate(now.getDate() + (6 - day + 7) % 7);
+    nextSaturday.setHours(11, 0, 0, 0);
     
-        const u = (db.users || []).find(x => x.id === currentUser.id);
-    if(u) { 
-      u.subscribed = true; 
-      u.role = 'subscriber'; 
-      u.subExpires = currentUser.subExpires; 
+    // Calculate Sunday 11:00 PM (36 hours later)
+    const sundayEnd = new Date(nextSaturday);
+    sundayEnd.setHours(23, 0, 0, 0);
+    
+    let startDate, endDate;
+    
+    // If it's currently Saturday before 11AM or Sunday before 11PM
+    if((day === 6 && hour < 11) || (day === 0 && hour < 23)) {
+      // Use this weekend
+      startDate = day === 6 ? new Date(now.setHours(11,0,0,0)) : nextSaturday;
+      endDate = new Date(startDate);
+      endDate.setHours(23, 0, 0, 0);
+    } else {
+      // Use next weekend
+      startDate = nextSaturday;
+      endDate = sundayEnd;
     }
     
+    // Check if already activated this weekend
+    const weekendKey = `stp_weekend_${currentUser.id}_${startDate.toDateString()}`;
+    if(localStorage.getItem(weekendKey)) {
+      showToast('Weekend Hero already activated!', 'warn');
+      return;
+    }
+    
+    // Activate Weekend Hero
+    currentUser.subscribed = true;
+    currentUser.role = 'subscriber';
+    currentUser.subExpires = endDate.toISOString();
+    
+    localStorage.setItem(weekendKey, 'true');
     localStorage.setItem('stp_user', JSON.stringify({id: currentUser.id}));
-    saveDB(db);
+    
+    // Show countdown
+    const hoursLeft = Math.floor((endDate - now) / 3600000);
+    
     closeModal('subModal');
     updateUI();
     renderPosts();
-    showToast('Weekend Hero activated! Location data unlocked. 🔓', 'success');
+    showToast(`🎉 Weekend Hero activated! ${hoursLeft} hours of access.`, 'success');
+    
+    // Set auto-reminder for next Friday 17:00
+    scheduleWeekendReminder();
     return;
   }
 
-  // Handle paid Stripe plans
+  // Handle paid Stripe plans (unchanged)
   const links = {
     weekly: 'https://buy.stripe.com/fZucN4dlvfDI9D3d1t7g400',
     monthly: 'https://buy.stripe.com/dRm6oG6X7bnsdTj4uX7g401',
@@ -1765,6 +1816,26 @@ function doSubscribe(plan){
     closeModal('subModal');
     showToast('Redirecting to secure payment...', 'success');
   }
+}
+
+// Schedule Friday 17:00 reminder
+function scheduleWeekendReminder(){
+  const now = new Date();
+  const day = now.getDay();
+  const nextFriday = new Date(now);
+  nextFriday.setDate(now.getDate() + (5 - day + 7) % 7);
+  nextFriday.setHours(17, 0, 0, 0);
+  
+  const timeUntilFriday = nextFriday - now;
+  
+  setTimeout(() => {
+    if(Notification.permission === 'granted') {
+      new Notification('SaveThePaws', {
+        body: '🎉 Weekend Hero starts tomorrow at 11:00 AM! Get ready to rescue.',
+        icon: 'icon-192.png'
+      });
+    }
+  }, timeUntilFriday);
 }
 
 // ─── SECURE LOGOUT ────────────────────────────────
@@ -1914,11 +1985,14 @@ function adminSec(name,el){
 }
 
 
-async function toggleBan(userId, banStatus) { 
-   const { error } = await sb.from('profiles').update({ is_banned: banStatus }).eq('id', userId);
-   if (!error) { 
-   showToast(`User ${banStatus ? 'banned' : 'unbanned'}`, banStatus ? 'warn' : 'success'); 
-   renderAdminData(); } 
+async function toggleBan(uid, banStatus) {
+  const { error } = await sb.from('profiles').update({ is_banned: banStatus }).eq('id', uid);
+  if(!error) {
+    showToast(`User ${banStatus ? 'banned' : 'unbanned'}`, banStatus ? 'warn' : 'success');
+    renderAdminData();
+  } else {
+    showToast('Failed: ' + error.message, 'danger');
+  }
 }
    
 async function renderAdminData(){
@@ -2036,24 +2110,6 @@ async function renderPending(){
   `).join('');
 }
 
-async function updatePostStatus(id, newStatus) {
-  const { error } = await sb.from('posts').update({ 
-    status: newStatus,
-    approved_by: currentUser?.email || 'admin',
-    approved_at: new Date().toISOString()
-  }).eq('id', id);
-  
-  if(!error) {
-    showToast(`Post updated to "${newStatus}"`, 'success');
-    renderAdminData();
-    renderPending();
-    loadCloudPosts(false);
-    renderStats();
-  } else {
-    showToast('Failed to update: ' + error.message, 'danger');
-  }
-}
-
 async function deletePost(id){
   if(!confirm('Delete this post permanently?')) return;
   const { error } = await sb.from('posts').delete().eq('id', id);
@@ -2091,17 +2147,6 @@ async function toggleSub(uid, grantSub){
     showToast('Failed: ' + error.message, 'danger');
   }
 }
-
-async function toggleBan(uid, banStatus) {
-  const { error } = await sb.from('profiles').update({ is_banned: banStatus }).eq('id', uid);
-  if(!error) {
-    showToast(`User ${banStatus ? 'banned' : 'unbanned'}`, banStatus ? 'warn' : 'success');
-    renderAdminData();
-  } else {
-    showToast('Failed: ' + error.message, 'danger');
-  }
-}
-
 // NEW FUNCTION: Handles the dropdown status changes
 async function updatePostStatus(id, newStatus) {
   const { error } = await sb.from('posts').update({ status: newStatus }).eq('id', id);
@@ -2114,7 +2159,6 @@ async function updatePostStatus(id, newStatus) {
     showToast('Failed to update status', 'danger');
   }
 }
-
 // NEW FUNCTION: Handles banning users
 async function toggleBan(userId, banStatus) {
   const { error } = await sb.from('profiles').update({ is_banned: banStatus }).eq('id', userId);
@@ -2212,8 +2256,32 @@ function renderDonorList(){
         <div class="doa-name">${d.icon} ${d.name}</div>
         <div class="doa-url">${d.url}</div>
       </div>
+      <button class="abtn warn" onclick="editDonor('${d.id}')" style="margin-right:8px;">✏️ Edit</button>
       <button class="abtn danger" onclick="removeDonor('${d.id}')">Remove</button>
     </div>`).join('');
+}
+
+// NEW: Edit donor function
+function editDonor(id){
+  const donor = db.donors.find(d => d.id === id);
+  if(!donor) return;
+  
+  const newName = prompt('Organization Name:', donor.name);
+  if(!newName) return;
+  
+  const newUrl = prompt('Donation URL:', donor.url);
+  if(!newUrl) return;
+  
+  const newIcon = prompt('Icon (emoji):', donor.icon);
+  
+  donor.name = newName;
+  donor.url = newUrl;
+  donor.icon = newIcon || donor.icon;
+  
+  saveDB(db);
+  renderDonorList();
+  renderSidebarDonations();
+  showToast('Organization updated', 'success');
 }
 function removeDonor(id){db.donors=db.donors.filter(d=>d.id!==id);saveDB(db);renderDonorList();renderSidebarDonations();}
 
