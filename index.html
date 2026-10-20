@@ -1147,7 +1147,7 @@ function renderPosts(){
   }
 if(currentFilter==='injured') posts=posts.filter(p=>p.condition==='injured');
   else if(currentFilter==='saved') posts=posts.filter(p=>p.saved);
-  else if(currentFilter!=='all') posts=posts.filter(p=>p.animalType===currentFilter);
+ else if(currentFilter!=='all') posts=posts.filter(p=>(p.animalType || p.animaltype)===currentFilter);
 
   if(q) posts=posts.filter(p=>(p.description || '').toLowerCase().includes(q)||p.city.toLowerCase().includes(q)||p.animalType.includes(q));
 
@@ -1435,19 +1435,19 @@ showToast('Image upload failed. Check storage settings.', 'danger');
   }
 
   btn.textContent = '💾 Saving to Database...';
-  const newPost = {
-    uploader: currentUser.name,
-    animalType: type,
-    condition: condition,
-    description: desc || 'No description provided.',
-    city: city,
-    country: country,
-    lat: window._geoLat || (40 + Math.random()*2).toFixed(4),
-    lon: window._geoLon || (22 + Math.random()*2).toFixed(4),
-    timestamp: Date.now(),
-    saved: false,
-    status: 'pending',
-    photoData: photoUrl
+const newPost = {
+  uploader: currentUser.name,
+  animalType: type,
+  condition: condition,
+  description: desc || 'No description provided.',
+  city: city,
+  country: country,
+  lat: window._geoLat || (40 + Math.random()*2).toFixed(4),
+  lon: window._geoLon || (22 + Math.random()*2).toFixed(4),
+  timestamp: Date.now(),
+  saved: false,
+  status: 'pending',
+  photoData: photoUrl
 };
 
     const { error } = await sb.from('posts').insert([newPost]);
@@ -1478,23 +1478,39 @@ function openClaim(postId){
   document.getElementById('claimNote').value='';
   openModal('claimModal');
 }
-function confirmClaim(){
-   const today = new Date().toDateString();
-const claimKey = `stp_claims_${currentUser.id}_${today}`;
-const todayClaims = parseInt(localStorage.getItem(claimKey) || '0');
-if (todayClaims >= 3) { 
-  showToast('You have reached your daily claim limit. Every rescue counts!', 'warn'); 
-  return; 
-}
-  const post=db.posts.find(p=>p.id===claimTargetId);
-  if(!post)return;
-  post.saved=true; post.savedBy=currentUser.name; post.savedAt=Date.now();
-  db.activity.unshift({type:'saved',text:post.animalType+' in '+post.city+' claimed by '+currentUser.name,time:'just now'});
-   localStorage.setItem(claimKey, (todayClaims + 1).toString());
-  saveDB(db);
-  closeModal('claimModal');
-  renderPosts();renderActivity();renderStats();checkBadges();
-  showToast('Animal marked as Saved! 🏠','success');
+async function confirmClaim(){
+  const today = new Date().toDateString();
+  const claimKey = `stp_claims_${currentUser.id}_${today}`;
+  const todayClaims = parseInt(localStorage.getItem(claimKey) || '0');
+  if (todayClaims >= 3) { 
+    showToast('You have reached your daily claim limit. Every rescue counts!', 'warn'); 
+    return; 
+  }
+  
+  // Find the post in Supabase and update it
+  const { data: posts, error } = await sb.from('posts').select('*').eq('id', claimTargetId).single();
+  if(error || !posts) {
+    showToast('Post not found', 'danger');
+    return;
+  }
+  
+  const { error: updateError } = await sb.from('posts').update({
+    saved: true,
+    savedBy: currentUser.name,
+    savedAt: Date.now(),
+    status: 'live'
+  }).eq('id', claimTargetId);
+  
+  if(!updateError) {
+    localStorage.setItem(claimKey, (todayClaims + 1).toString());
+    showToast('Animal marked as Saved! 🏠','success');
+    closeModal('claimModal');
+    loadCloudPosts(false);
+    renderStats();
+    checkBadges();
+  } else {
+    showToast('Failed to claim: ' + updateError.message, 'danger');
+  }
 }
 
 // ─── EDIT ───────────────────────────────────
@@ -1585,42 +1601,36 @@ function checkBadges() {
 }
    // ─── INFINITE SCROLL CLOUD LOADING ───────────
 let currentPage = 0;
-const pageSize = 20;
+const pageSize = 50;
 let isLoadingPosts = false;
 let hasMorePosts = true;
 
 async function loadCloudPosts(isAppend = false) {
-  if (isLoadingPosts || !hasMorePosts) return;
+  if (isLoadingPosts) return;
   isLoadingPosts = true;
   const start = currentPage * pageSize;
   const end = start + pageSize - 1;
-const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString();
 
-const { data, error } = await sb
-  .from('posts')
-  .select('*')
-  .eq('status', 'live')
-  .order('timestamp', { ascending: false })
-  .range(start, end);
+  const { data, error } = await sb
+    .from('posts')
+    .select('*')
+    .eq('status', 'live')
+    .order('timestamp', { ascending: false })
+    .range(start, end);
 
   if (!error && data) {
-    if (isAppend) db.posts = [...db.posts, ...data];
-    else db.posts = data;
-    
+    if (isAppend) {
+      db.posts = [...db.posts, ...data];
+    } else {
+      db.posts = data;
+    }
     renderPosts();
     renderStats();
-    
     if (data.length < pageSize) hasMorePosts = false;
     else currentPage++;
   }
   isLoadingPosts = false;
 }
-
-window.addEventListener('scroll', () => {
-  if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
-    loadCloudPosts(true);
-  }
-});
 // ─── AUTH ───────────────────────────────────
 function handleAccountBtn(){
   if(currentUser){
@@ -1911,11 +1921,10 @@ async function toggleBan(userId, banStatus) {
    renderAdminData(); } 
 }
    
-
 async function renderAdminData(){
   if(!currentUser || currentUser.email !== 'gds_gr@hotmail.gr') return;
 
-  // Fetch REAL data directly from Supabase
+  // Fetch REAL data from Supabase
   const { data: allPosts } = await sb.from('posts').select('*').order('timestamp', { ascending: false });
   const { data: allUsers } = await sb.from('profiles').select('*');
   
@@ -1944,7 +1953,7 @@ async function renderAdminData(){
       <td>${p.uploader}</td>
       <td><span class="badge ${p.status==='pending'?'orange':p.saved?'green':p.condition==='injured'?'red':'purple'}">${p.status==='pending'?'Pending':p.saved?'Saved':p.condition}</span></td>
       <td>
-        <select class="abtn" onchange="updatePostStatus('${p.id}', this.value)" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);padding:4px;border-radius:var(--radius-sm);cursor:pointer;">
+        <select onchange="updatePostStatus('${p.id}', this.value)" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);padding:4px;border-radius:var(--radius-sm);cursor:pointer;">
           <option value="pending" ${p.status==='pending'?'selected':''}>Pending</option>
           <option value="live" ${p.status==='live'?'selected':''}>Live</option>
           <option value="rejected" ${p.status==='rejected'?'selected':''}>Rejected</option>
@@ -1954,7 +1963,7 @@ async function renderAdminData(){
     </tr>
   `).join('');
 
-  // Users Table
+  // Users Table with Ban/Sub/Admin buttons
   document.getElementById('adminUsersBody').innerHTML = users.map(u => `
     <tr>
       <td>${u.name || 'Unknown'}</td>
@@ -1964,13 +1973,13 @@ async function renderAdminData(){
       <td>${posts.filter(p => p.uploader === (u.name || u.email)).length}</td>
       <td>
         ${u.role!=='admin'?`<button class="abtn warn" onclick="makeAdmin('${u.id}')">Admin</button>`:''}
-        ${!u.is_subscriber?`<button class="abtn green" onclick="grantSub('${u.id}')">Sub</button>`:''}
+        <button class="abtn ${u.is_subscriber ? 'danger' : 'green'}" onclick="toggleSub('${u.id}', ${!u.is_subscriber})">${u.is_subscriber ? 'Unsub' : 'Sub'}</button>
         <button class="abtn ${u.is_banned ? 'green' : 'danger'}" onclick="toggleBan('${u.id}', ${!u.is_banned})">${u.is_banned ? 'Unban' : 'Ban'}</button>
       </td>
     </tr>
   `).join('');
 
-  // All Posts Table with Dropdown
+  // All Posts Table
   document.getElementById('adminPostsBody').innerHTML = posts.map(p => `
     <tr>
       <td>${animalEmoji(p.animalType || p.animaltype)} ${p.animalType || p.animaltype}</td>
@@ -1979,7 +1988,7 @@ async function renderAdminData(){
       <td>${p.uploader}</td>
       <td style="font-size:11px;color:var(--text3);">${new Date(p.timestamp).toLocaleDateString()}</td>
       <td>
-        <select class="abtn" onchange="updatePostStatus('${p.id}', this.value)" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);padding:4px;border-radius:var(--radius-sm);cursor:pointer;">
+        <select onchange="updatePostStatus('${p.id}', this.value)" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);padding:4px;border-radius:var(--radius-sm);cursor:pointer;">
           <option value="pending" ${p.status==='pending'?'selected':''}>Pending</option>
           <option value="live" ${p.status==='live'?'selected':''}>Live</option>
           <option value="rejected" ${p.status==='rejected'?'selected':''}>Rejected</option>
@@ -1993,7 +2002,6 @@ async function renderAdminData(){
 }
 
 async function renderPending(){
-  // Fetch ONLY pending posts with images from Supabase
   const { data: posts } = await sb.from('posts').select('*').eq('status', 'pending').order('timestamp', { ascending: false });
   const list = document.getElementById('pendingList');
   const pend = posts || [];
@@ -2005,7 +2013,6 @@ async function renderPending(){
     return;
   }
 
-  // This now correctly displays the image thumbnail!
   list.innerHTML = pend.map(p => `
     <div class="pending-card">
       ${p.photoData 
@@ -2017,7 +2024,7 @@ async function renderPending(){
         <p>${p.description || ''}</p>
         ${p.flagReason ? `<div class="pi-reason">⚠ ${p.flagReason}</div>` : ''}
         <div class="pending-actions">
-          <select class="abtn" onchange="updatePostStatus('${p.id}', this.value)" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);padding:4px 9px;border-radius:var(--radius-sm);font-size:12px;cursor:pointer;">
+          <select onchange="updatePostStatus('${p.id}', this.value)" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);padding:4px 9px;border-radius:var(--radius-sm);font-size:12px;cursor:pointer;">
             <option value="pending" selected>Pending</option>
             <option value="live">Approve (Live)</option>
             <option value="rejected">Reject</option>
@@ -2027,6 +2034,72 @@ async function renderPending(){
       </div>
     </div>
   `).join('');
+}
+
+async function updatePostStatus(id, newStatus) {
+  const { error } = await sb.from('posts').update({ 
+    status: newStatus,
+    approved_by: currentUser?.email || 'admin',
+    approved_at: new Date().toISOString()
+  }).eq('id', id);
+  
+  if(!error) {
+    showToast(`Post updated to "${newStatus}"`, 'success');
+    renderAdminData();
+    renderPending();
+    loadCloudPosts(false);
+    renderStats();
+  } else {
+    showToast('Failed to update: ' + error.message, 'danger');
+  }
+}
+
+async function deletePost(id){
+  if(!confirm('Delete this post permanently?')) return;
+  const { error } = await sb.from('posts').delete().eq('id', id);
+  if(!error) {
+    showToast('Post deleted','success');
+    renderAdminData();
+    renderPending();
+    loadCloudPosts(false);
+    renderStats();
+  } else {
+    showToast('Delete failed: ' + error.message, 'danger');
+  }
+}
+
+async function makeAdmin(uid){
+  if(!confirm('Grant admin privileges to this user?')) return;
+  const { error } = await sb.from('profiles').update({ role: 'admin', is_subscriber: true }).eq('id', uid);
+  if(!error) {
+    showToast('Admin granted','success');
+    renderAdminData();
+  } else {
+    showToast('Failed: ' + error.message, 'danger');
+  }
+}
+
+async function toggleSub(uid, grantSub){
+  const update = grantSub 
+    ? { is_subscriber: true, sub_expires: new Date(Date.now() + 365*24*60*60*1000).toISOString() }
+    : { is_subscriber: false, sub_expires: null };
+  const { error } = await sb.from('profiles').update(update).eq('id', uid);
+  if(!error) {
+    showToast(grantSub ? 'Subscription granted' : 'Subscription removed', 'success');
+    renderAdminData();
+  } else {
+    showToast('Failed: ' + error.message, 'danger');
+  }
+}
+
+async function toggleBan(uid, banStatus) {
+  const { error } = await sb.from('profiles').update({ is_banned: banStatus }).eq('id', uid);
+  if(!error) {
+    showToast(`User ${banStatus ? 'banned' : 'unbanned'}`, banStatus ? 'warn' : 'success');
+    renderAdminData();
+  } else {
+    showToast('Failed: ' + error.message, 'danger');
+  }
 }
 
 // NEW FUNCTION: Handles the dropdown status changes
@@ -2049,44 +2122,6 @@ async function toggleBan(userId, banStatus) {
     showToast(`User ${banStatus ? 'banned' : 'unbanned'}`, banStatus ? 'warn' : 'success');
     renderAdminData();
   }
-}
-
-async function approvePost(id){
-  const { error } = await sb.from('posts').update({ status: 'live', flagReason: '' }).eq('id', id);
-  if(!error) {
-    showToast('Post approved','success');
-    renderAdminData();
-    renderPending();
-    loadCloudPosts(false);
-  } else {
-    showToast('Failed to approve','danger');
-  }
-}
-
-async function deletePost(id){
-  if(!confirm('Delete this post?')) return;
-  const { error } = await sb.from('posts').delete().eq('id', id);
-  if(!error) {
-    showToast('Post deleted','success');
-    renderAdminData();
-    renderPending();
-    loadCloudPosts(false);
-  }
-}
-   
-function makeAdmin(uid){
-  if(!confirm('Grant admin to this user?'))return;
-  const u=db.users.find(x=>x.id===uid);
-  if(u){u.role='admin';u.subscribed=true;saveDB(db);renderAdminData();showToast('Admin granted','success');}
-}
-function grantSub(uid){
-  const u=db.users.find(x=>x.id===uid);
-  if(u){u.subscribed=true;u.role='subscriber';const e=new Date();e.setFullYear(e.getFullYear()+1);u.subExpires=e.toISOString().split('T')[0];saveDB(db);renderAdminData();showToast('Subscription granted','success');}
-}
-function removeUser(uid){
-  if(!confirm('Remove this user?'))return;
-  db.users=db.users.filter(u=>u.id!==uid);
-  saveDB(db);renderAdminData();showToast('User removed');
 }
 
 // ─── ADS ────────────────────────────────────
