@@ -1420,7 +1420,7 @@ showToast('Image upload failed. Check storage settings.', 'danger');
   btn.textContent = '💾 Saving to Database...';
   const newPost = {
     uploader: currentUser.name,
-    animaltype: type,
+    animalType: type,
     condition: condition,
     description: desc || 'No description provided.',
     city: city,
@@ -1430,7 +1430,7 @@ showToast('Image upload failed. Check storage settings.', 'danger');
     timestamp: Date.now(),
     saved: false,
     status: 'pending',
-    photodata: photoUrl
+    photoData: photoUrl
 };
 
     const { error } = await sb.from('posts').insert([newPost]);
