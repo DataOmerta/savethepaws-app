@@ -108,7 +108,6 @@ body{overscroll-behavior:none;}
 }
 .main-feed::-webkit-scrollbar{width:3px;}
 .main-feed::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
-<button class="refresh-btn-bottom" onclick="loadCloudPosts(false)" title="Refresh Feed">🔄</button>
 /* MAP VIEW */
 .map-view{flex:1;display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;}
 .map-view.active{display:flex;}
@@ -522,10 +521,10 @@ document.addEventListener('touchend', () => {
 .mc-btn:hover { background: rgba(255,255,255,0.2); }
 .mc-info { flex: 1; color: #fff; font-size: 12px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: none; }
 .mc-vol { width: 60px; accent-color: #fff; display: none; }
-.music-circular.expanded .mc-info, 
-.music-circular.expanded .mc-vol, 
+.music-circular.expanded .mc-info,
+.music-circular.expanded .mc-vol { display: block; }
 #mcStopBtn { display: none; }
-.music-circular.expanded #mcStopBtn { display: flex; }
+.music-circular.expanded #mcStopBtn { display: flex;  }
 @media(max-width:660px){ .music-circular { bottom: 90px; right: 20px; } }
    /* Badge Progress Ladder */
 .badge-ladder-item {
@@ -692,12 +691,11 @@ document.addEventListener('touchend', () => {
   accent-color: var(--orange);
   display: none;
 }
-.music-circular.expanded .mc-info,
-.music-circular.expanded .mc-vol,
+
 .music-circular.expanded #mcStopBtn {
   display: flex;
 }
-#mcStopBtn { display: none; }
+
 
 /* Mobile: Music player in bottom nav area */
 @media(max-width:660px) {
@@ -823,18 +821,18 @@ Sat 11AM - Sun 11PM<br>
 <div class="fchip" onclick="setFilter('collar',this)">🔔 With Collar</div>
 </div>
       <!-- FEED VIEW -->
-      <div class="main-feed" id="mainFeed">
-         <div class="sub-banner" id="subBanner">
-               <div class="sb-icon">🔐</div>
-            <div class="sb-text">
-                  <strong data-i18n="sub_banner_title">Unlock location & contact details</strong>
-                  <span data-i18n="sub_banner_sub">Subscribe to claim animals and see GPS data</span>
-            </div>
-                  <button class="sb-cta" onclick="openSubModal()" data-i18n="subscribe_btn">Subscribe</button>
-           </div>
-            <div id="postsContainer" style="width:100%; max-width:700px;"></div>
-            <button class="refresh-fab" onclick="loadCloudPosts(false)" title="Refresh Feed">🔄</button>
-      </div>
+<div class="main-feed" id="mainFeed">
+<div class="sub-banner" id="subBanner">
+<div class="sb-icon">🔐</div>
+<div class="sb-text">
+<strong data-i18n="sub_banner_title">Unlock location & contact details</strong>
+<span data-i18n="sub_banner_sub">Subscribe to claim animals and see GPS data</span>
+</div>
+<button class="sb-cta" onclick="openSubModal()" data-i18n="subscribe_btn">Subscribe</button>
+</div>
+<div id="postsContainer"></div>
+<button class="refresh-fab" onclick="loadCloudPosts(false)" title="Refresh Feed">🔄</button>
+</div>
 
 
       <!-- MAP VIEW -->
@@ -1471,9 +1469,9 @@ function startGeo(){
 // ─── STATS ──────────────────────────────────
 function renderStats(){
 const live = db.posts.filter(p=>p.status==='live');
-  document.getElementById('statSaved').textContent = live.filter(p=>p.saved).length;
-  document.getElementById('statTotal').textContent = live.length;
-  const pend = posts.filter(p=>p.status==='pending').length;
+document.getElementById('statSaved').textContent = live.filter(p=>p.saved).length;
+document.getElementById('statTotal').textContent = live.length;
+const pend = db.posts.filter(p=>p.status==='pending').length;
   document.getElementById('statPending').textContent = pend;
   const pb = document.getElementById('pendingBadge');
   if(pb) pb.textContent = pend;
@@ -1519,11 +1517,10 @@ function getDistance(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 function renderPosts(){
-  const q = (document.getElementById('searchInput')?.value||'').toLowerCase().trim();
-  const isSub = currentUser && currentUser.subscribed;
-  const isReg = !!currentUser;
-
-    let posts = posts.filter(p=>p.status==='live').slice().reverse();
+const q = (document.getElementById('searchInput')?.value||'').toLowerCase().trim();
+const isSub = currentUser && currentUser.subscribed;
+const isReg = !!currentUser;
+let posts = db.posts.filter(p=>p.status==='live').slice().reverse();
 
   // Location Funnel
   if (currentLocationMode === 'near' && window._geoLat && window._geoLon) {
@@ -1644,9 +1641,9 @@ function renderAdCard(ad){
 
 // ─── MAP ────────────────────────────────────
 function renderMap(){
-  const isSub = currentUser && currentUser.subscribed;
-  if(!isSub) return;
-  const pins = posts.filter(p=>p.status==='live'&&!p.saved);
+const isSub = currentUser && currentUser.subscribed;
+if(!isSub) return;
+const pins = db.posts.filter(p=>p.status==='live'&&!p.saved);
   document.getElementById('mapPins').innerHTML = pins.map(p=>`
     <div class="map-pin">${animalEmoji(p.animal_type)} ${p.city} — ${p.animal_type}</div>`).join('');
 }
@@ -1946,9 +1943,9 @@ function sharePost(postId) {
 }
    // ─── USER STATS HELPER ─────────────────────────
 function getUserStats() {
-  if (!currentUser) return { posts: 0, claims: 0, injured: 0 };
-  const userPosts = posts.filter(p => p.uploader_name === currentUser.name);
-  const userClaims = posts.filter(p => p.saved_by === currentUser.name);
+if (!currentUser) return { posts: 0, claims: 0, injured: 0 };
+const userPosts = db.posts.filter(p => p.uploader_name === currentUser.name);
+const userClaims = db.posts.filter(p => p.saved_by === currentUser.name);
   const userInjured = userPosts.filter(p => p.condition === 'injured');
   return {
     posts: userPosts.length,
@@ -1958,11 +1955,10 @@ function getUserStats() {
 }
    // ─── BADGE SYSTEM ───────────────────────────
 function checkBadges() {
-  if (!currentUser) return;
-  const badgesKey = `stp_badges_${currentUser.id}`;
-  const earnedBadges = JSON.parse(localStorage.getItem(badgesKey) || '[]');
-  
-  const userClaims = posts.filter(p => p.saved_by === currentUser.name).length;
+if (!currentUser) return;
+const badgesKey = `stp_badges_${currentUser.id}`;
+const earnedBadges = JSON.parse(localStorage.getItem(badgesKey) || '[]');
+const userClaims = db.posts.filter(p => p.saved_by === currentUser.name).length;
 
   const userStats = getUserStats(); // Define it first!
   if (!earnedBadges.includes('scout') && (userStats.posts >= 10 || userClaims >= 1)) {
@@ -2054,9 +2050,8 @@ const { data, error } = await sb
   .eq('status', 'live')
   .order('timestamp', { ascending: false })
   .range(start, end);
-
-  if (!error && data) {
-    if (isAppend) {
+if (!error && data) {
+if (isAppend) {
 db.posts = [...db.posts, ...data];
 } else {
 db.posts = data;
@@ -2075,10 +2070,9 @@ function handleAccountBtn(){
   } else { openLoginModal(); }
 }
 function mobileAccountMenu(){
-  if(!currentUser){ openLoginModal(); return; }
-  if(currentUser.role==='admin'){
-    const choice = confirm('Go to Admin Dashboard?\nOK = Admin Dashboard\nCancel = Sign Out');
-    if(choice) goToAdmin(); else if(confirm('Sign out?')) signOut();
+if(!currentUser){ openLoginModal(); return; }
+if(currentUser.role==='admin'){
+const choice = confirm('Go to Admin Dashboard?\nOK = Admin Dashboard\nCancel = Sign Out');
   } else {
     if(confirm('Sign out of '+currentUser.name+'?')) signOut();
   }
@@ -2344,122 +2338,29 @@ function closeNotifBanner(){
 }
 function openNotifPanel(){ showToast('No new notifications'); }
 
-function openSubModal(){openModal('subModal');}
-function openMapModal(lat, lon, city) {
-
-   const isSub = currentUser && currentUser.subscribed;
-  if(isSub) { showToast('You already have an active subscription!', 'warn'); return; }
-  
-  const modalContent = document.querySelector('#subModal .modal');
-  modalContent.innerHTML = `
-    <button class="modal-close" onclick="closeModal('subModal')">✕</button>
-    <h2>🔓 Unlock SaveThePaws</h2>
-    <p class="modal-sub">Subscribe to see GPS locations, contact uploaders, view the live map, and claim animals for rescue or adoption.</p>
-    <div class="plans-grid" style="grid-template-columns: repeat(2, 1fr); gap: 12px;">
-      <!-- Row 1: Weekly + Monthly -->
-      <div class="plan-card" onclick="doSubscribe('weekly')">
-        <div class="plan-name">Weekly</div>
-        <div class="plan-price">€1.99</div>
-        <div class="plan-period">per week</div>
-        <ul class="plan-perks">
-          <li>GPS & location data</li>
-          <li>Contact uploaders</li>
-          <li>Live map access</li>
-          <li>Claim animals</li>
-        </ul>
-        <button class="plan-btn" style="background:var(--bg3);color:var(--text2);border:1px solid var(--border2);">Start Weekly</button>
-      </div>
-      
-      <div class="plan-card" onclick="doSubscribe('monthly')">
-        <div class="plan-name">Monthly</div>
-        <div class="plan-price">€4.99</div>
-        <div class="plan-period">per month · save 37%</div>
-        <ul class="plan-perks">
-          <li>GPS & location data</li>
-          <li>Contact uploaders</li>
-          <li>Live map access</li>
-          <li>Claim animals</li>
-          <li>Theme switcher</li>
-        </ul>
-        <button class="plan-btn">Choose Monthly</button>
-      </div>
-      
-      <!-- Row 2: 3-Month + Annual -->
-      <div class="plan-card" onclick="doSubscribe('quarterly')">
-        <div class="plan-badge">POPULAR</div>
-        <div class="plan-name">3 Months</div>
-        <div class="plan-price">€11.99</div>
-        <div class="plan-period">per quarter · save 46%</div>
-        <ul class="plan-perks">
-          <li>Everything in Monthly</li>
-          <li>Priority support</li>
-          <li>Early features</li>
-        </ul>
-        <button class="plan-btn">Choose 3-Month</button>
-      </div>
-      
-      <div class="plan-card featured" onclick="doSubscribe('annual')">
-        <div class="plan-badge" style="background:var(--success);">BEST VALUE</div>
-        <div class="plan-name">Annual</div>
-        <div class="plan-price">€29</div>
-        <div class="plan-period">per year · save 71%</div>
-        <ul class="plan-perks">
-          <li>Everything included</li>
-          <li>Priority support</li>
-          <li>Rescue org badge</li>
-          <li>Download your reports</li>
-          <li>Ad-free experience</li>
-        </ul>
-        <button class="plan-btn" style="background:var(--success);">Best Value</button>
-      </div>
-      
-      <!-- Row 3: Weekend Hero + Badge System (side by side) -->
-      <div class="plan-card" onclick="doSubscribe('weekend')" style="border-color: var(--orange);">
-        <div class="plan-badge" style="background:var(--orange);">WEEKEND HERO</div>
-        <div class="plan-name">Weekend Hero</div>
-        <div class="plan-price" style="color: var(--orange);">Free</div>
-        <div class="plan-period">36-hour access</div>
-        <ul class="plan-perks">
-          <li>Full live map access</li>
-          <li>Near Me & Country modes</li>
-          <li>Claim animals</li>
-        </ul>
-        <button class="plan-btn" style="background:var(--orange); border:none;">Activate Weekend</button>
-      </div>
-      
-      <div class="plan-card" style="border-color: var(--accent); cursor: default;">
-        <div class="plan-name">🏆 Badge Rewards</div>
-        <div style="font-size:11px; color:var(--text2); text-align:left; padding:8px; line-height:1.6;">
-          <div style="margin-bottom:6px;"><strong style="color:var(--accent2);">🥉 Scout</strong><br><small>Post 10 reports OR claim 1</small></div>
-          <div style="margin-bottom:6px;"><strong style="color:var(--success);">🛡️ Guardian</strong><br><small>Claim 5 animals</small></div>
-          <div><strong style="color:var(--warn);">🦸 Hero</strong><br><small>Claim 10 animals</small></div>
-        </div>
-        <button class="plan-btn" style="background:var(--bg3); border:1px solid var(--border2); cursor:default;">Learn More</button>
-      </div>
-    </div>
-  `;
-   // SECURITY CHECK: Only subscribers can view the exact map
-  if (!currentUser || !currentUser.subscribed) {
-    openSubModal();
-    return;
-  }
-  
-  const container = document.getElementById('mapFrameContainer');
-  
-  // OpenStreetMap Embed URL (tight bounding box for maximum accuracy, centered on marker)
-  const latNum = parseFloat(lat);
-  const lonNum = parseFloat(lon);
-  const offset = 0.002; // Roughly ~200 meters, keeps the map tightly zoomed on the exact pin
-  const osmEmbedUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${lonNum-offset},${latNum-offset},${lonNum+offset},${latNum+offset}&layer=mapnik&marker=${latNum},${lonNum}`;
-  
-  container.innerHTML = `<iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="${osmEmbedUrl}" style="border: 0;"></iframe>`;
-  
-  // Set external navigation links for maximum accuracy
-  document.getElementById('gmapsLink').href = `https://www.google.com/maps?q=${latNum},${lonNum}`;
-  document.getElementById('osmLink').href = `https://www.openstreetmap.org/?mlat=${latNum}&mlon=${lonNum}#map=19/${latNum}/${lonNum}`;
-  
-  openModal('mapModal');
+function openSubModal(){
+const isSub = currentUser && currentUser.subscribed;
+if(isSub) { showToast('You already have an active subscription!', 'warn'); return; }
+openModal('subModal');
 }
+   
+function openMapModal(lat, lon, city) {
+// SECURITY CHECK: Only subscribers can view the exact map
+if (!currentUser || !currentUser.subscribed) {
+openSubModal();
+return;
+}
+const container = document.getElementById('mapFrameContainer');
+const latNum = parseFloat(lat);
+const lonNum = parseFloat(lon);
+const offset = 0.002;
+const osmEmbedUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${lonNum-offset},${latNum-offset},${lonNum+offset},${latNum+offset}&layer=mapnik&marker=${latNum},${lonNum}`;
+container.innerHTML = `<iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="${osmEmbedUrl}" style="border: 0;"></iframe>`;
+document.getElementById('gmapsLink').href = `https://www.google.com/maps?q=${latNum},${lonNum}`;
+document.getElementById('osmLink').href = `https://www.openstreetmap.org/?mlat=${latNum}&mlon=${lonNum}#map=19/${latNum}/${lonNum}`;
+openModal('mapModal');
+}
+ 
 // ─── MODALS ─────────────────────────────────
 function openModal(id){ document.getElementById(id).classList.add('open'); }
 function closeModal(id){ document.getElementById(id).classList.remove('open'); }
