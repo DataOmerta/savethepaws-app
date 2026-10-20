@@ -116,38 +116,7 @@ body{overscroll-behavior:none;}
 .map-pins{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;justify-content:center;}
 .map-pin{background:var(--card);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:8px 12px;font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px;}
 
-   /*Pull-to-Refresh Logic*/
-let ptrStartY = 0;
-let ptrIsRefreshing = false;
-
-document.addEventListener('touchstart', (e) => {
-  if (window.scrollY === 0) {
-    ptrStartY = e.touches[0].clientY;
-  }
-}, {passive: true});
-
-document.addEventListener('touchmove', (e) => {
-  if (ptrStartY && window.scrollY === 0) {
-    const currentY = e.touches[0].clientY;
-    const diff = currentY - ptrStartY;
-    if (diff > 100) {
-      document.getElementById('ptrIndicator').classList.add('show');
-      document.getElementById('ptrIndicator').classList.add('refreshing');
-    }
-  }
-}, {passive: true});
-
-document.addEventListener('touchend', () => {
-  if (document.getElementById('ptrIndicator').classList.contains('show') && !ptrIsRefreshing) {
-    ptrIsRefreshing = true;
-    loadCloudPosts(false).then(() => {
-      document.getElementById('ptrIndicator').classList.remove('show', 'refreshing');
-      ptrIsRefreshing = false;
-    });
-  }
-  ptrStartY = 0;
-});
-
+   
 /* Pull-to-Refresh Indicator */
 .ptr-indicator {
   position: fixed;
@@ -507,25 +476,6 @@ document.addEventListener('touchend', () => {
 .rating-skip{background:none;border:none;color:var(--text3);font-size:13px;cursor:pointer;padding:4px;}
 .rating-skip:hover{color:var(--text2);}
    
-/* ═══════════════════════════════════════════
-   MUSIC PLAYER
-═══════════════════════════════════════════ */
-.music-circular {
-  position: fixed; bottom: 100px; right: 30px; width: 60px; height: 60px;
-  background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center;
-  cursor: grab; z-index: 9999; box-shadow: 0 4px 20px rgba(124,111,224,0.5); transition: width 0.3s, height 0.3s, border-radius 0.3s;
-}
-.music-circular:active { cursor: grabbing; }
-.music-circular.expanded { width: 240px; height: 70px; border-radius: 35px; justify-content: space-between; padding: 0 15px; }
-.mc-btn { background: none; border: none; color: #fff; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; }
-.mc-btn:hover { background: rgba(255,255,255,0.2); }
-.mc-info { flex: 1; color: #fff; font-size: 12px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: none; }
-.mc-vol { width: 60px; accent-color: #fff; display: none; }
-.music-circular.expanded .mc-info,
-.music-circular.expanded .mc-vol { display: block; }
-#mcStopBtn { display: none; }
-.music-circular.expanded #mcStopBtn { display: flex;  }
-@media(max-width:660px){ .music-circular { bottom: 90px; right: 20px; } }
    /* Badge Progress Ladder */
 .badge-ladder-item {
   display: flex;
@@ -565,14 +515,7 @@ document.addEventListener('touchend', () => {
 .user-stat-label { color: var(--text3); }
 .user-stat-value { color: var(--accent2); font-weight: 700; }
 
-/* Music Player Solid Buttons */
-.mc-btn-filled {
-  background: var(--accent);
-  color: #fff;
-}
-.mc-btn-filled:hover {
-  background: var(--accent2);
-}
+
 
 /* Floating Refresh Button */
 .refresh-fab {
@@ -634,81 +577,33 @@ document.addEventListener('touchend', () => {
   margin-bottom: 10px;
 }
 
-/* Music Player Smaller */
+/* ═══ FINAL MUSIC PLAYER CSS ═══ */
 .music-circular {
-  position: fixed;
-  bottom: 80px;
-  right: 20px;
-  width: 50px;
-  height: 50px;
-  background: var(--accent);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: grab;
-  z-index: 9999;
-  box-shadow: 0 4px 20px rgba(124,111,224,0.5);
-  transition: width 0.3s, height 0.3s, border-radius 0.3s;
+  position: fixed; bottom: 80px; right: 20px; width: 50px; height: 50px;
+  background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  cursor: grab; z-index: 9999; box-shadow: 0 4px 20px rgba(124,111,224,0.5); transition: width 0.3s, height 0.3s, border-radius 0.3s;
 }
-.music-circular.expanded {
-  width: 220px;
-  height: 56px;
-  border-radius: 28px;
-  justify-content: space-between;
-  padding: 0 10px;
-}
+.music-circular:active { cursor: grabbing; }
+.music-circular.expanded { width: 220px; height: 56px; border-radius: 28px; justify-content: space-between; padding: 0 10px; }
 .mc-btn {
-  background: none;
-  border: none;
-  color: #fff;
-  font-size: 16px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  flex-shrink: 0;
+  background: none; border: none; color: #fff; font-size: 16px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
 }
-.mc-btn-filled {
-  background: var(--accent);
-}
+.mc-btn:hover { background: rgba(255,255,255,0.2); }
+.mc-btn-filled { background: var(--accent); }
+.mc-btn-filled:hover { background: var(--accent2); }
 .mc-info {
-  flex: 1;
-  color: var(--orange);
-  font-size: 11px;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: none;
-  font-weight: 600;
+  flex: 1; color: var(--orange); font-size: 11px; text-align: center;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: none; font-weight: 600;
 }
-.mc-vol {
-  width: 50px;
-  accent-color: var(--orange);
-  display: none;
-}
-
-.music-circular.expanded #mcStopBtn {
-  display: flex;
-}
-
-
-/* Mobile: Music player in bottom nav area */
+.mc-vol { width: 50px; accent-color: var(--orange); display: none; }
+.music-circular.expanded .mc-info,
+.music-circular.expanded .mc-vol { display: block; }
+#mcStopBtn { display: none; }
+.music-circular.expanded #mcStopBtn { display: flex; }
 @media(max-width:660px) {
-  .music-circular {
-    bottom: 75px;
-    right: 15px;
-    width: 44px;
-    height: 44px;
-  }
-  .music-circular.expanded {
-    width: 200px;
-    height: 50px;
-  }
+  .music-circular { bottom: 75px; right: 15px; width: 44px; height: 44px; }
+  .music-circular.expanded { width: 200px; height: 50px; }
 }
 </style>
 </head>
@@ -1826,18 +1721,18 @@ showToast('Image upload failed. Check storage settings.', 'danger');
 
   btn.textContent = '💾 Saving to Database...';
 const newPost = {
-  uploader_name: currentUser.name,
-  animalType: type,
-  condition: condition,
-  description: desc || 'No description provided.',
-  city: city,
-  country: country,
-  lat: window._geoLat || (40 + Math.random()*2).toFixed(4),
-  lon: window._geoLon || (22 + Math.random()*2).toFixed(4),
-  timestamp: Date.now(),
-  saved: false,
-  status: 'pending',
-  photoData: photoUrl
+uploader_name: currentUser.name,
+animal_type: type,
+condition: condition,
+description: desc || 'No description provided.',
+city: city,
+country: country,
+lat: window._geoLat || (40 + Math.random()*2).toFixed(4),
+lon: window._geoLon || (22 + Math.random()*2).toFixed(4),
+timestamp: Date.now(),
+saved: false,
+status: 'pending',
+photo_data: photoUrl
 };
 
     const { error } = await sb.from('posts').insert([newPost]);
@@ -1899,7 +1794,7 @@ async function confirmClaim(){
 // ─── EDIT ───────────────────────────────────
 function openEdit(postId){
   editTargetId=postId;
-  const post=posts.find(p=>p.id===postId);
+   const post=db.posts.find(p=>p.id===postId);
   if(!post)return;
   document.getElementById('editDesc').value= post.description;
   openModal('editModal');
@@ -1918,7 +1813,7 @@ function saveEdit(){
 
 // ─── FLAG ───────────────────────────────────
 function flagPost(postId){
-  const post=posts.find(p=>p.id===postId);
+  const post=db.posts.find(p=>p.id===postId);
   if(!post)return;
   post.status='pending';
   post.flag_reason='Flagged by user';
@@ -2378,12 +2273,14 @@ function showToast(msg,type=''){
 // ─── ADMIN ──────────────────────────────────
   function goToAdmin(){
 const isAdmin = currentUser && (currentUser.role === 'admin' || currentUser.email === 'gds_gr@hotmail.gr');
-if(!isAdmin){showToast('Admin access only','warn');return;}
-  }
-  document.getElementById('mainScreen').classList.remove('active');
-  document.getElementById('adminScreen').classList.add('active');
-  document.getElementById('adminUserLabel').textContent = currentUser.name;
-  renderAdminData();
+if(!isAdmin){
+showToast('Admin access only','warn');
+return;
+}
+document.getElementById('mainScreen').classList.remove('active');
+document.getElementById('adminScreen').classList.add('active');
+document.getElementById('adminUserLabel').textContent = currentUser.name;
+renderAdminData();
 }
    
 function goToMain(){
