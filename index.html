@@ -1262,7 +1262,7 @@ if(currentFilter==='injured') posts=posts.filter(p=>p.condition==='injured');
 }
 
 function renderPostCard(post, isSub, isReg){
-  const isOwner = currentUser && currentUser.id === post.uploader_id;
+  const isOwner = currentUser && currentUser.name === post.uploader_name;
   const condTag = post.condition==='injured' ? '<span class="atag injured">🚑 Injured</span>' :
                   post.condition==='lost' ? '<span class="atag" style="background:var(--warn-bg);color:var(--warn);border-color:var(--warn);">🏷 Lost</span>' : '';
   const savedTag = post.saved ? '<span class="atag saved">✓ Saved</span>' : '';
@@ -1296,7 +1296,7 @@ function renderPostCard(post, isSub, isReg){
       <div class="pc-header">
         <div class="pc-avatar">${animalEmoji(post.animal_type)}</div>
         <div class="pc-meta">
-          <div class="pc-user">${isSub ? post.uploader : '••••••'}</div>
+          <div class="pc-user">${isSub ? post.uploader_name : '••••••'}</div>
           <div class="pc-time">${fmtTime(post.timestamp)}</div>
         </div>
         <div class="pc-tags">
@@ -1437,16 +1437,7 @@ async function moderateImage(base64Data) {
   return { safe: true };
 }
 
-// For text (Supabase Edge Function)
-async function moderateText(text) {
-  const { data, error } = await sb.functions.invoke('moderate-text', {
-    body: { text }
-  });
-  
-  if(error) return { safe: true }; // Fail open
-  
-  return data;
-}
+
 async function sightengineCheck(imageData) {
   // SIGHTENGINE TRIAL EXPIRED - bypassing moderation
   console.log('⚠️ Sightengine moderation');
@@ -1522,7 +1513,7 @@ showToast('Image upload failed. Check storage settings.', 'danger');
 
   btn.textContent = '💾 Saving to Database...';
 const newPost = {
-  uploader: currentUser.name,
+  uploader_name: currentUser.name,
   animal_type: type,
   condition: condition,
   description: desc || 'No description provided.',
@@ -1647,7 +1638,7 @@ function sharePost(postId) {
    // ─── USER STATS HELPER ─────────────────────────
 function getUserStats() {
   if (!currentUser) return { posts: 0, claims: 0, injured: 0 };
-  const userPosts = db.posts.filter(p => p.uploader_id === currentUser.id);
+  const userPosts = db.posts.filter(p => p.uploader_name === currentUser.name);
   const userClaims = db.posts.filter(p => p.saved_by === currentUser.name);
   const userInjured = userPosts.filter(p => p.condition === 'injured');
   return {
@@ -1992,7 +1983,6 @@ function openNotifPanel(){ showToast('No new notifications'); }
 
 // ─── SUBSCRIBE MODAL ────────────────────────
 function openSubModal(){ openModal('subModal'); }
-   }
 function openMapModal(lat, lon, city) {
   // SECURITY CHECK: Only subscribers can view the exact map
   if (!currentUser || !currentUser.subscribed) {
@@ -2031,13 +2021,15 @@ function showToast(msg,type=''){
 }
 
 // ─── ADMIN ──────────────────────────────────
-function goToAdmin(){
-  if(!currentUser||currentUser.role!=='admin'){showToast('Admin access only','warn');return;}
-  document.getElementById('mainScreen').classList.remove('active');
-  document.getElementById('adminScreen').classList.add('active');
-  document.getElementById('adminUserLabel').textContent=currentUser.name;
-  renderAdminData();
-}
+function goToAdmin(){ 
+   // Allow access if role is admin OR if it's your specific email
+   const isAdmin = currentUser && (currentUser.role === 'admin' || currentUser.email === 'gds_gr@hotmail.gr');
+   if(!isAdmin){showToast('Admin access only','warn');return;} 
+   document.getElementById('mainScreen').classList.remove('active');
+   document.getElementById('adminScreen').classList.add('active');
+   document.getElementById('adminUserLabel').textContent = currentUser.name;
+   renderAdminData(); }
+   
 function goToMain(){
   document.getElementById('adminScreen').classList.remove('active');
   document.getElementById('mainScreen').classList.add('active');
@@ -2051,17 +2043,16 @@ function adminSec(name,el){
   if(name==='ads') renderAdsList();
   if(name==='donations') renderDonorList();
 }
-   
-async function renderAdminData(){
-  if(!currentUser || currentUser.email !== 'gds_gr@hotmail.gr') return;
- // Run the 2-day cleanup check
-  await cleanupOldSavedPosts();
-  // Fetch REAL data from Supabase
-  const { data: allPosts } = await sb.from('posts').select('*').order('timestamp', { ascending: false });
-  const { data: allUsers } = await sb.from('profiles').select('*');
-  
-  const posts = allPosts || [];
-  const users = allUsers || [];
+
+async function renderAdminData(){ 
+   if(!currentUser || currentUser.email !== 'gds_gr@hotmail.gr') return; 
+   await cleanupOldSavedPosts();
+   const { data: allPosts, error: pErr } = await sb.from('posts').select('*').order('timestamp', { ascending: false }); 
+   const { data: allUsers, error: uErr } = await sb.from('profiles').select('*');
+   if(pErr) console.error("Failed to fetch posts:", pErr);
+   if(uErr) console.error("Failed to fetch users:", uErr); 
+   const posts = allPosts || []; 
+   const users = allUsers || [];
 
   const live = posts.filter(p => p.status === 'live');
   const saved = live.filter(p => p.saved).length;
@@ -2082,7 +2073,7 @@ async function renderAdminData(){
     <tr>
       <td>${animalEmoji(p.animal_type || p.animal_type)} ${p.animal_type || p.animal_type}</td>
       <td>${p.city}</td>
-      <td>${p.uploader}</td>
+      <td>${p.uploader_name}</td>
       <td><span class="badge ${p.status==='pending'?'orange':p.saved?'green':p.condition==='injured'?'red':'purple'}">${p.status==='pending'?'Pending':p.saved?'Saved':p.condition}</span></td>
       <td>
         <select onchange="updatePostStatus('${p.id}', this.value)" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);padding:4px;border-radius:var(--radius-sm);cursor:pointer;">
@@ -2102,7 +2093,7 @@ async function renderAdminData(){
       <td style="color:var(--text3);font-size:12px;">${u.email}</td>
       <td><span class="badge ${u.role==='admin'?'yellow':u.is_subscriber?'green':'purple'}">${u.role || 'user'}</span></td>
       <td style="color:var(--text3);font-size:12px;">${u.sub_expires ? new Date(u.sub_expires).toLocaleDateString() : '—'}</td>
-      <td>${posts.filter(p => p.uploader === (u.name || u.email)).length}</td>
+      <td>${posts.filter(p => p.uploader_name === (u.name || u.email)).length}</td>
       <td>
         ${u.role!=='admin'?`<button class="abtn warn" onclick="makeAdmin('${u.id}')">Admin</button>`:''}
         <button class="abtn ${u.is_subscriber ? 'danger' : 'green'}" onclick="toggleSub('${u.id}', ${!u.is_subscriber})">${u.is_subscriber ? 'Unsub' : 'Sub'}</button>
@@ -2117,7 +2108,7 @@ async function renderAdminData(){
       <td>${animalEmoji(p.animal_type || p.animal_type)} ${p.animal_type || p.animal_type}</td>
       <td>${p.city}, ${p.country}</td>
       <td><span class="badge ${p.status==='pending'?'orange':p.saved?'green':p.condition==='injured'?'red':'purple'}">${p.status==='pending'?'Pending':p.saved?'Saved':p.condition}</span></td>
-      <td>${p.uploader}</td>
+      <td>${p.uploader_name}</td>
       <td style="font-size:11px;color:var(--text3);">${new Date(p.timestamp).toLocaleDateString()}</td>
       <td>
         <select onchange="updatePostStatus('${p.id}', this.value)" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);padding:4px;border-radius:var(--radius-sm);cursor:pointer;">
