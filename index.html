@@ -1367,15 +1367,15 @@ function renderPostCard(post, isSub, isReg){
   const isOwner = currentUser && currentUser.name === post.uploader_name;
   const condTag = post.condition==='injured' ? '<span class="atag injured">🚑 Injured</span>' :
                   post.condition==='lost' ? '<span class="atag" style="background:var(--warn-bg);color:var(--warn);border-color:var(--warn);">🏷 Lost</span>' : '';
-  const savedTag = post.saved ? '<span class="atag saved">✓ Saved</span>' : '';
+  const savedTag = post.saved_by ? '<span class="atag saved">✓ Saved</span>' : '';
 
-  const photoContent = post.photoData
-    ? `<img src="${post.photoData}" class="pc-img" alt="Animal photo" loading="lazy">`
-    : `<div class="pc-img-placeholder" style="background:${animalGrad(post.animalType)}">${animalEmoji(post.animalType)}</div>`;
+  const photoContent = post.photo_data
+    ? `<img src="${post.photo_data}" class="pc-img" alt="Animal photo" loading="lazy">`
+    : `<div class="pc-img-placeholder" style="background:${animalGrad(post.animal_type)}">${animalEmoji(post.animal_type)}</div>`;
 
-  const savedWM = post.saved ? `<div class="saved-wm"><div class="wm">✓ Saved</div></div>` : '';
+  const savedWM = post.saved_by ? `<div class="saved-wm"><div class="wm">✓ Saved</div></div>` : '';
   const waitTime = fmtTime(post.timestamp).replace('ago', '');
-  const urgencyText = !isSub ? `<div style="color:var(--danger);font-size:12px;font-weight:700;margin-top:8px;animation:pulse 2s infinite; line-height:1.4;">This ${post.animalType} has been waiting for ${waitTime}. I could be there in 5 minutes if I could just see the map.</div>` : '';
+  const urgencyText = !isSub ? `<div style="color:var(--danger);font-size:12px;font-weight:700;margin-top:8px;animation:pulse 2s infinite; line-height:1.4;">This ${post.animal_type} has been waiting for ${waitTime}. I could be there in 5 minutes if I could just see the map.</div>` : '';
 
     const coords = isSub
     ? `<span class="info-chip" onclick="openMapModal('${post.lat}', '${post.lon}', '${post.city}')" style="cursor: pointer; font-weight: 600;"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="10" r="3"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg> View Exact Map</span>
@@ -1384,7 +1384,7 @@ function renderPostCard(post, isSub, isReg){
        <span class="info-chip blurred-chip" onclick="openSubModal()">🏙 ${post.city}, ${post.country}</span>
        <span class="lock-pill" onclick="openSubModal()">🔒 Subscribe to unlock map</span>`;
 
-  const claimBtn = post.saved
+  const claimBtn = post.saved_by
     ? `<button class="btn-claim claimed" disabled>✓ Adopted</button>`
     : isSub
       ? `<button class="btn-claim" onclick="openClaim('${post.id}')">🏠 Claim</button>`
@@ -1396,13 +1396,13 @@ function renderPostCard(post, isSub, isReg){
   return `
     <div class="post-card" id="post-${post.id}">
       <div class="pc-header">
-        <div class="pc-avatar">${animalEmoji(post.animalType)}</div>
+        <div class="pc-avatar">${animalEmoji(post.animal_type)}</div>
         <div class="pc-meta">
           <div class="pc-user">${isSub ? post.uploader_name : '••••••'}</div>
           <div class="pc-time">${fmtTime(post.timestamp)}</div>
         </div>
         <div class="pc-tags">
-        <span class="atag">${(post.animalType || 'animal').charAt(0).toUpperCase()+(post.animalType || 'animal').slice(1)}</span>
+        <span class="atag">${(post.animal_type || 'animal').charAt(0).toUpperCase()+(post.animal_type || 'animal').slice(1)}</span>
           ${condTag}${savedTag}
         </div>
       </div>
@@ -1434,7 +1434,7 @@ function renderMap(){
   if(!isSub) return;
   const pins = db.posts.filter(p=>p.status==='live'&&!p.saved);
   document.getElementById('mapPins').innerHTML = pins.map(p=>`
-    <div class="map-pin">${animalEmoji(p.animalType)} ${p.city} — ${p.animalType}</div>`).join('');
+    <div class="map-pin">${animalEmoji(p.animal_type)} ${p.city} — ${p.animal_type}</div>`).join('');
 }
 
 // ─── TABS ───────────────────────────────────
@@ -1747,7 +1747,7 @@ function flagPost(postId){
 function sharePost(postId) {
   const post = db.posts.find(p => p.id === postId);
   if (!post) return;
-  const text = `Check out this ${post.animalType} in ${post.city} on SaveThePaws, the world's first real-time animal rescue network!`;
+  const text = `Check out this ${post.animal_type} in ${post.city} on SaveThePaws, the world's first real-time animal rescue network!`;
   const url = window.location.href;
   if (navigator.share) {
     navigator.share({ title: 'SaveThePaws', text: text, url: url }).catch(()=>{});
@@ -2293,7 +2293,7 @@ async function renderAdminData(){
   // Recent Posts Table with Dropdown
   document.getElementById('adminRecentBody').innerHTML = posts.slice(0,8).map(p => `
     <tr>
-      <td>${animalEmoji(p.animalType || p.animalType)} ${p.animalType || p.animalType}</td>
+      <td>${animalEmoji(p.animal_type || p.animal_type)} ${p.animal_type || p.animal_type}</td>
       <td>${p.city}</td>
       <td>${p.uploader_name}</td>
       <td><span class="badge ${p.status==='pending'?'orange':p.saved?'green':p.condition==='injured'?'red':'purple'}">${p.status==='pending'?'Pending':p.saved?'Saved':p.condition}</span></td>
@@ -2327,7 +2327,7 @@ async function renderAdminData(){
   // All Posts Table
   document.getElementById('adminPostsBody').innerHTML = posts.map(p => `
     <tr>
-      <td>${animalEmoji(p.animalType || p.animalType)} ${p.animalType || p.animalType}</td>
+      <td>${animalEmoji(p.animal_type || p.animal_type)} ${p.animal_type || p.animal_type}</td>
       <td>${p.city}, ${p.country}</td>
       <td><span class="badge ${p.status==='pending'?'orange':p.saved?'green':p.condition==='injured'?'red':'purple'}">${p.status==='pending'?'Pending':p.saved?'Saved':p.condition}</span></td>
       <td>${p.uploader_name}</td>
@@ -2362,10 +2362,10 @@ async function renderPending(){
     <div class="pending-card">
       ${p.photoData 
         ? `<img src="${p.photoData}" alt="Animal" style="width:100px;height:100px;object-fit:cover;border-radius:var(--radius-sm);">` 
-        : `<div class="pci-placeholder">${animalEmoji(p.animalType || p.animalType)}</div>`
+        : `<div class="pci-placeholder">${animalEmoji(p.animal_type || p.animal_type)}</div>`
       }
       <div class="pending-info">
-        <h4>${animalEmoji(p.animalType || p.animalType)} ${p.animalType || p.animalType} — ${p.city}, ${p.country}</h4>
+        <h4>${animalEmoji(p.animal_type || p.animal_type)} ${p.animal_type || p.animal_type} — ${p.city}, ${p.country}</h4>
         <p>${p.description || ''}</p>
         ${p.flag_reason ? `<div class="pi-reason">⚠ ${p.flag_reason}</div>` : ''}
         <div class="pending-actions">
