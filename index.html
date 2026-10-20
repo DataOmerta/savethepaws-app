@@ -527,6 +527,191 @@ document.addEventListener('touchend', () => {
 #mcStopBtn { display: none; }
 .music-circular.expanded #mcStopBtn { display: flex; }
 @media(max-width:660px){ .music-circular { bottom: 90px; right: 20px; } }
+   /* Badge Progress Ladder */
+.badge-ladder-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  margin-bottom: 4px;
+  background: var(--bg3);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--border2);
+  transition: all 0.3s;
+}
+.badge-ladder-item.earned {
+  border-left-color: var(--success);
+  background: var(--success-bg);
+}
+.badge-ladder-item.current {
+  border-left-color: var(--orange);
+  background: var(--orange-bg);
+  animation: pulse 2s infinite;
+}
+.badge-ladder-icon { font-size: 16px; flex-shrink: 0; }
+.badge-ladder-info { flex: 1; }
+.badge-ladder-name { font-size: 11px; font-weight: 700; color: var(--text); }
+.badge-ladder-desc { font-size: 9px; color: var(--text3); }
+.badge-ladder-progress { font-size: 9px; color: var(--accent2); font-weight: 600; }
+
+/* User Stats Panel */
+.user-stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 11px;
+  border-bottom: 1px solid var(--border);
+}
+.user-stat-row:last-child { border-bottom: none; }
+.user-stat-label { color: var(--text3); }
+.user-stat-value { color: var(--accent2); font-weight: 700; }
+
+/* Music Player Solid Buttons */
+.mc-btn-filled {
+  background: var(--accent);
+  color: #fff;
+}
+.mc-btn-filled:hover {
+  background: var(--accent2);
+}
+
+/* Floating Refresh Button */
+.refresh-fab {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 300;
+  box-shadow: var(--shadow);
+  font-size: 20px;
+  transition: transform 0.2s;
+}
+.refresh-fab:hover { transform: translateX(-50%) scale(1.1); }
+
+/* Subscribe Banner Centered */
+.sub-banner {
+  background: linear-gradient(135deg,rgba(124,111,224,.18),rgba(91,79,207,.08));
+  border:1px solid var(--accent);
+  border-radius:var(--radius);
+  padding:14px 16px;
+  display:flex;
+  align-items:center;
+  justify-content: center;
+  gap:12px;
+  flex-shrink:0;
+  text-align: center;
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto 14px auto;
+}
+
+/* Filter Rows */
+.filter-row {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+/* Search Wrap with Buttons */
+.search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 40px;
+  padding: 8px 14px;
+  margin-bottom: 10px;
+}
+
+/* Music Player Smaller */
+.music-circular {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  background: var(--accent);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  z-index: 9999;
+  box-shadow: 0 4px 20px rgba(124,111,224,0.5);
+  transition: width 0.3s, height 0.3s, border-radius 0.3s;
+}
+.music-circular.expanded {
+  width: 220px;
+  height: 56px;
+  border-radius: 28px;
+  justify-content: space-between;
+  padding: 0 10px;
+}
+.mc-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.mc-btn-filled {
+  background: var(--accent);
+}
+.mc-info {
+  flex: 1;
+  color: var(--orange);
+  font-size: 11px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: none;
+  font-weight: 600;
+}
+.mc-vol {
+  width: 50px;
+  accent-color: var(--orange);
+  display: none;
+}
+.music-circular.expanded .mc-info,
+.music-circular.expanded .mc-vol,
+.music-circular.expanded #mcStopBtn {
+  display: flex;
+}
+#mcStopBtn { display: none; }
+
+/* Mobile: Music player in bottom nav area */
+@media(max-width:660px) {
+  .music-circular {
+    bottom: 75px;
+    right: 15px;
+    width: 44px;
+    height: 44px;
+  }
+  .music-circular.expanded {
+    width: 200px;
+    height: 50px;
+  }
+}
 </style>
 </head>
 <body>
@@ -539,12 +724,11 @@ document.addEventListener('touchend', () => {
       <span class="logo-icon">🐾</span>SaveThePaws
     </div>
 <div class="topbar-right">
-  <button class="lang-btn" onclick="toggleLang()" id="langBtn">EL</button>
-  <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">🌙 Dark</button>
-  <button class="notif-bell" onclick="openNotifPanel()" id="notifBell">🔔<span class="notif-dot" id="notifDot"></span></button>
-  <button class="login-btn" onclick="openDonateModal()" style="background:var(--orange-bg);border-color:var(--orange);color:var(--orange);">❤️ Donate</button>
-  <button class="login-btn" id="adminBtnTop" onclick="goToAdmin()" style="display:none;background:var(--warn-bg);border-color:var(--warn);color:var(--warn);">🛡 Admin</button>
-  <button class="login-btn" id="loginBtnTop" onclick="handleAccountBtn()">Sign in</button>
+<button class="lang-btn" onclick="toggleLang()" id="langBtn">EL</button>
+<button class="notif-bell" onclick="openNotifPanel()" id="notifBell"><span class="notif-dot" id="notifDot"></span></button>
+<button class="login-btn" id="adminBtnTop" onclick="goToAdmin()" style="display:none;background:var(--warn-bg);border-color:var(--warn);color:var(--warn);">🛡 Admin</button>
+<button class="login-btn" id="loginBtnTop" onclick="handleAccountBtn()">Sign in</button>
+<button class="login-btn" id="logoutBtnTop" onclick="signOut()" style="display:none;background:var(--danger-bg);border-color:var(--danger);color:var(--danger);">Sign out</button>
 </div>
   </div>
 
@@ -556,95 +740,102 @@ document.addEventListener('touchend', () => {
   <div class="layout">
 <!-- LEFT SIDEBAR -->
 <div class="sidebar-left">
-  <button class="post-btn" onclick="handlePostBtn()">
-    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12l7-7 7 7"/></svg>
-    <span data-i18n="report_btn">Report Animal</span>
-  </button>
-  
-  <!-- A: Weekend Hero Box -->
-  <div class="stat-card" style="border-color: var(--orange);">
-    <div class="s-label" style="color: var(--orange);">🏆 Weekend Hero</div>
-    <div style="font-size: 11px; color: var(--text2); line-height: 1.5; margin-top: 6px;">
-      Free 36-hour access every weekend<br>
-      Sat 11AM - Sun 11PM<br>
-      <button onclick="doSubscribe('weekend')" style="background: var(--orange); color: #fff; border: none; border-radius: 4px; padding: 4px 8px; font-size: 11px; margin-top: 6px; cursor: pointer; width: 100%;">Activate Now</button>
-    </div>
-  </div>
-  
- <!-- B: Rules/Badges Box -->
-<div class="stat-card">
-  <div class="s-label">📋 Badge Rewards</div>
-  <div style="font-size: 10px; color: var(--text2); line-height: 1.6; margin-top: 6px;">
-    <div style="margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border);">
-      <strong style="color: var(--accent2);"> Scout</strong><br>
-      <small>Post 10 reports OR claim 1 animal</small><br>
-      <small style="color: var(--success);">→ Priority support access</small>
-    </div>
-    <div style="margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border);">
-      <strong style="color: var(--success);">🛡️ Guardian</strong><br>
-      <small>Claim 5 animals</small><br>
-      <small style="color: var(--success);">→ Rescue org badge on profile</small>
-    </div>
-    <div style="margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border);">
-      <strong style="color: var(--warn);">🦸 Hero</strong><br>
-      <small>Claim 10 animals</small><br>
-      <small style="color: var(--success);">→ Featured rescuer spotlight</small>
-    </div>
-    <div>
-      <strong style="color: var(--danger);"> Legend</strong><br>
-      <small>Claim 25 animals</small><br>
-      <small style="color: var(--success);">→ Lifetime premium access</small>
-    </div>
-  </div>
+<button class="post-btn" onclick="handlePostBtn()">
+<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12l7-7 7 7"/></svg>
+<span data-i18n="report_btn">Report Animal</span>
+</button>
+
+<!-- A: Weekend Hero Box -->
+<div class="stat-card" style="border-color: var(--orange);">
+<div class="s-label" style="color: var(--orange);">🏆 Weekend Hero</div>
+<div style="font-size: 11px; color: var(--text2); line-height: 1.5; margin-top: 6px;">
+Free 36-hour access every weekend<br>
+Sat 11AM - Sun 11PM<br>
+<button onclick="doSubscribe('weekend')" style="background: var(--orange); color: #fff; border: none; border-radius: 4px; padding: 4px 8px; font-size: 11px; margin-top: 6px; cursor: pointer; width: 100%;">Activate Now</button>
 </div>
-    <!-- MAIN AREA -->
-    <div class="main-area">
-      <div class="feed-tabs">
-        <div class="feed-tab active" onclick="switchTab('feed', this)" data-i18n="feed_tab">Feed</div>
-        <div class="feed-tab" onclick="switchTab('map', this)" id="mapTab">
-          <span data-i18n="map_tab">Map</span>
-          <span class="tab-lock" id="mapLock">🔒</span>
-        </div>
-        <div class="feed-tab" onclick="openDonateModal()" data-i18n="donate_tab">Donate</div>
-      </div>
+</div>
+
+<!-- B: Badge Rewards Ladder -->
+<div class="stat-card" id="badgeLadderCard">
+<div class="s-label">📋 Badge Progress</div>
+<div id="badgeLadder" style="margin-top: 8px;"></div>
+</div>
+
+<!-- Stats -->
+<div class="stat-card">
+<div class="s-label" data-i18n="saved_label">Animals Saved</div>
+<div class="s-num" id="statSaved">0</div>
+<div class="s-sub" data-i18n="adopted">adopted / claimed</div>
+</div>
+<div class="stat-card">
+<div class="s-label" data-i18n="posted_label">Total Reports</div>
+<div class="s-num" id="statTotal">0</div>
+<div class="s-sub" data-i18n="all_posts">all community posts</div>
+</div>
+<div class="stat-card" id="pendingStatCard" style="display:none;">
+<div class="s-label" data-i18n="pending_label">Pending Review</div>
+<div class="s-num" id="statPending" style="color:var(--orange);">0</div>
+<div class="s-sub" data-i18n="awaiting">awaiting moderation</div>
+</div>
+
+<!-- Role -->
+<div class="sidebar-role">
+<div class="r-label" data-i18n="your_role">Your Role</div>
+<div class="r-val" id="sideRole">Guest</div>
+<div class="r-val" id="sideBadges" style="font-size:11px; color:var(--accent2); margin-top:6px;"></div>
+</div>
+
+<!-- Donate button (replaces old Sign Out position) -->
+<button onclick="openDonateModal()" style="background:var(--orange-bg);border:1px solid var(--orange);color:var(--orange);border-radius:var(--radius);padding:10px;font-size:13px;font-weight:700;cursor:pointer;width:100%;margin-top:4px;">❤️ Donate</button>
+
+<!-- Admin button -->
+<button id="sideAdminBtn" onclick="goToAdmin()" style="display:none;background:var(--warn-bg);border:1px solid var(--warn);color:var(--warn);border-radius:var(--radius);padding:10px;font-size:13px;font-weight:700;cursor:pointer;width:100%;margin-top:4px;">🛡 Admin Dashboard</button>
+
+<!-- Sign Out (moved to topbar, kept here for mobile) -->
+<button class="logout-btn" id="sideLogoutBtn" onclick="signOut()">↩ Sign Out</button>
+</div>
+<!-- END LEFT SIDEBAR -->
+
+<!-- MAIN AREA -->
+<div class="main-area">
 
       <!-- FEED CONTROLS -->
-      <div class="feed-controls" id="feedControls">
-        <div class="search-wrap">
-          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <input placeholder="Search animals, cities..." id="searchInput" oninput="renderPosts()" autocomplete="off">
-        </div>
-       
-
-<div class="filter-row">
-  <div class="fchip active" onclick="setFilter('all',this)" data-i18n="filter_all">All</div>
-  <div class="fchip" onclick="setFilter('cat',this)">🐱 Cats</div>
-  <div class="fchip" onclick="setFilter('dog',this)">🐶 Dogs</div>
-  <div class="fchip" onclick="setFilter('bird',this)">🐦 Birds</div>
-  <div class="fchip" onclick="setFilter('rabbit',this)">🐰 Rabbits</div>
-  <div class="fchip" onclick="setFilter('injured',this)">🚑 Injured</div>
-  <div class="fchip" onclick="setFilter('saved',this)" data-i18n="filter_saved">✓ Saved</div>
-  <div class="fchip" onclick="loadCloudPosts(false)" style="margin-left:auto; border-color:var(--accent);">🔄 Refresh</div>
-  <div class="fchip" onclick="showRatingPopup()" style="background:var(--orange-bg); border-color:var(--orange); color:var(--orange);">⭐ Rate Us</div>
+    <div class="feed-controls" id="feedControls">
+<div class="search-wrap">
+<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+<input placeholder="Search animals, cities..." id="searchInput" oninput="renderPosts()" autocomplete="off">
+<button class="fchip" onclick="loadCloudPosts(false)" style="margin-left:8px; border-color:var(--accent); background:var(--accent-bg);">🔄 Refresh</button>
+<button class="fchip" onclick="showRatingPopup()" style="margin-left:4px; background:var(--orange-bg); border-color:var(--orange); color:var(--orange);">⭐ Rate Us</button>
 </div>
- <div class="ptr-indicator" id="ptrIndicator">
-  <span>🔄</span>
-  <span>Refreshing...</span>
-    </div> 
+<div class="filter-row" id="filterRow1">
+<div class="fchip active" onclick="setFilter('all',this)" data-i18n="filter_all">All</div>
+<div class="fchip" onclick="setFilter('cat',this)">🐱 Cat</div>
+<div class="fchip" onclick="setFilter('dog',this)">🐶 Dog</div>
+<div class="fchip" onclick="setFilter('bird',this)">🐦 Bird</div>
+<div class="fchip" onclick="setFilter('rabbit',this)">🐰 Rabbit</div>
+<div class="fchip" onclick="setFilter('other',this)">🐾 Other</div>
+</div>
+<div class="filter-row" id="filterRow2">
+<div class="fchip" onclick="setFilter('injured',this)"> Injured</div>
+<div class="fchip" onclick="setFilter('saved',this)" data-i18n="filter_saved">✓ Saved</div>
+<div class="fchip" onclick="setFilter('healthy',this)">💚 Healthy</div>
+<div class="fchip" onclick="setFilter('lost',this)">🏷 Lost</div>
+<div class="fchip" onclick="setFilter('collar',this)">🔔 With Collar</div>
+</div>
       <!-- FEED VIEW -->
       <div class="main-feed" id="mainFeed">
-        <div class="sub-banner" id="subBanner">
-          <div class="sb-icon">🔐</div>
-          <div class="sb-text">
-            <strong data-i18n="sub_banner_title">Unlock location & contact details</strong>
-            <span data-i18n="sub_banner_sub">Subscribe to claim animals and see GPS data</span>
-          </div>
-          <button class="sb-cta" onclick="openSubModal()" data-i18n="subscribe_btn">Subscribe</button>
-        </div>
-         <div id="postsContainer"></div>
-<button class="refresh-btn-bottom" onclick="loadCloudPosts(false)" title="Refresh Feed">🔄</button>
-</div><div id="postsContainer"></div>
+         <div class="sub-banner" id="subBanner">
+               <div class="sb-icon">🔐</div>
+            <div class="sb-text">
+                  <strong data-i18n="sub_banner_title">Unlock location & contact details</strong>
+                  <span data-i18n="sub_banner_sub">Subscribe to claim animals and see GPS data</span>
+            </div>
+                  <button class="sb-cta" onclick="openSubModal()" data-i18n="subscribe_btn">Subscribe</button>
+           </div>
+            <div id="postsContainer" style="width:100%; max-width:700px;"></div>
+            <button class="refresh-fab" onclick="loadCloudPosts(false)" title="Refresh Feed">🔄</button>
       </div>
+
 
       <!-- MAP VIEW -->
       <div class="map-view" id="mapView">
@@ -660,26 +851,29 @@ document.addEventListener('touchend', () => {
     <!-- RIGHT SIDEBAR -->
     <div class="sidebar-right">
       <div class="sr-section">
-        <h4 data-i18n="activity_title">Recent Activity</h4>
-        <div id="activityFeed"></div>
+         <h4>🏆 Badge Progress</h4>
+         <div id="badgeProgressLadder"></div>
       </div>
-      <div class="sr-section">
-        <h4 data-i18n="donate_title">Support Organizations</h4>
-        <div id="sidebarDonations"></div>
-      </div>
-    </div>
-  </div>
+         <div class="sr-section">
+         <h4> Your Stats</h4>
+         <div id="userStatsPanel"></div>
+   </div>
+<div class="sr-section">
+      <h4 data-i18n="donate_title">Support Organizations</h4>
+         <div id="sidebarDonations"></div>
+</div>
 </div>
 
+
 <!-- MUSIC PLAYER -->
-   <audio id="bgAudio" loop></audio>
-   <div class="music-circular" id="musicCircular"> 
-      <button class="mc-btn" id="mcShuffleBtn" title="Shuffle">🔀</button>
-      <div class="mc-info" id="mcInfo" style="color: var(--orange);">Loading...</div> 
-      <button class="mc-btn" id="mcPlayBtn" title="Play / Pause">▶</button>
-<button class="mc-btn" id="mcStopBtn" title="Stop">⏹</button>
-      <input class="mc-vol" id="mcVol" type="range" min="0" max="1" step="0.05" value="0.4" title="Volume"> 
-   </div>
+<audio id="bgAudio" loop></audio>
+<div class="music-circular" id="musicCircular">
+<button class="mc-btn mc-btn-filled" id="mcShuffleBtn" title="Shuffle">🔀</button>
+<div class="mc-info" id="mcInfo">Loading...</div>
+<button class="mc-btn mc-btn-filled" id="mcPlayBtn" title="Play / Pause">▶</button>
+<button class="mc-btn mc-btn-filled" id="mcStopBtn" title="Stop">⏹</button>
+<input class="mc-vol" id="mcVol" type="range" min="0" max="1" step="0.05" value="0.4" title="Volume">
+</div>
 
 <!-- RATING POPUP -->
 <div class="rating-overlay" id="ratingOverlay">
@@ -1276,13 +1470,15 @@ function startGeo(){
 
 // ─── STATS ──────────────────────────────────
 function renderStats(){
-  const live = posts.filter(p=>p.status==='live');
+const live = db.posts.filter(p=>p.status==='live');
   document.getElementById('statSaved').textContent = live.filter(p=>p.saved).length;
   document.getElementById('statTotal').textContent = live.length;
   const pend = posts.filter(p=>p.status==='pending').length;
   document.getElementById('statPending').textContent = pend;
   const pb = document.getElementById('pendingBadge');
   if(pb) pb.textContent = pend;
+   renderBadgeLadder();
+renderUserStats();
 }
 
 // ─── ACTIVITY ───────────────────────────────
@@ -1340,7 +1536,21 @@ function renderPosts(){
   }
 if(currentFilter==='injured') posts=posts.filter(p=>p.condition==='injured');
   else if(currentFilter==='saved') posts=posts.filter(p=>p.saved);
-else if(currentFilter!=='all') posts=posts.filter(p=>p.animal_type===currentFilter);
+else if(currentFilter!=='all') {
+  if(['cat','dog','bird','rabbit','other'].includes(currentFilter)) {
+    posts=posts.filter(p=>(p.animal_type||'').toLowerCase()===currentFilter);
+  } else if(currentFilter==='injured') {
+    posts=posts.filter(p=>p.condition==='injured');
+  } else if(currentFilter==='saved') {
+    posts=posts.filter(p=>p.saved);
+  } else if(currentFilter==='healthy') {
+    posts=posts.filter(p=>p.condition==='healthy');
+  } else if(currentFilter==='lost') {
+    posts=posts.filter(p=>p.condition==='lost');
+  } else if(currentFilter==='collar') {
+    posts=posts.filter(p=>p.condition==='lost');
+  }
+}
 if(q) posts=posts.filter(p=>(p.description || '').toLowerCase().includes(q) || (p.city || '').toLowerCase().includes(q) || (p.animal_type || '').includes(q));
 
   // inject ads
@@ -1775,6 +1985,58 @@ function checkBadges() {
     sideBadges.textContent = '🏆 ' + earnedBadges.map(b => b.charAt(0).toUpperCase() + b.slice(1)).join(', ');
   }
 }
+   // ─── BADGE LADDER + USER STATS ─────────────────
+function renderBadgeLadder() {
+  const container = document.getElementById('badgeLadder');
+  if (!container) return;
+  
+  const badges = [
+    { name: 'Scout', icon: '🥉', req: 10, type: 'posts', color: 'var(--accent2)', reward: 'Priority support' },
+    { name: 'Guardian', icon: '🛡️', req: 5, type: 'claims', color: 'var(--success)', reward: 'Rescue badge' },
+    { name: 'Hero', icon: '🦸', req: 10, type: 'claims', color: 'var(--warn)', reward: 'Featured spotlight' },
+    { name: 'Legend', icon: '👑', req: 25, type: 'claims', color: 'var(--danger)', reward: 'Lifetime premium' }
+  ];
+  
+  const stats = getUserStats();
+  const earnedBadges = JSON.parse(localStorage.getItem(`stp_badges_${currentUser?.id}`) || '[]');
+  
+  container.innerHTML = badges.map((b, i) => {
+    const current = b.type === 'posts' ? stats.posts : stats.claims;
+    const progress = Math.min(100, Math.round((current / b.req) * 100));
+    const earned = earnedBadges.includes(b.name.toLowerCase());
+    const isCurrent = !earned && (i === 0 || earnedBadges.includes(badges[i-1].name.toLowerCase()));
+    
+    let statusClass = '';
+    if (earned) statusClass = 'earned';
+    else if (isCurrent) statusClass = 'current';
+    
+    return `
+      <div class="badge-ladder-item ${statusClass}">
+        <div class="badge-ladder-icon">${b.icon}</div>
+        <div class="badge-ladder-info">
+          <div class="badge-ladder-name" style="color:${b.color}">${b.name}</div>
+          <div class="badge-ladder-desc">${b.type === 'posts' ? 'Post' : 'Claim'} ${b.req} ${b.type} → ${b.reward}</div>
+        </div>
+        <div class="badge-ladder-progress">${earned ? '✓' : progress + '%'}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderUserStats() {
+  const container = document.getElementById('userStatsPanel');
+  if (!container) return;
+  
+  const stats = getUserStats();
+  const posts = db.posts.filter(p => p.uploader_name === currentUser?.name).length;
+  
+  container.innerHTML = `
+    <div class="user-stat-row"><span class="user-stat-label">Posts</span><span class="user-stat-value">${posts}</span></div>
+    <div class="user-stat-row"><span class="user-stat-label">Claims</span><span class="user-stat-value">${stats.claims}</span></div>
+    <div class="user-stat-row"><span class="user-stat-label">Injured Helped</span><span class="user-stat-value">${stats.injured}</span></div>
+    <div class="user-stat-row"><span class="user-stat-label">Badges</span><span class="user-stat-value">${JSON.parse(localStorage.getItem(`stp_badges_${currentUser?.id}`) || '[]').length}/4</span></div>
+  `;
+}
    // ─── INFINITE SCROLL CLOUD LOADING ───────────
 let currentPage = 0;
 const pageSize = 50;
@@ -1795,10 +2057,10 @@ const { data, error } = await sb
 
   if (!error && data) {
     if (isAppend) {
-      posts = [...posts, ...data];
-    } else {
-      posts = data;
-    }
+db.posts = [...db.posts, ...data];
+} else {
+db.posts = data;
+}
     renderPosts();
     renderStats();
     if (data.length < pageSize) hasMorePosts = false;
@@ -2040,6 +2302,9 @@ function updateUI(){
 
   if(isAdmin) showAdminBtn(); else hideAdminBtn();
   updateLogoutBtn();
+   // Show/hide topbar logout button
+const logoutTop = document.getElementById('logoutBtnTop');
+if(logoutTop) logoutTop.style.display = currentUser ? 'flex' : 'none';
 }
 
 function switchForm(to){
@@ -2210,11 +2475,9 @@ function showToast(msg,type=''){
 }
 
 // ─── ADMIN ──────────────────────────────────
-function goToAdmin(){ 
-  const isAdmin = currentUser && (currentUser.role === 'admin' || currentUser.email === 'gds_gr@hotmail.gr');
-  if(!isAdmin){
-    showToast('Admin access only','warn');
-    return;
+  function goToAdmin(){
+const isAdmin = currentUser && (currentUser.role === 'admin' || currentUser.email === 'gds_gr@hotmail.gr');
+if(!isAdmin){showToast('Admin access only','warn');return;}
   }
   document.getElementById('mainScreen').classList.remove('active');
   document.getElementById('adminScreen').classList.add('active');
