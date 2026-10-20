@@ -1332,27 +1332,40 @@ function keywordCheck(desc, type){
 /*async function sightengineCheck(imageData) {
   try {
     const formData = new FormData();
-    formData.append('media', imageData);
+    // Fix: Remove the "data:image/jpeg;base64," part before sending
+    const rawBase64 = imageData.split(',')[1]; 
+    formData.append('media', rawBase64);
     formData.append('models', 'nudity-2.1,weapon,gore');
-    formData.append('api_user', '1622452775'); 
-    formData.append('api_secret', '5DGESTpwGTFUntMYVjDbG6mo3mV9FqwH'); 
+    formData.append('api_user', '1622452775');
+    formData.append('api_secret', '5DGESTpwGTFUntMYVjDbG6mo3mV9FqwH');
+    
+    const response = await fetch('https://api.sightengine.com/1.0/check.json', { 
+      method: 'POST', 
+      body: formData 
+    });
+    
+    if (!response.ok) {
+       console.warn('Sightengine API returned error status:', response.status);
+       return true; // If API fails, assume safe so upload isn't blocked
+    }
 
-    const response = await fetch('https://api.sightengine.com/1.0/check.json', { method: 'POST', body: formData });
     const data = await response.json();
     
     if ((data.nudity && data.nudity.raw > 0.6) || (data.weapon && data.weapon > 0.6) || (data.gore && data.gore > 0.6)) {
-      return false; // Unsafe
+      return false; 
     }
-    return true; // Safe
+    return true; 
   } catch(e) {
     console.error("Sightengine API error:", e);
     return true; 
   }
+}
 }*/
 async function sightengineCheck(imageData) {
-  // Sightengine free trial expired — skipping moderation for now
-  console.log('⚠️ Sightengine skipped (trial expired)');
-  return true;
+  // SIGHTENGINE TRIAL EXPIRED - bypassing moderation
+  console.log('⚠️ Sightengine moderation');
+  return true; // Always allow
+
 }
 async function submitPost(){
   if(!currentUser){ showToast('Sign in to post','warn'); return; }
@@ -1936,19 +1949,23 @@ function renderPending(){
   const list=document.getElementById('pendingList');
   document.getElementById('pendingBadge').textContent=pend.length;
   if(!pend.length){list.innerHTML='<div style="color:var(--text3);text-align:center;padding:30px;font-size:14px;">No pending posts. All clear!</div>';return;}
-  list.innerHTML=pend.map(p=>`
-    <div class="pending-card">
-      ${p.photoData?`<img src="${p.photoData}" alt="Animal">`:`<div class="pci-placeholder">${animalEmoji(p.animalType)}</div>`}
-      <div class="pending-info">
-        <h4>${animalEmoji(p.animalType)} ${p.animalType} — ${p.city}, ${p.country}</h4>
-        <p>${p.description || ''}</p>
-        ${p.flagReason?`<div class="pi-reason">⚠ ${p.flagReason}</div>`:''}
-        <div class="pending-actions">
-          <button class="abtn green" onclick="approvePost('${p.id}')">✓ Approve</button>
-          <button class="abtn danger" onclick="deletePost('${p.id}')">✕ Reject</button>
-        </div>
+ list.innerHTML=pend.map(p=>`
+  <div class="pending-card">
+    ${p.photoData 
+      ? `<img src="${p.photoData}" alt="Animal" style="width:100px;height:100px;object-fit:cover;">` 
+      : `<div class="pci-placeholder">${animalEmoji(p.animalType)}</div>`
+    }
+    <div class="pending-info">
+      <h4>${animalEmoji(p.animalType)} ${p.animalType} — ${p.city}, ${p.country}</h4>
+      <p>${p.description || ''}</p>
+      ${p.flagReason?`<div class="pi-reason">⚠ ${p.flagReason}</div>`:''}
+      <div class="pending-actions">
+        <button class="abtn green" onclick="approvePost('${p.id}')">✓ Approve</button>
+        <button class="abtn danger" onclick="deletePost('${p.id}')">✕ Reject</button>
       </div>
-    </div>`).join('');
+    </div>
+  </div>
+`).join('');
 }
 
 async function approvePost(id){
