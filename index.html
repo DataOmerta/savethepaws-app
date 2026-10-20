@@ -96,7 +96,16 @@ body{overscroll-behavior:none;}
 .feed-tab.active{color:var(--accent2);border-bottom-color:var(--accent);}
 .feed-tab.locked{color:var(--text3);cursor:pointer;}
 .tab-lock{font-size:11px;margin-left:4px;}
-.main-feed{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth;}
+.main-feed {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  scroll-behavior: smooth;
+  align-items: center;
+}
 .main-feed::-webkit-scrollbar{width:3px;}
 .main-feed::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 <button class="refresh-btn-bottom" onclick="loadCloudPosts(false)" title="Refresh Feed">🔄</button>
@@ -143,7 +152,7 @@ document.addEventListener('touchend', () => {
 /* Pull-to-Refresh Indicator */
 .ptr-indicator {
   position: fixed;
-  top: 60px;
+  top: 70px;
   left: 50%;
   transform: translateX(-50%);
   background: var(--accent);
@@ -203,6 +212,9 @@ document.addEventListener('touchend', () => {
   gap:12px;
   flex-shrink:0;
   text-align: center;
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
 }
 .sub-banner .sb-icon{font-size:26px;flex-shrink:0;}
 .sub-banner .sb-text strong{display:block;font-size:14px;font-weight:700;margin-bottom:2px;}
@@ -510,7 +522,10 @@ document.addEventListener('touchend', () => {
 .mc-btn:hover { background: rgba(255,255,255,0.2); }
 .mc-info { flex: 1; color: #fff; font-size: 12px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: none; }
 .mc-vol { width: 60px; accent-color: #fff; display: none; }
-.music-circular.expanded .mc-info, .music-circular.expanded .mc-vol { display: block; }
+.music-circular.expanded .mc-info, 
+.music-circular.expanded .mc-vol, 
+.music-circular.expanded #mcStopBtn { display: flex; }
+#mcStopBtn { display: none; }
 @media(max-width:660px){ .music-circular { bottom: 90px; right: 20px; } }
 </style>
 </head>
@@ -523,13 +538,14 @@ document.addEventListener('touchend', () => {
     <div class="logo" onclick="goToMain()">
       <span class="logo-icon">🐾</span>SaveThePaws
     </div>
-    <div class="topbar-right">
-      <button class="lang-btn" onclick="toggleLang()" id="langBtn">EL</button>
-      <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">🌙 Dark</button>
-      <button class="notif-bell" onclick="openNotifPanel()" id="notifBell">🔔<span class="notif-dot" id="notifDot"></span></button>
-      <button class="login-btn" id="adminBtnTop" onclick="goToAdmin()" style="display:none;background:var(--warn-bg);border-color:var(--warn);color:var(--warn);">🛡 Admin</button>
-      <button class="login-btn" id="loginBtnTop" onclick="handleAccountBtn()">Sign in</button>
-    </div>
+<div class="topbar-right">
+  <button class="lang-btn" onclick="toggleLang()" id="langBtn">EL</button>
+  <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">🌙 Dark</button>
+  <button class="notif-bell" onclick="openNotifPanel()" id="notifBell">🔔<span class="notif-dot" id="notifDot"></span></button>
+  <button class="login-btn" onclick="openDonateModal()" style="background:var(--orange-bg);border-color:var(--orange);color:var(--orange);">❤️ Donate</button>
+  <button class="login-btn" id="adminBtnTop" onclick="goToAdmin()" style="display:none;background:var(--warn-bg);border-color:var(--warn);color:var(--warn);">🛡 Admin</button>
+  <button class="login-btn" id="loginBtnTop" onclick="handleAccountBtn()">Sign in</button>
+</div>
   </div>
 
   <div class="notif-banner" id="notifBanner">
@@ -555,42 +571,31 @@ document.addEventListener('touchend', () => {
     </div>
   </div>
   
-  <!-- B: Rules/Badges Box -->
-  <div class="stat-card">
-    <div class="s-label">📋 Badge Rewards</div>
-    <div style="font-size: 10px; color: var(--text2); line-height: 1.6; margin-top: 6px;">
-      <div style="margin-bottom: 6px;"><strong style="color: var(--accent2);"> Scout</strong><br><small>Post 10 reports OR claim 1 animal</small></div>
-      <div style="margin-bottom: 6px;"><strong style="color: var(--success);">🛡️ Guardian</strong><br><small>Claim 5 animals</small></div>
-      <div><strong style="color: var(--warn);">🦸 Hero</strong><br><small>Claim 10 animals</small></div>
+ <!-- B: Rules/Badges Box -->
+<div class="stat-card">
+  <div class="s-label">📋 Badge Rewards</div>
+  <div style="font-size: 10px; color: var(--text2); line-height: 1.6; margin-top: 6px;">
+    <div style="margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border);">
+      <strong style="color: var(--accent2);"> Scout</strong><br>
+      <small>Post 10 reports OR claim 1 animal</small><br>
+      <small style="color: var(--success);">→ Priority support access</small>
+    </div>
+    <div style="margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border);">
+      <strong style="color: var(--success);">🛡️ Guardian</strong><br>
+      <small>Claim 5 animals</small><br>
+      <small style="color: var(--success);">→ Rescue org badge on profile</small>
+    </div>
+    <div style="margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border);">
+      <strong style="color: var(--warn);">🦸 Hero</strong><br>
+      <small>Claim 10 animals</small><br>
+      <small style="color: var(--success);">→ Featured rescuer spotlight</small>
+    </div>
+    <div>
+      <strong style="color: var(--danger);"> Legend</strong><br>
+      <small>Claim 25 animals</small><br>
+      <small style="color: var(--success);">→ Lifetime premium access</small>
     </div>
   </div>
-  
-  <div class="stat-card">
-    <div class="s-label" data-i18n="saved_label">Animals Saved</div>
-    <div class="s-num" id="statSaved">0</div>
-    <div class="s-sub" data-i18n="adopted">adopted / claimed</div>
-  </div>
-  
-  <div class="stat-card">
-    <div class="s-label" data-i18n="posted_label">Total Reports</div>
-    <div class="s-num" id="statTotal">0</div>
-    <div class="s-sub" data-i18n="all_posts">all community posts</div>
-  </div>
-  
-  <div class="stat-card" id="pendingStatCard" style="display:none;">
-    <div class="s-label" data-i18n="pending_label">Pending Review</div>
-    <div class="s-num" id="statPending" style="color:var(--orange);">0</div>
-    <div class="s-sub" data-i18n="awaiting">awaiting moderation</div>
-  </div>
-  
-  <div class="sidebar-role">
-    <div class="r-label" data-i18n="your_role">Your Role</div>
-    <div class="r-val" id="sideRole">Guest</div>
-    <div class="r-val" id="sideBadges" style="font-size:11px; color:var(--accent2); margin-top:6px;"></div>
-  </div>
-  
-  <button id="sideAdminBtn" onclick="goToAdmin()" style="display:none;background:var(--warn-bg);border:1px solid var(--warn);color:var(--warn);border-radius:var(--radius);padding:10px;font-size:13px;font-weight:700;cursor:pointer;width:100%;">🛡 Admin Dashboard</button>
-  <button class="logout-btn" id="sideLogoutBtn" onclick="signOut()"> Sign Out</button>
 </div>
     <!-- MAIN AREA -->
     <div class="main-area">
@@ -609,11 +614,8 @@ document.addEventListener('touchend', () => {
           <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           <input placeholder="Search animals, cities..." id="searchInput" oninput="renderPosts()" autocomplete="off">
         </div>
-         <div class="ptr-indicator" id="ptrIndicator">
-  <span>🔄</span>
-  <span>Refreshing...</span>
-            <button class="refresh-btn-bottom">
-</div>
+       
+
 <div class="filter-row">
   <div class="fchip active" onclick="setFilter('all',this)" data-i18n="filter_all">All</div>
   <div class="fchip" onclick="setFilter('cat',this)">🐱 Cats</div>
@@ -625,7 +627,10 @@ document.addEventListener('touchend', () => {
   <div class="fchip" onclick="loadCloudPosts(false)" style="margin-left:auto; border-color:var(--accent);">🔄 Refresh</div>
   <div class="fchip" onclick="showRatingPopup()" style="background:var(--orange-bg); border-color:var(--orange); color:var(--orange);">⭐ Rate Us</div>
 </div>
-
+ <div class="ptr-indicator" id="ptrIndicator">
+  <span>🔄</span>
+  <span>Refreshing...</span>
+    </div> 
       <!-- FEED VIEW -->
       <div class="main-feed" id="mainFeed">
         <div class="sub-banner" id="subBanner">
@@ -672,7 +677,7 @@ document.addEventListener('touchend', () => {
       <button class="mc-btn" id="mcShuffleBtn" title="Shuffle">🔀</button>
       <div class="mc-info" id="mcInfo" style="color: var(--orange);">Loading...</div> 
       <button class="mc-btn" id="mcPlayBtn" title="Play / Pause">▶</button>
-      <button class="mc-btn" id="mcStopBtn" title="Stop" style="display:none;">⏹</button>
+      <button class="mc-btn" id="mcStopBtn" title="Stop" style="display:flex;">⏹</button>
       <input class="mc-vol" id="mcVol" type="range" min="0" max="1" step="0.05" value="0.4" title="Volume"> 
    </div>
 
@@ -890,16 +895,11 @@ document.addEventListener('touchend', () => {
     <button class="modal-close" onclick="closeModal('uploadModal')">✕</button>
     <h2>📷 <span data-i18n="report_title">Report an Animal</span></h2>
     <p class="modal-sub" data-i18n="report_sub">Photo + description only. Location is collected automatically. Your identity is private.</p>
-    <div class="photo-drop" id="photoDrop">
-      <input type="file" accept="image/*" capture="environment" id="photoInput" onchange="previewPhoto(this)" style="display:none;">
-       <div class="photo-drop" id="photoDrop" onclick="document.getElementById('photoInput').click()">
-  <div class="pd-icon"></div>
-  <p data-i18n="photo_drop">Tap to take photo or upload from gallery</p>
-  <input type="file" accept="image/*" capture="environment" id="photoInput" onchange="previewPhoto(this)" style="display:none;">
+  <div class="photo-drop" id="photoDrop" onclick="document.getElementById('photoInput').click()">
+<div class="pd-icon">📷</div>
+<p data-i18n="photo_drop">Tap to take photo or upload from gallery</p>
+<input type="file" accept="image/*" capture="environment" id="photoInput" onchange="previewPhoto(this)" style="display:none;">
 </div>
-      <div class="pd-icon">📷</div>
-      <p data-i18n="photo_drop">Tap to take photo or upload from gallery</p>
-    </div>
     <img id="photoPreview" class="photo-preview-img" alt="Preview">
     <div class="ai-checking" id="aiChecking">🤖 Verifying this is an animal photo...</div>
     <div class="fg-row" style="margin-top:12px;">
@@ -1296,7 +1296,11 @@ function renderActivity(){
 
 // ─── SIDEBAR DONATIONS ──────────────────────
 function renderSidebarDonations(){
-  document.getElementById('sidebarDonations').innerHTML = db.donors.slice(0,3).map(d=>`
+  // Use Supabase data if available, fallback to local
+  const donorsToUse = (db.donors && db.donors.length > 0) ? db.donors : [
+    {icon:'🐾', name:'SaveThePaws Fund', url:'https://paypal.me/JimOem'}
+  ];
+  document.getElementById('sidebarDonations').innerHTML = donorsToUse.slice(0,3).map(d=>`
     <div class="donate-org-item">
       <strong>${d.icon} ${d.name}</strong>
       <a href="${d.url}" target="_blank" rel="noopener">Donate →</a>
@@ -1337,7 +1341,7 @@ function renderPosts(){
 if(currentFilter==='injured') posts=posts.filter(p=>p.condition==='injured');
   else if(currentFilter==='saved') posts=posts.filter(p=>p.saved);
 else if(currentFilter!=='all') posts=posts.filter(p=>p.animal_type===currentFilter);
-if(q) posts=posts.filter(p=>...||(p.animal_type||'').includes(q));
+if(q) posts=posts.filter(p=>(p.description || '').toLowerCase().includes(q) || (p.city || '').toLowerCase().includes(q) || (p.animal_type || '').includes(q));
 
   // inject ads
   const adFreq = db.settings.adFreq||6;
@@ -1837,7 +1841,7 @@ function handleAccountBtn(){
 function mobileAccountMenu(){
   if(!currentUser){ openLoginModal(); return; }
   if(currentUser.role==='admin'){
-    const choice = confirm('Go to Admin Dashboard?\nOK = Admin Dashboard\nCancel = Sign Out\n');
+    const choice = confirm('Go to Admin Dashboard?\nOK = Admin Dashboard\nCancel = Sign Out');
     if(choice) goToAdmin(); else if(confirm('Sign out?')) signOut();
   } else {
     if(confirm('Sign out of '+currentUser.name+'?')) signOut();
@@ -2782,10 +2786,8 @@ function playProximityAlert() {
     </div>
   </div>
 </div>
-
 <div class="credits-watermark" style="position: fixed; bottom: 8px; left: 0; right: 0; text-align: center; font-size: 11px; color: rgba(124,111,224,0.4); z-index: 100; pointer-events: none;">
   Sound/Art Direction by Bill Melachrinos • Planning/Development Dimitris Paraschidis • Communication/Advertising Aneta Conic
 </div>
-
 </body>
 </html>
