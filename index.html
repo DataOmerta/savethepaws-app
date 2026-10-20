@@ -612,6 +612,7 @@ document.addEventListener('touchend', () => {
          <div class="ptr-indicator" id="ptrIndicator">
   <span>🔄</span>
   <span>Refreshing...</span>
+            <button class="refresh-btn-bottom">
 </div>
 <div class="filter-row">
   <div class="fchip active" onclick="setFilter('all',this)" data-i18n="filter_all">All</div>
@@ -635,7 +636,9 @@ document.addEventListener('touchend', () => {
           </div>
           <button class="sb-cta" onclick="openSubModal()" data-i18n="subscribe_btn">Subscribe</button>
         </div>
-        <div id="postsContainer"></div>
+         <div id="postsContainer"></div>
+<button class="refresh-btn-bottom" onclick="loadCloudPosts(false)" title="Refresh Feed">🔄</button>
+</div><div id="postsContainer"></div>
       </div>
 
       <!-- MAP VIEW -->
@@ -900,8 +903,8 @@ document.addEventListener('touchend', () => {
     <img id="photoPreview" class="photo-preview-img" alt="Preview">
     <div class="ai-checking" id="aiChecking">🤖 Verifying this is an animal photo...</div>
     <div class="fg-row" style="margin-top:12px;">
-      <div class="fg"><label data-i18n="animal_type">Animal Type</label>
-        <select id="animal_type">
+      <div class="fg"><label data-i18n="animalType">Animal Type</label>
+        <select id="animalType">
           <option value="cat">🐱 Cat</option>
           <option value="dog">🐶 Dog</option>
           <option value="bird">🐦 Bird</option>
@@ -1104,7 +1107,7 @@ const LANG = {
     donate_tab:'Donate',activity_title:'Recent Activity',donate_title:'Support Organizations',
     donate_float:'Donate',report_title:'Report an Animal',
     report_sub:'Photo + description only. Location is collected automatically.',
-    photo_drop:'Tap to take photo or upload from gallery',animal_type:'Animal Type',
+    photo_drop:'Tap to take photo or upload from gallery',animalType:'Animal Type',
     condition:'Condition',description:'Description',adopted:'adopted / claimed',
     all_posts:'all community posts',awaiting:'awaiting moderation',
     filter_all:'All',filter_saved:'✓ Saved',
@@ -1118,7 +1121,7 @@ const LANG = {
     donate_tab:'Δωρεά',activity_title:'Πρόσφατη Δραστηριότητα',donate_title:'Υποστήριξη Οργανισμών',
     donate_float:'Δωρεά',report_title:'Αναφορά Ζώου',
     report_sub:'Μόνο φωτογραφία + περιγραφή. Η τοποθεσία εντοπίζεται αυτόματα.',
-    photo_drop:'Πατήστε για φωτογραφία ή μεταφόρτωση',animal_type:'Είδος Ζώου',
+    photo_drop:'Πατήστε για φωτογραφία ή μεταφόρτωση',animalType:'Είδος Ζώου',
     condition:'Κατάσταση',description:'Περιγραφή',adopted:'υιοθετήθηκαν / διεκδικήθηκαν',
     all_posts:'όλες οι αναφορές',awaiting:'αναμένουν έγκριση',
     filter_all:'Όλα',filter_saved:'✓ Σώθηκαν',
@@ -1333,9 +1336,8 @@ function renderPosts(){
   }
 if(currentFilter==='injured') posts=posts.filter(p=>p.condition==='injured');
   else if(currentFilter==='saved') posts=posts.filter(p=>p.saved);
- else if(currentFilter!=='all') posts=posts.filter(p=>(p.animal_type || p.animal_type)===currentFilter);
-
-  if(q) posts=posts.filter(p=>(p.description || '').toLowerCase().includes(q)||p.city.toLowerCase().includes(q)||p.animal_type.includes(q));
+else if(currentFilter!=='all') posts=posts.filter(p=>p.animal_type===currentFilter);
+if(q) posts=posts.filter(p=>...||(p.animal_type||'').includes(q));
 
   // inject ads
   const adFreq = db.settings.adFreq||6;
@@ -1367,13 +1369,13 @@ function renderPostCard(post, isSub, isReg){
                   post.condition==='lost' ? '<span class="atag" style="background:var(--warn-bg);color:var(--warn);border-color:var(--warn);">🏷 Lost</span>' : '';
   const savedTag = post.saved ? '<span class="atag saved">✓ Saved</span>' : '';
 
-  const photoContent = post.photo_data
-    ? `<img src="${post.photo_data}" class="pc-img" alt="Animal photo" loading="lazy">`
-    : `<div class="pc-img-placeholder" style="background:${animalGrad(post.animal_type)}">${animalEmoji(post.animal_type)}</div>`;
+  const photoContent = post.photoData
+    ? `<img src="${post.photoData}" class="pc-img" alt="Animal photo" loading="lazy">`
+    : `<div class="pc-img-placeholder" style="background:${animalGrad(post.animalType)}">${animalEmoji(post.animalType)}</div>`;
 
   const savedWM = post.saved ? `<div class="saved-wm"><div class="wm">✓ Saved</div></div>` : '';
   const waitTime = fmtTime(post.timestamp).replace('ago', '');
-  const urgencyText = !isSub ? `<div style="color:var(--danger);font-size:12px;font-weight:700;margin-top:8px;animation:pulse 2s infinite; line-height:1.4;">This ${post.animal_type} has been waiting for ${waitTime}. I could be there in 5 minutes if I could just see the map.</div>` : '';
+  const urgencyText = !isSub ? `<div style="color:var(--danger);font-size:12px;font-weight:700;margin-top:8px;animation:pulse 2s infinite; line-height:1.4;">This ${post.animalType} has been waiting for ${waitTime}. I could be there in 5 minutes if I could just see the map.</div>` : '';
 
     const coords = isSub
     ? `<span class="info-chip" onclick="openMapModal('${post.lat}', '${post.lon}', '${post.city}')" style="cursor: pointer; font-weight: 600;"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="10" r="3"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg> View Exact Map</span>
@@ -1394,7 +1396,7 @@ function renderPostCard(post, isSub, isReg){
   return `
     <div class="post-card" id="post-${post.id}">
       <div class="pc-header">
-        <div class="pc-avatar">${animalEmoji(post.animal_type)}</div>
+        <div class="pc-avatar">${animalEmoji(post.animalType)}</div>
         <div class="pc-meta">
           <div class="pc-user">${isSub ? post.uploader_name : '••••••'}</div>
           <div class="pc-time">${fmtTime(post.timestamp)}</div>
@@ -1432,7 +1434,7 @@ function renderMap(){
   if(!isSub) return;
   const pins = db.posts.filter(p=>p.status==='live'&&!p.saved);
   document.getElementById('mapPins').innerHTML = pins.map(p=>`
-    <div class="map-pin">${animalEmoji(p.animal_type)} ${p.city} — ${p.animal_type}</div>`).join('');
+    <div class="map-pin">${animalEmoji(p.animalType)} ${p.city} — ${p.animalType}</div>`).join('');
 }
 
 // ─── TABS ───────────────────────────────────
@@ -1557,7 +1559,7 @@ async function submitPost(){
   const desc = document.getElementById('animalDesc').value.trim();
   const city = document.getElementById('animalCity').value.trim();
   const country = document.getElementById('animalCountry').value.trim();
-  const type = document.getElementById('animal_type').value;
+  const type = document.getElementById('animalType').value;
   const condition = document.getElementById('animalCondition').value;
   const photoSrc = document.getElementById('photoPreview').src;
   const hasPhoto = document.getElementById('photoPreview').style.display !== 'none' && photoSrc && photoSrc.startsWith('data:');
@@ -1614,7 +1616,7 @@ showToast('Image upload failed. Check storage settings.', 'danger');
   btn.textContent = '💾 Saving to Database...';
 const newPost = {
   uploader_name: currentUser.name,
-  animal_type: type,
+  animalType: type,
   condition: condition,
   description: desc || 'No description provided.',
   city: city,
@@ -1624,7 +1626,7 @@ const newPost = {
   timestamp: Date.now(),
   saved: false,
   status: 'pending',
-  photo_data: photoUrl
+  photoData: photoUrl
 };
 
     const { error } = await sb.from('posts').insert([newPost]);
@@ -1659,10 +1661,29 @@ async function confirmClaim(){
   const today = new Date().toDateString();
   const claimKey = `stp_claims_${currentUser.id}_${today}`;
   const todayClaims = parseInt(localStorage.getItem(claimKey) || '0');
-  if (todayClaims >= 3) { 
-    showToast('You have reached your daily claim limit. Every rescue counts!', 'warn'); 
-    return; 
+  if (todayClaims >= 3) {
+    showToast('You have reached your daily claim limit. Every rescue counts!', 'warn');
+    return;
   }
+  
+  const { error: updateError } = await sb.from('posts').update({
+    saved: true,
+    saved_by: currentUser.name,
+    saved_at: new Date().toISOString(),
+    status: 'live'
+  }).eq('id', claimTargetId);
+  
+  if(!updateError) {
+    localStorage.setItem(claimKey, (todayClaims + 1).toString());
+    showToast('Animal marked as Saved! 🏠','success');
+    closeModal('claimModal');
+    loadCloudPosts(false);
+    renderStats();
+    checkBadges();
+  } else {
+    showToast('Failed to claim: ' + updateError.message, 'danger');
+  }
+}
   
   // Find the post in Supabase and update it
   const { data: posts, error } = await sb.from('posts').select('*').eq('id', claimTargetId).single();
@@ -1726,7 +1747,7 @@ function flagPost(postId){
 function sharePost(postId) {
   const post = db.posts.find(p => p.id === postId);
   if (!post) return;
-  const text = `Check out this ${post.animal_type} in ${post.city} on SaveThePaws, the world's first real-time animal rescue network!`;
+  const text = `Check out this ${post.animalType} in ${post.city} on SaveThePaws, the world's first real-time animal rescue network!`;
   const url = window.location.href;
   if (navigator.share) {
     navigator.share({ title: 'SaveThePaws', text: text, url: url }).catch(()=>{});
@@ -1787,13 +1808,12 @@ async function loadCloudPosts(isAppend = false) {
   isLoadingPosts = true;
   const start = currentPage * pageSize;
   const end = start + pageSize - 1;
-
-  const { data, error } = await sb
-    .from('posts')
-    .select('*')
-    .eq('status', 'live')
-    .order('timestamp', { ascending: false })
-    .range(start, end);
+const { data, error } = await sb
+  .from('posts')
+  .select('*')
+  .eq('status', 'live')
+  .order('timestamp', { ascending: false })
+  .range(start, end);
 
   if (!error && data) {
     if (isAppend) {
@@ -2241,15 +2261,20 @@ function adminSec(name,el){
   if(name==='donations') renderDonorList();
 }
 
-async function renderAdminData(){ 
-   if(!currentUser || currentUser.email !== 'gds_gr@hotmail.gr') return; 
-   await cleanupOldSavedPosts();
-   const { data: allPosts, error: pErr } = await sb.from('posts').select('*').order('timestamp', { ascending: false }); 
-   const { data: allUsers, error: uErr } = await sb.from('profiles').select('*');
-   if(pErr) console.error("Failed to fetch posts:", pErr);
-   if(uErr) console.error("Failed to fetch users:", uErr); 
-   const posts = allPosts || []; 
-   const users = allUsers || [];
+async function renderAdminData(){
+  const isAdmin = currentUser && (currentUser.role === 'admin' || currentUser.email === 'gds_gr@hotmail.gr');
+  if(!isAdmin) return;
+  
+  const { data: allPosts, error: pErr } = await sb.from('posts').select('*').order('timestamp', { ascending: false });
+  const { data: allUsers, error: uErr } = await sb.from('profiles').select('*');
+  
+  if(pErr) console.error("Failed to fetch posts:", pErr);
+  if(uErr) console.error("Failed to fetch users:", uErr);
+  
+  const posts = allPosts || [];
+  const users = allUsers || [];
+  
+  // Rest of the function stays the same, but use 'posts' and 'users' instead of 'db.posts' and 'db.users'
 
   const live = posts.filter(p => p.status === 'live');
   const saved = live.filter(p => p.saved).length;
@@ -2268,7 +2293,7 @@ async function renderAdminData(){
   // Recent Posts Table with Dropdown
   document.getElementById('adminRecentBody').innerHTML = posts.slice(0,8).map(p => `
     <tr>
-      <td>${animalEmoji(p.animal_type || p.animal_type)} ${p.animal_type || p.animal_type}</td>
+      <td>${animalEmoji(p.animalType || p.animalType)} ${p.animalType || p.animalType}</td>
       <td>${p.city}</td>
       <td>${p.uploader_name}</td>
       <td><span class="badge ${p.status==='pending'?'orange':p.saved?'green':p.condition==='injured'?'red':'purple'}">${p.status==='pending'?'Pending':p.saved?'Saved':p.condition}</span></td>
@@ -2302,7 +2327,7 @@ async function renderAdminData(){
   // All Posts Table
   document.getElementById('adminPostsBody').innerHTML = posts.map(p => `
     <tr>
-      <td>${animalEmoji(p.animal_type || p.animal_type)} ${p.animal_type || p.animal_type}</td>
+      <td>${animalEmoji(p.animalType || p.animalType)} ${p.animalType || p.animalType}</td>
       <td>${p.city}, ${p.country}</td>
       <td><span class="badge ${p.status==='pending'?'orange':p.saved?'green':p.condition==='injured'?'red':'purple'}">${p.status==='pending'?'Pending':p.saved?'Saved':p.condition}</span></td>
       <td>${p.uploader_name}</td>
@@ -2335,12 +2360,12 @@ async function renderPending(){
 
   list.innerHTML = pend.map(p => `
     <div class="pending-card">
-      ${p.photo_data 
-        ? `<img src="${p.photo_data}" alt="Animal" style="width:100px;height:100px;object-fit:cover;border-radius:var(--radius-sm);">` 
-        : `<div class="pci-placeholder">${animalEmoji(p.animal_type || p.animal_type)}</div>`
+      ${p.photoData 
+        ? `<img src="${p.photoData}" alt="Animal" style="width:100px;height:100px;object-fit:cover;border-radius:var(--radius-sm);">` 
+        : `<div class="pci-placeholder">${animalEmoji(p.animalType || p.animalType)}</div>`
       }
       <div class="pending-info">
-        <h4>${animalEmoji(p.animal_type || p.animal_type)} ${p.animal_type || p.animal_type} — ${p.city}, ${p.country}</h4>
+        <h4>${animalEmoji(p.animalType || p.animalType)} ${p.animalType || p.animalType} — ${p.city}, ${p.country}</h4>
         <p>${p.description || ''}</p>
         ${p.flag_reason ? `<div class="pi-reason">⚠ ${p.flag_reason}</div>` : ''}
         <div class="pending-actions">
