@@ -1890,60 +1890,79 @@ function adminSec(name,el){
   if(name==='donations') renderDonorList();
 }
 
-function renderAdminData(){
-  const live=db.posts.filter(p=>p.status==='live');
-  const saved=live.filter(p=>p.saved).length;
-  const pend=db.posts.filter(p=>p.status==='pending').length;
-    const subs = (db.users || []).filter(u => u.subscribed).length;
-  document.getElementById('adminStatGrid').innerHTML=[
-    {l:'Total Posts',v:live.length,s:pend+' pending'},
-    {l:'Animals Saved',v:saved,s:Math.round(saved/(live.length||1)*100)+'% save rate'},
-    {l:'Total Users',v:db.users.length,s:subs+' subscribers'},
-    {l:'Est. Revenue',v:'€'+(subs*29),s:'annual basis'},
-    {l:'Ads Active',v:db.ads.filter(a=>a.active).length,s:'in feed rotation'},
-    {l:'Donors Listed',v:db.donors.length,s:'organizations'}
-  ].map(s=>`<div class="astat"><div class="al">${s.l}</div><div class="av">${s.v}</div><div class="as">${s.s}</div></div>`).join('');
+async function renderAdminData(){
+  // Fetch from Supabase instead of local db
+  const { data: allPosts } = await sb.from('posts').select('*').order('timestamp', { ascending: false });
+  const { data: allUsers } = await sb.from('profiles').select('*');
+  
+  const live = allPosts.filter(p => p.status === 'live') || [];
+  const saved = live.filter(p => p.saved).length;
+  const pend = allPosts.filter(p => p.status === 'pending').length;
+  const subs = (allUsers || []).filter(u => u.is_subscriber).length;
+  
+  // Update stats
+  document.getElementById('adminStatGrid').innerHTML = [
+    {l:'Total Posts', v: live.length, s: pend + ' pending'},
+    {l:'Animals Saved', v: saved, s: Math.round(saved/(live.length||1)*100) + '% save rate'},
+    {l:'Total Users', v: (allUsers || []).length, s: subs + ' subscribers'},
+    {l:'Est. Revenue', v: '€' + (subs*29), s: 'annual basis'},
+    {l:'Ads Active', v: db.ads.filter(a => a.active).length, s: 'in feed rotation'},
+    {l:'Donors Listed', v: db.donors.length, s: 'organizations'}
+  ].map(s => `<div class="astat"><div class="al">${s.l}</div><div class="av">${s.v}</div><div class="as">${s.s}</div></div>`).join('');
 
-  document.getElementById('adminRecentBody').innerHTML=[...db.posts].reverse().slice(0,8).map(p=>`
+  // Recent posts table
+  document.getElementById('adminRecentBody').innerHTML = (allPosts || []).reverse().slice(0,8).map(p => `
     <tr>
-      <td>${animalEmoji(p.animalType)} ${p.animalType}</td>
+      <td>${animalEmoji(p.animaltype)} ${p.animaltype}</td>
       <td>${p.city}</td>
       <td>${p.uploader}</td>
       <td><span class="badge ${p.status==='pending'?'orange':p.saved?'green':p.condition==='injured'?'red':'purple'}">${p.status==='pending'?'Pending':p.saved?'Saved':p.condition}</span></td>
       <td>
-        ${p.status==='pending'?`<button class="abtn green" onclick="approvePost('${p.id}')">Approve</button>`:''}
+        ${p.status==='pending' ? `<button class="abtn green" onclick="approvePost('${p.id}')">Approve</button>` : ''}
         <button class="abtn danger" onclick="deletePost('${p.id}')">Delete</button>
       </td>
-    </tr>`).join('');
+    </tr>
+  `).join('');
 
-  document.getElementById('adminUsersBody').innerHTML=db.users.map(u=>`
+  // Users table
+  document.getElementById('adminUsersBody').innerHTML = (allUsers || []).map(u => `
     <tr>
       <td>${u.name}</td>
       <td style="color:var(--text3);font-size:12px;">${u.email}</td>
-      <td><span class="badge ${u.role==='admin'?'yellow':u.subscribed?'green':'purple'}">${u.role}</span></td>
-      <td style="color:var(--text3);font-size:12px;">${u.subExpires||'—'}</td>
-      <td>${u.posts||0}</td>
+      <td><span class="badge ${u.role==='admin'?'yellow':u.is_subscriber?'green':'purple'}">${u.role || 'user'}</span></td>
+      <td style="color:var(--text3);font-size:12px;">${u.sub_expires || '—'}</td>
+      <td>${(allPosts || []).filter(p => p.uploader === u.name).length}</td>
       <td>
-        ${u.role!=='admin'?`<button class="abtn warn" onclick="makeAdmin('${u.id}')">Admin</button>`:''}
-        ${!u.subscribed?`<button class="abtn green" onclick="grantSub('${u.id}')">Sub</button>`:''}
-        ${u.id!=='u0'?`<button class="abtn danger" onclick="removeUser('${u.id}')">Remove</button>`:''}
+        ${u.role !== 'admin' ? `<button class="abtn warn" onclick="makeAdmin('${u.id}')">Admin</button>` : ''}
+        ${!u.is_subscribed ? `<button class="abtn green" onclick="grantSub('${u.id}')">Sub</button>` : ''}
+        <button class="abtn ${u.is_banned ? 'green' : 'danger'}" onclick="toggleBan('${u.id}', ${!u.is_banned})">${u.is_banned ? 'Unban' : 'Ban'}</button>
       </td>
-    </tr>`).join('');
+    </tr>
+  `).join('');
 
-  document.getElementById('adminPostsBody').innerHTML=[...db.posts].reverse().map(p=>`
+  // All posts table
+  document.getElementById('adminPostsBody').innerHTML = (allPosts || []).reverse().map(p => `
     <tr>
-      <td>${animalEmoji(p.animalType)} ${p.animalType}</td>
+      <td>${animalEmoji(p.animaltype)} ${p.animaltype}</td>
       <td>${p.city}, ${p.country}</td>
       <td><span class="badge ${p.status==='pending'?'orange':p.saved?'green':p.condition==='injured'?'red':'purple'}">${p.status==='pending'?'Pending':p.saved?'Saved':p.condition}</span></td>
       <td>${p.uploader}</td>
       <td style="font-size:11px;color:var(--text3);">${new Date(p.timestamp).toLocaleDateString()}</td>
       <td>
-        ${p.status==='pending'?`<button class="abtn green" onclick="approvePost('${p.id}')">Approve</button>`:''}
+        ${p.status==='pending' ? `<button class="abtn green" onclick="approvePost('${p.id}')">Approve</button>` : ''}
         <button class="abtn danger" onclick="deletePost('${p.id}')">Delete</button>
       </td>
-    </tr>`).join('');
+    </tr>
+  `).join('');
 }
-
+   
+async function toggleBan(userId, banStatus) { 
+   const { error } = await sb.from('profiles').update({ is_banned: banStatus }).eq('id', userId);
+   if (!error) { 
+   showToast(`User ${banStatus ? 'banned' : 'unbanned'}`, banStatus ? 'warn' : 'success'); 
+   renderAdminData(); } 
+}
+   
 function renderPending(){
   const pend=db.posts.filter(p=>p.status==='pending');
   const list=document.getElementById('pendingList');
