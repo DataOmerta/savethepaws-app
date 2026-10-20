@@ -524,8 +524,8 @@ document.addEventListener('touchend', () => {
 .mc-vol { width: 60px; accent-color: #fff; display: none; }
 .music-circular.expanded .mc-info, 
 .music-circular.expanded .mc-vol, 
-.music-circular.expanded #mcStopBtn { display: flex; }
 #mcStopBtn { display: none; }
+.music-circular.expanded #mcStopBtn { display: flex; }
 @media(max-width:660px){ .music-circular { bottom: 90px; right: 20px; } }
 </style>
 </head>
@@ -677,7 +677,7 @@ document.addEventListener('touchend', () => {
       <button class="mc-btn" id="mcShuffleBtn" title="Shuffle">🔀</button>
       <div class="mc-info" id="mcInfo" style="color: var(--orange);">Loading...</div> 
       <button class="mc-btn" id="mcPlayBtn" title="Play / Pause">▶</button>
-      <button class="mc-btn" id="mcStopBtn" title="Stop" style="display:flex;">⏹</button>
+<button class="mc-btn" id="mcStopBtn" title="Stop">⏹</button>
       <input class="mc-vol" id="mcVol" type="range" min="0" max="1" step="0.05" value="0.4" title="Volume"> 
    </div>
 
@@ -1276,10 +1276,10 @@ function startGeo(){
 
 // ─── STATS ──────────────────────────────────
 function renderStats(){
-  const live = db.posts.filter(p=>p.status==='live');
+  const live = posts.filter(p=>p.status==='live');
   document.getElementById('statSaved').textContent = live.filter(p=>p.saved).length;
   document.getElementById('statTotal').textContent = live.length;
-  const pend = db.posts.filter(p=>p.status==='pending').length;
+  const pend = posts.filter(p=>p.status==='pending').length;
   document.getElementById('statPending').textContent = pend;
   const pb = document.getElementById('pendingBadge');
   if(pb) pb.textContent = pend;
@@ -1327,7 +1327,7 @@ function renderPosts(){
   const isSub = currentUser && currentUser.subscribed;
   const isReg = !!currentUser;
 
-    let posts = db.posts.filter(p=>p.status==='live').slice().reverse();
+    let posts = posts.filter(p=>p.status==='live').slice().reverse();
 
   // Location Funnel
   if (currentLocationMode === 'near' && window._geoLat && window._geoLon) {
@@ -1436,7 +1436,7 @@ function renderAdCard(ad){
 function renderMap(){
   const isSub = currentUser && currentUser.subscribed;
   if(!isSub) return;
-  const pins = db.posts.filter(p=>p.status==='live'&&!p.saved);
+  const pins = posts.filter(p=>p.status==='live'&&!p.saved);
   document.getElementById('mapPins').innerHTML = pins.map(p=>`
     <div class="map-pin">${animalEmoji(p.animal_type)} ${p.city} — ${p.animal_type}</div>`).join('');
 }
@@ -1689,42 +1689,16 @@ async function confirmClaim(){
   }
 }
   
-  // Find the post in Supabase and update it
-  const { data: posts, error } = await sb.from('posts').select('*').eq('id', claimTargetId).single();
-  if(error || !posts) {
-    showToast('Post not found', 'danger');
-    return;
-  }
-  
-  const { error: updateError } = await sb.from('posts').update({
-    saved: true,
-    saved_by: currentUser.name,
-    saved_at: Date.now(),
-    status: 'live'
-  }).eq('id', claimTargetId);
-  
-  if(!updateError) {
-    localStorage.setItem(claimKey, (todayClaims + 1).toString());
-    showToast('Animal marked as Saved! 🏠','success');
-    closeModal('claimModal');
-    loadCloudPosts(false);
-    renderStats();
-    checkBadges();
-  } else {
-    showToast('Failed to claim: ' + updateError.message, 'danger');
-  }
-}
-
 // ─── EDIT ───────────────────────────────────
 function openEdit(postId){
   editTargetId=postId;
-  const post=db.posts.find(p=>p.id===postId);
+  const post=posts.find(p=>p.id===postId);
   if(!post)return;
   document.getElementById('editDesc').value= post.description;
   openModal('editModal');
 }
 function saveEdit(){
-  const post=db.posts.find(p=>p.id===editTargetId);
+  const post=posts.find(p=>p.id===editTargetId);
   if(!post)return;
   const newDesc=document.getElementById('editDesc').value.trim();
   if(!newDesc){showToast('Description cannot be empty','warn');return;}
@@ -1737,7 +1711,7 @@ function saveEdit(){
 
 // ─── FLAG ───────────────────────────────────
 function flagPost(postId){
-  const post=db.posts.find(p=>p.id===postId);
+  const post=posts.find(p=>p.id===postId);
   if(!post)return;
   post.status='pending';
   post.flag_reason='Flagged by user';
@@ -1749,7 +1723,7 @@ function flagPost(postId){
 
    // ─── SHARE ───────────────────────────────────
 function sharePost(postId) {
-  const post = db.posts.find(p => p.id === postId);
+  const post = posts.find(p => p.id === postId);
   if (!post) return;
   const text = `Check out this ${post.animal_type} in ${post.city} on SaveThePaws, the world's first real-time animal rescue network!`;
   const url = window.location.href;
@@ -1763,8 +1737,8 @@ function sharePost(postId) {
    // ─── USER STATS HELPER ─────────────────────────
 function getUserStats() {
   if (!currentUser) return { posts: 0, claims: 0, injured: 0 };
-  const userPosts = db.posts.filter(p => p.uploader_name === currentUser.name);
-  const userClaims = db.posts.filter(p => p.saved_by === currentUser.name);
+  const userPosts = posts.filter(p => p.uploader_name === currentUser.name);
+  const userClaims = posts.filter(p => p.saved_by === currentUser.name);
   const userInjured = userPosts.filter(p => p.condition === 'injured');
   return {
     posts: userPosts.length,
@@ -1778,7 +1752,7 @@ function checkBadges() {
   const badgesKey = `stp_badges_${currentUser.id}`;
   const earnedBadges = JSON.parse(localStorage.getItem(badgesKey) || '[]');
   
-  const userClaims = db.posts.filter(p => p.saved_by === currentUser.name).length;
+  const userClaims = posts.filter(p => p.saved_by === currentUser.name).length;
 
   const userStats = getUserStats(); // Define it first!
   if (!earnedBadges.includes('scout') && (userStats.posts >= 10 || userClaims >= 1)) {
@@ -1821,9 +1795,9 @@ const { data, error } = await sb
 
   if (!error && data) {
     if (isAppend) {
-      db.posts = [...db.posts, ...data];
+      posts = [...posts, ...data];
     } else {
-      db.posts = data;
+      posts = data;
     }
     renderPosts();
     renderStats();
@@ -2105,9 +2079,10 @@ function closeNotifBanner(){
 }
 function openNotifPanel(){ showToast('No new notifications'); }
 
-// ─── SUBSCRIBE MODAL ────────────────────────
-function openSubModal(){
-  const isSub = currentUser && currentUser.subscribed;
+function openSubModal(){openModal('subModal');}
+function openMapModal(lat, lon, city) {
+
+   const isSub = currentUser && currentUser.subscribed;
   if(isSub) { showToast('You already have an active subscription!', 'warn'); return; }
   
   const modalContent = document.querySelector('#subModal .modal');
@@ -2198,11 +2173,7 @@ function openSubModal(){
       </div>
     </div>
   `;
-  
-  openModal('subModal');
-}
-function openMapModal(lat, lon, city) {
-  // SECURITY CHECK: Only subscribers can view the exact map
+   // SECURITY CHECK: Only subscribers can view the exact map
   if (!currentUser || !currentUser.subscribed) {
     openSubModal();
     return;
@@ -2278,13 +2249,11 @@ async function renderAdminData(){
   const posts = allPosts || [];
   const users = allUsers || [];
   
-  // Rest of the function stays the same, but use 'posts' and 'users' instead of 'db.posts' and 'db.users'
-
   const live = posts.filter(p => p.status === 'live');
   const saved = live.filter(p => p.saved).length;
   const pend = posts.filter(p => p.status === 'pending').length;
   const subs = users.filter(u => u.is_subscriber).length;
-
+  
   document.getElementById('adminStatGrid').innerHTML = [
     {l:'Total Posts', v:live.length, s:pend+' pending'},
     {l:'Animals Saved', v:saved, s:Math.round(saved/(live.length||1)*100)+'% save rate'},
@@ -2293,7 +2262,7 @@ async function renderAdminData(){
     {l:'Ads Active', v:db.ads.filter(a=>a.active).length, s:'in feed rotation'},
     {l:'Donors Listed', v:db.donors.length, s:'organizations'}
   ].map(s => `<div class="astat"><div class="al">${s.l}</div><div class="av">${s.v}</div><div class="as">${s.s}</div></div>`).join('');
-
+  
   // Recent Posts Table with Dropdown
   document.getElementById('adminRecentBody').innerHTML = posts.slice(0,8).map(p => `
     <tr>
@@ -2364,8 +2333,8 @@ async function renderPending(){
 
   list.innerHTML = pend.map(p => `
     <div class="pending-card">
-      ${p.photoData 
-        ? `<img src="${p.photoData}" alt="Animal" style="width:100px;height:100px;object-fit:cover;border-radius:var(--radius-sm);">` 
+      ${p.photo_data 
+        ? `<img src="${p.photo_data}" alt="Animal" style="width:100px;height:100px;object-fit:cover;border-radius:var(--radius-sm);">` 
         : `<div class="pci-placeholder">${animalEmoji(p.animal_type || p.animal_type)}</div>`
       }
       <div class="pending-info">
