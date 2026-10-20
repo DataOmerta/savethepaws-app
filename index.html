@@ -120,12 +120,22 @@ body{overscroll-behavior:none;}
 /* ═══════════════════════════════════════════
    SUBSCRIBE BANNER (in feed)
 ═══════════════════════════════════════════ */
-.sub-banner{background:linear-gradient(135deg,rgba(124,111,224,.18),rgba(91,79,207,.08));border:1px solid var(--accent);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.sub-banner {
+  background: linear-gradient(135deg,rgba(124,111,224,.18),rgba(91,79,207,.08));
+  border:1px solid var(--accent);
+  border-radius:var(--radius);
+  padding:14px 16px;
+  display:flex;
+  align-items:center;
+  justify-content: center;
+  gap:12px;
+  flex-shrink:0;
+  text-align: center;
+}
 .sub-banner .sb-icon{font-size:26px;flex-shrink:0;}
 .sub-banner .sb-text strong{display:block;font-size:14px;font-weight:700;margin-bottom:2px;}
 .sub-banner .sb-text span{font-size:12px;color:var(--text2);}
 .sub-banner .sb-cta{background:var(--accent);border:none;color:#fff;border-radius:var(--radius-sm);padding:9px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;}
-
 /* ═══════════════════════════════════════════
    POST CARD
 ═══════════════════════════════════════════ */
@@ -183,21 +193,47 @@ body{overscroll-behavior:none;}
 /* ═══════════════════════════════════════════
    RIGHT SIDEBAR
 ═══════════════════════════════════════════ */
-.sidebar-right{width:210px;background:var(--bg2);border-left:1px solid var(--border);padding:14px 12px;flex-shrink:0;overflow-y:auto;display:flex;flex-direction:column;gap:14px;}
-.sr-section h4{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px;}
-.activity-item{display:flex;align-items:flex-start;gap:7px;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px;}
-.activity-item:last-child{border-bottom:none;}
-.adot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:3px;}
-.adot.saved{background:var(--success);}
-.adot.new{background:var(--accent);}
-.adot.sub{background:var(--warn);}
-.adot.report{background:var(--danger);}
-.atext{color:var(--text2);line-height:1.35;}
-.atime{font-size:10px;color:var(--text3);display:block;margin-top:2px;}
-.donate-org-item{background:var(--card);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:9px 11px;margin-bottom:7px;}
-.donate-org-item strong{display:block;font-size:13px;margin-bottom:2px;}
-.donate-org-item a{font-size:12px;color:var(--accent2);text-decoration:none;}
+.sidebar-right {
+  width: 210px;
+  background: var(--bg2);
+  border-left: 1px solid var(--border);
+  padding: 14px 12px;
+  flex-shrink: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
 
+.sr-section h4 {
+  font-size: 11px;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .7px;
+  margin-bottom: 8px;
+}
+
+.donate-org-item {
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  padding: 9px 11px;
+  margin-bottom: 7px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.donate-org-item strong {
+  display: block;
+  font-size: 13px;
+}
+
+.donate-org-item a {
+  font-size: 12px;
+  color: var(--accent2);
+  text-decoration: none;
+}
 /* ═══════════════════════════════════════════
    BOTTOM NAV
 ═══════════════════════════════════════════ */
@@ -459,7 +495,14 @@ body{overscroll-behavior:none;}
       <button id="sideAdminBtn" onclick="goToAdmin()" style="display:none;background:var(--warn-bg);border:1px solid var(--warn);color:var(--warn);border-radius:var(--radius);padding:10px;font-size:13px;font-weight:700;cursor:pointer;width:100%;">🛡 Admin Dashboard</button>
       <button class="logout-btn" id="sideLogoutBtn" onclick="signOut()">↩ Sign Out</button>
     </div>
-
+<div class="stat-card" style="border-color: var(--orange);">
+  <div class="s-label" style="color: var(--orange);">🏆 Weekend Hero</div>
+  <div style="font-size: 11px; color: var(--text2); line-height: 1.5; margin-top: 6px;">
+    Free 36-hour access every weekend<br>
+    Sat 11AM - Sun 11PM<br>
+    <button onclick="doSubscribe('weekend')" style="background: var(--orange); color: #fff; border: none; border-radius: 4px; padding: 4px 8px; font-size: 11px; margin-top: 6px; cursor: pointer;">Activate Now</button>
+  </div>
+</div>
     <!-- MAIN AREA -->
     <div class="main-area">
       <div class="feed-tabs">
@@ -478,14 +521,15 @@ body{overscroll-behavior:none;}
           <input placeholder="Search animals, cities..." id="searchInput" oninput="renderPosts()" autocomplete="off">
         </div>
 <div class="filter-row">
-   <div class="fchip active" onclick="setFilter('all',this)" data-i18n="filter_all">All</div>
-   <div class="fchip" onclick="setFilter('cat',this)">🐱 Cats</div>
-   <div class="fchip" onclick="setFilter('dog',this)">🐶 Dogs</div> 
-   <div class="fchip" onclick="setFilter('bird',this)">🐦 Birds</div>
-   <div class="fchip" onclick="setFilter('rabbit',this)">🐰 Rabbits</div> 
-   <div class="fchip" onclick="setFilter('injured',this)">🚑 Injured</div> 
-   <div class="fchip" onclick="setFilter('saved',this)" data-i18n="filter_saved">✓ Saved</div> 
-   <div class="fchip" onclick="loadCloudPosts(false)" style="margin-left:auto; border-color:var(--accent);">🔄 Refresh Feed</div> 
+  <div class="fchip active" onclick="setFilter('all',this)" data-i18n="filter_all">All</div>
+  <div class="fchip" onclick="setFilter('cat',this)">🐱 Cats</div>
+  <div class="fchip" onclick="setFilter('dog',this)">🐶 Dogs</div>
+  <div class="fchip" onclick="setFilter('bird',this)">🐦 Birds</div>
+  <div class="fchip" onclick="setFilter('rabbit',this)">🐰 Rabbits</div>
+  <div class="fchip" onclick="setFilter('injured',this)">🚑 Injured</div>
+  <div class="fchip" onclick="setFilter('saved',this)" data-i18n="filter_saved">✓ Saved</div>
+  <div class="fchip" onclick="loadCloudPosts(false)" style="margin-left:auto; border-color:var(--accent);">🔄 Refresh</div>
+  <div class="fchip" onclick="showRatingPopup()" style="background:var(--orange-bg); border-color:var(--orange); color:var(--orange);">⭐ Rate Us</div>
 </div>
 
       <!-- FEED VIEW -->
@@ -527,13 +571,14 @@ body{overscroll-behavior:none;}
 </div>
 
 <!-- MUSIC PLAYER -->
-<audio id="bgAudio" loop></audio>
-<div class="music-circular" id="musicCircular">
-  <button class="mc-btn" id="mcShuffleBtn" title="Shuffle">🔀</button>
-  <div class="mc-info" id="mcInfo">Loading...</div>
-  <button class="mc-btn" id="mcPlayBtn" title="Play / Pause">▶</button>
-  <input class="mc-vol" id="mcVol" type="range" min="0" max="1" step="0.05" value="0.4" title="Volume">
-</div>
+   <audio id="bgAudio" loop></audio>
+   <div class="music-circular" id="musicCircular"> 
+      <button class="mc-btn" id="mcShuffleBtn" title="Shuffle">🔀</button>
+      <div class="mc-info" id="mcInfo" style="color: var(--orange);">Loading...</div> 
+      <button class="mc-btn" id="mcPlayBtn" title="Play / Pause">▶</button>
+      <button class="mc-btn" id="mcStopBtn" title="Stop" style="display:none;">⏹</button>
+      <input class="mc-vol" id="mcVol" type="range" min="0" max="1" step="0.05" value="0.4" title="Volume"> 
+   </div>
 
 <!-- RATING POPUP -->
 <div class="rating-overlay" id="ratingOverlay">
@@ -672,6 +717,23 @@ body{overscroll-behavior:none;}
         <div id="notifHistory" style="color:var(--text3);font-size:13px;">No notifications sent yet.</div>
       </div>
 
+       <div class="sr-section">
+  <h4> Badge Rewards</h4>
+  <div style="font-size: 11px; color: var(--text2); line-height: 1.6;">
+    <div style="margin-bottom: 6px; padding: 6px; background: var(--bg3); border-radius: 4px;">
+      <strong style="color: var(--accent2);">🥉 Scout</strong><br>
+      <small>Post 10 reports OR claim 1 animal</small>
+    </div>
+    <div style="margin-bottom: 6px; padding: 6px; background: var(--bg3); border-radius: 4px;">
+      <strong style="color: var(--success);">🛡️ Guardian</strong><br>
+      <small>Claim 5 animals</small>
+    </div>
+    <div style="padding: 6px; background: var(--bg3); border-radius: 4px;">
+      <strong style="color: var(--warn);"> Hero</strong><br>
+      <small>Claim 10 animals</small>
+    </div>
+  </div>
+</div>
       <!-- DONATIONS -->
       <div class="asec" id="sec-donations">
         <div class="sec-title">Donation Organization Manager</div>
@@ -741,7 +803,7 @@ body{overscroll-behavior:none;}
     <div class="ai-checking" id="aiChecking">🤖 Verifying this is an animal photo...</div>
     <div class="fg-row" style="margin-top:12px;">
       <div class="fg"><label data-i18n="animal_type">Animal Type</label>
-        <select id="animalType">
+        <select id="animal_type">
           <option value="cat">🐱 Cat</option>
           <option value="dog">🐶 Dog</option>
           <option value="bird">🐦 Bird</option>
@@ -1065,7 +1127,12 @@ window.onload = async function(){
     
     console.log("✅ SaveThePaws System Initialized Successfully");
 };
-
+// Auto-refresh feed every 30 seconds
+setInterval(() => {
+  if(currentTab === 'feed') {
+    loadCloudPosts(false);
+  }
+}, 30000); // 30 seconds
 function checkPendingNotif(){
   if(db.pendingNotif && currentUser){
     const n = db.pendingNotif;
@@ -1166,9 +1233,9 @@ function renderPosts(){
   }
 if(currentFilter==='injured') posts=posts.filter(p=>p.condition==='injured');
   else if(currentFilter==='saved') posts=posts.filter(p=>p.saved);
- else if(currentFilter!=='all') posts=posts.filter(p=>(p.animalType || p.animaltype)===currentFilter);
+ else if(currentFilter!=='all') posts=posts.filter(p=>(p.animal_type || p.animal_type)===currentFilter);
 
-  if(q) posts=posts.filter(p=>(p.description || '').toLowerCase().includes(q)||p.city.toLowerCase().includes(q)||p.animalType.includes(q));
+  if(q) posts=posts.filter(p=>(p.description || '').toLowerCase().includes(q)||p.city.toLowerCase().includes(q)||p.animal_type.includes(q));
 
   // inject ads
   const adFreq = db.settings.adFreq||6;
@@ -1195,18 +1262,18 @@ if(currentFilter==='injured') posts=posts.filter(p=>p.condition==='injured');
 }
 
 function renderPostCard(post, isSub, isReg){
-  const isOwner = currentUser && currentUser.id === post.uploaderId;
+  const isOwner = currentUser && currentUser.id === post.uploader_id;
   const condTag = post.condition==='injured' ? '<span class="atag injured">🚑 Injured</span>' :
                   post.condition==='lost' ? '<span class="atag" style="background:var(--warn-bg);color:var(--warn);border-color:var(--warn);">🏷 Lost</span>' : '';
   const savedTag = post.saved ? '<span class="atag saved">✓ Saved</span>' : '';
 
-  const photoContent = post.photoData
-    ? `<img src="${post.photoData}" class="pc-img" alt="Animal photo" loading="lazy">`
-    : `<div class="pc-img-placeholder" style="background:${animalGrad(post.animalType)}">${animalEmoji(post.animalType)}</div>`;
+  const photoContent = post.photo_data
+    ? `<img src="${post.photo_data}" class="pc-img" alt="Animal photo" loading="lazy">`
+    : `<div class="pc-img-placeholder" style="background:${animalGrad(post.animal_type)}">${animalEmoji(post.animal_type)}</div>`;
 
   const savedWM = post.saved ? `<div class="saved-wm"><div class="wm">✓ Saved</div></div>` : '';
   const waitTime = fmtTime(post.timestamp).replace('ago', '');
-  const urgencyText = !isSub ? `<div style="color:var(--danger);font-size:12px;font-weight:700;margin-top:8px;animation:pulse 2s infinite; line-height:1.4;">This ${post.animalType} has been waiting for ${waitTime}. I could be there in 5 minutes if I could just see the map.</div>` : '';
+  const urgencyText = !isSub ? `<div style="color:var(--danger);font-size:12px;font-weight:700;margin-top:8px;animation:pulse 2s infinite; line-height:1.4;">This ${post.animal_type} has been waiting for ${waitTime}. I could be there in 5 minutes if I could just see the map.</div>` : '';
 
     const coords = isSub
     ? `<span class="info-chip" onclick="openMapModal('${post.lat}', '${post.lon}', '${post.city}')" style="cursor: pointer; font-weight: 600;"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="10" r="3"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg> View Exact Map</span>
@@ -1227,13 +1294,13 @@ function renderPostCard(post, isSub, isReg){
   return `
     <div class="post-card" id="post-${post.id}">
       <div class="pc-header">
-        <div class="pc-avatar">${animalEmoji(post.animalType)}</div>
+        <div class="pc-avatar">${animalEmoji(post.animal_type)}</div>
         <div class="pc-meta">
           <div class="pc-user">${isSub ? post.uploader : '••••••'}</div>
           <div class="pc-time">${fmtTime(post.timestamp)}</div>
         </div>
         <div class="pc-tags">
-          <span class="atag">${post.animalType.charAt(0).toUpperCase()+post.animalType.slice(1)}</span>
+          <span class="atag">${post.animal_type.charAt(0).toUpperCase()+post.animal_type.slice(1)}</span>
           ${condTag}${savedTag}
         </div>
       </div>
@@ -1265,7 +1332,7 @@ function renderMap(){
   if(!isSub) return;
   const pins = db.posts.filter(p=>p.status==='live'&&!p.saved);
   document.getElementById('mapPins').innerHTML = pins.map(p=>`
-    <div class="map-pin">${animalEmoji(p.animalType)} ${p.city} — ${p.animalType}</div>`).join('');
+    <div class="map-pin">${animalEmoji(p.animal_type)} ${p.city} — ${p.animal_type}</div>`).join('');
 }
 
 // ─── TABS ───────────────────────────────────
@@ -1347,39 +1414,39 @@ function keywordCheck(desc, type){
   return ANIMAL_KEYWORDS.some(kw => text.includes(kw));
 }
 
-// ─── SIGHTENGINE AI MODERATION ───────────────
-/*async function sightengineCheck(imageData) {
-  try {
-    const formData = new FormData();
-    // Fix: Remove the "data:image/jpeg;base64," part before sending
-    const rawBase64 = imageData.split(',')[1]; 
-    formData.append('media', rawBase64);
-    formData.append('models', 'nudity-2.1,weapon,gore');
-    formData.append('api_user', '1622452775');
-    formData.append('api_secret', '5DGESTpwGTFUntMYVjDbG6mo3mV9FqwH');
-    
-    const response = await fetch('https://api.sightengine.com/1.0/check.json', { 
-      method: 'POST', 
-      body: formData 
-    });
-    
-    if (!response.ok) {
-       console.warn('Sightengine API returned error status:', response.status);
-       return true; // If API fails, assume safe so upload isn't blocked
-    }
-
-    const data = await response.json();
-    
-    if ((data.nudity && data.nudity.raw > 0.6) || (data.weapon && data.weapon > 0.6) || (data.gore && data.gore > 0.6)) {
-      return false; 
-    }
-    return true; 
-  } catch(e) {
-    console.error("Sightengine API error:", e);
-    return true; 
+// For images (Sightengine)
+async function moderateImage(base64Data) {
+  const formData = new FormData();
+  formData.append('media', base64Data.split(',')[1]);
+  formData.append('models', 'nudity-2.1,weapon,gore');
+  formData.append('api_user', '1622452775');
+  formData.append('api_secret', '5DGESTpwGTFUntMYVjDbG6mo3mV9FqwH');
+  
+  const response = await fetch('https://api.sightengine.com/1.0/check.json', {
+    method: 'POST',
+    body: formData
+  });
+  
+  const data = await response.json();
+  
+  // Block if any category > 0.6
+  if((data.nudity?.raw > 0.6) || (data.weapon > 0.6) || (data.gore > 0.6)) {
+    return { safe: false, reason: 'Inappropriate content detected' };
   }
+  
+  return { safe: true };
 }
-}*/
+
+// For text (Supabase Edge Function)
+async function moderateText(text) {
+  const { data, error } = await sb.functions.invoke('moderate-text', {
+    body: { text }
+  });
+  
+  if(error) return { safe: true }; // Fail open
+  
+  return data;
+}
 async function sightengineCheck(imageData) {
   // SIGHTENGINE TRIAL EXPIRED - bypassing moderation
   console.log('⚠️ Sightengine moderation');
@@ -1399,7 +1466,7 @@ async function submitPost(){
   const desc = document.getElementById('animalDesc').value.trim();
   const city = document.getElementById('animalCity').value.trim();
   const country = document.getElementById('animalCountry').value.trim();
-  const type = document.getElementById('animalType').value;
+  const type = document.getElementById('animal_type').value;
   const condition = document.getElementById('animalCondition').value;
   const photoSrc = document.getElementById('photoPreview').src;
   const hasPhoto = document.getElementById('photoPreview').style.display !== 'none' && photoSrc && photoSrc.startsWith('data:');
@@ -1456,7 +1523,7 @@ showToast('Image upload failed. Check storage settings.', 'danger');
   btn.textContent = '💾 Saving to Database...';
 const newPost = {
   uploader: currentUser.name,
-  animalType: type,
+  animal_type: type,
   condition: condition,
   description: desc || 'No description provided.',
   city: city,
@@ -1466,7 +1533,7 @@ const newPost = {
   timestamp: Date.now(),
   saved: false,
   status: 'pending',
-  photoData: photoUrl
+  photo_data: photoUrl
 };
 
     const { error } = await sb.from('posts').insert([newPost]);
@@ -1515,8 +1582,8 @@ async function confirmClaim(){
   
   const { error: updateError } = await sb.from('posts').update({
     saved: true,
-    savedBy: currentUser.name,
-    savedAt: Date.now(),
+    saved_by: currentUser.name,
+    saved_at: Date.now(),
     status: 'live'
   }).eq('id', claimTargetId);
   
@@ -1557,7 +1624,7 @@ function flagPost(postId){
   const post=db.posts.find(p=>p.id===postId);
   if(!post)return;
   post.status='pending';
-  post.flagReason='Flagged by user';
+  post.flag_reason='Flagged by user';
   db.activity.unshift({type:'report',text:'Post flagged by user for review',time:'just now'});
   saveDB(db);
   renderPosts();renderStats();
@@ -1568,7 +1635,7 @@ function flagPost(postId){
 function sharePost(postId) {
   const post = db.posts.find(p => p.id === postId);
   if (!post) return;
-  const text = `Check out this ${post.animalType} in ${post.city} on SaveThePaws, the world's first real-time animal rescue network!`;
+  const text = `Check out this ${post.animal_type} in ${post.city} on SaveThePaws, the world's first real-time animal rescue network!`;
   const url = window.location.href;
   if (navigator.share) {
     navigator.share({ title: 'SaveThePaws', text: text, url: url }).catch(()=>{});
@@ -1580,8 +1647,8 @@ function sharePost(postId) {
    // ─── USER STATS HELPER ─────────────────────────
 function getUserStats() {
   if (!currentUser) return { posts: 0, claims: 0, injured: 0 };
-  const userPosts = db.posts.filter(p => p.uploaderId === currentUser.id);
-  const userClaims = db.posts.filter(p => p.savedBy === currentUser.name);
+  const userPosts = db.posts.filter(p => p.uploader_id === currentUser.id);
+  const userClaims = db.posts.filter(p => p.saved_by === currentUser.name);
   const userInjured = userPosts.filter(p => p.condition === 'injured');
   return {
     posts: userPosts.length,
@@ -1595,7 +1662,7 @@ function checkBadges() {
   const badgesKey = `stp_badges_${currentUser.id}`;
   const earnedBadges = JSON.parse(localStorage.getItem(badgesKey) || '[]');
   
-  const userClaims = db.posts.filter(p => p.savedBy === currentUser.name).length;
+  const userClaims = db.posts.filter(p => p.saved_by === currentUser.name).length;
 
   const userStats = getUserStats(); // Define it first!
   if (!earnedBadges.includes('scout') && (userStats.posts >= 10 || userClaims >= 1)) {
@@ -1785,7 +1852,7 @@ function doSubscribe(plan){
     // Activate Weekend Hero
     currentUser.subscribed = true;
     currentUser.role = 'subscriber';
-    currentUser.subExpires = endDate.toISOString();
+    currentUser.sub_expires = endDate.toISOString();
     
     localStorage.setItem(weekendKey, 'true');
     localStorage.setItem('stp_user', JSON.stringify({id: currentUser.id}));
@@ -1925,6 +1992,7 @@ function openNotifPanel(){ showToast('No new notifications'); }
 
 // ─── SUBSCRIBE MODAL ────────────────────────
 function openSubModal(){ openModal('subModal'); }
+   }
 function openMapModal(lat, lon, city) {
   // SECURITY CHECK: Only subscribers can view the exact map
   if (!currentUser || !currentUser.subscribed) {
@@ -2012,7 +2080,7 @@ async function renderAdminData(){
   // Recent Posts Table with Dropdown
   document.getElementById('adminRecentBody').innerHTML = posts.slice(0,8).map(p => `
     <tr>
-      <td>${animalEmoji(p.animalType || p.animaltype)} ${p.animalType || p.animaltype}</td>
+      <td>${animalEmoji(p.animal_type || p.animal_type)} ${p.animal_type || p.animal_type}</td>
       <td>${p.city}</td>
       <td>${p.uploader}</td>
       <td><span class="badge ${p.status==='pending'?'orange':p.saved?'green':p.condition==='injured'?'red':'purple'}">${p.status==='pending'?'Pending':p.saved?'Saved':p.condition}</span></td>
@@ -2046,7 +2114,7 @@ async function renderAdminData(){
   // All Posts Table
   document.getElementById('adminPostsBody').innerHTML = posts.map(p => `
     <tr>
-      <td>${animalEmoji(p.animalType || p.animaltype)} ${p.animalType || p.animaltype}</td>
+      <td>${animalEmoji(p.animal_type || p.animal_type)} ${p.animal_type || p.animal_type}</td>
       <td>${p.city}, ${p.country}</td>
       <td><span class="badge ${p.status==='pending'?'orange':p.saved?'green':p.condition==='injured'?'red':'purple'}">${p.status==='pending'?'Pending':p.saved?'Saved':p.condition}</span></td>
       <td>${p.uploader}</td>
@@ -2079,14 +2147,14 @@ async function renderPending(){
 
   list.innerHTML = pend.map(p => `
     <div class="pending-card">
-      ${p.photoData 
-        ? `<img src="${p.photoData}" alt="Animal" style="width:100px;height:100px;object-fit:cover;border-radius:var(--radius-sm);">` 
-        : `<div class="pci-placeholder">${animalEmoji(p.animalType || p.animaltype)}</div>`
+      ${p.photo_data 
+        ? `<img src="${p.photo_data}" alt="Animal" style="width:100px;height:100px;object-fit:cover;border-radius:var(--radius-sm);">` 
+        : `<div class="pci-placeholder">${animalEmoji(p.animal_type || p.animal_type)}</div>`
       }
       <div class="pending-info">
-        <h4>${animalEmoji(p.animalType || p.animaltype)} ${p.animalType || p.animaltype} — ${p.city}, ${p.country}</h4>
+        <h4>${animalEmoji(p.animal_type || p.animal_type)} ${p.animal_type || p.animal_type} — ${p.city}, ${p.country}</h4>
         <p>${p.description || ''}</p>
-        ${p.flagReason ? `<div class="pi-reason">⚠ ${p.flagReason}</div>` : ''}
+        ${p.flag_reason ? `<div class="pi-reason">⚠ ${p.flag_reason}</div>` : ''}
         <div class="pending-actions">
           <select onchange="updatePostStatus('${p.id}', this.value)" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);padding:4px 9px;border-radius:var(--radius-sm);font-size:12px;cursor:pointer;">
             <option value="pending" selected>Pending</option>
@@ -2167,7 +2235,7 @@ async function cleanupOldSavedPosts() {
     .from('posts')
     .select('id')
     .eq('saved', true)
-    .lt('savedAt', twoDaysAgo); // Note: Ensure your DB column is named 'savedAt' or 'saved_at'
+    .lt('saved_at', twoDaysAgo); // Note: Ensure your DB column is named 'saved_at' or 'saved_at'
 
   if (!error && oldPosts && oldPosts.length > 0) {
     for (const post of oldPosts) {
@@ -2501,8 +2569,8 @@ function playProximityAlert() {
   </div>
 </div>
 
-<div class="credits-watermark">
-  Sound/Art Direction by Bill Melachrinos &nbsp;•&nbsp; Planning/Development Dimitris Paraschidis &nbsp;•&nbsp; Communication/Advertising Aneta Conic
+<div class="credits-watermark" style="position: fixed; bottom: 8px; left: 0; right: 0; text-align: center; font-size: 11px; color: rgba(124,111,224,0.4); z-index: 100; pointer-events: none;">
+  Sound/Art Direction by Bill Melachrinos • Planning/Development Dimitris Paraschidis • Communication/Advertising Aneta Conic
 </div>
 
 </body>
