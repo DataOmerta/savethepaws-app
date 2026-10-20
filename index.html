@@ -1329,7 +1329,7 @@ function keywordCheck(desc, type){
 }
 
 // ─── SIGHTENGINE AI MODERATION ───────────────
-async function sightengineCheck(imageData) {
+/*async function sightengineCheck(imageData) {
   try {
     const formData = new FormData();
     formData.append('media', imageData);
@@ -1348,8 +1348,12 @@ async function sightengineCheck(imageData) {
     console.error("Sightengine API error:", e);
     return true; 
   }
+}*/
+async function sightengineCheck(imageData) {
+  // Sightengine free trial expired — skipping moderation for now
+  console.log('⚠️ Sightengine skipped (trial expired)');
+  return true;
 }
-
 async function submitPost(){
   if(!currentUser){ showToast('Sign in to post','warn'); return; }
   const today = new Date().toDateString();
