@@ -477,16 +477,16 @@ body{overscroll-behavior:none;}
           <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           <input placeholder="Search animals, cities..." id="searchInput" oninput="renderPosts()" autocomplete="off">
         </div>
-        <div class="filter-row">
-          <div class="fchip active" onclick="setFilter('all',this)" data-i18n="filter_all">All</div>
-          <div class="fchip" onclick="setFilter('cat',this)">🐱 Cats</div>
-          <div class="fchip" onclick="setFilter('dog',this)">🐶 Dogs</div>
-          <div class="fchip" onclick="setFilter('bird',this)">🐦 Birds</div>
-          <div class="fchip" onclick="setFilter('rabbit',this)">🐰 Rabbits</div>
-          <div class="fchip" onclick="setFilter('injured',this)">🚑 Injured</div>
-          <div class="fchip" onclick="setFilter('saved',this)" data-i18n="filter_saved">✓ Saved</div>
-        </div>
-      </div>
+<div class="filter-row">
+   <div class="fchip active" onclick="setFilter('all',this)" data-i18n="filter_all">All</div>
+   <div class="fchip" onclick="setFilter('cat',this)">🐱 Cats</div>
+   <div class="fchip" onclick="setFilter('dog',this)">🐶 Dogs</div> 
+   <div class="fchip" onclick="setFilter('bird',this)">🐦 Birds</div>
+   <div class="fchip" onclick="setFilter('rabbit',this)">🐰 Rabbits</div> 
+   <div class="fchip" onclick="setFilter('injured',this)">🚑 Injured</div> 
+   <div class="fchip" onclick="setFilter('saved',this)" data-i18n="filter_saved">✓ Saved</div> 
+   <div class="fchip" onclick="loadCloudPosts(false)" style="margin-left:auto; border-color:var(--accent);">🔄 Refresh Feed</div> 
+</div>
 
       <!-- FEED VIEW -->
       <div class="main-feed" id="mainFeed">
@@ -1983,21 +1983,11 @@ function adminSec(name,el){
   if(name==='ads') renderAdsList();
   if(name==='donations') renderDonorList();
 }
-
-
-async function toggleBan(uid, banStatus) {
-  const { error } = await sb.from('profiles').update({ is_banned: banStatus }).eq('id', uid);
-  if(!error) {
-    showToast(`User ${banStatus ? 'banned' : 'unbanned'}`, banStatus ? 'warn' : 'success');
-    renderAdminData();
-  } else {
-    showToast('Failed: ' + error.message, 'danger');
-  }
-}
    
 async function renderAdminData(){
   if(!currentUser || currentUser.email !== 'gds_gr@hotmail.gr') return;
-
+ // Run the 2-day cleanup check
+  await cleanupOldSavedPosts();
   // Fetch REAL data from Supabase
   const { data: allPosts } = await sb.from('posts').select('*').order('timestamp', { ascending: false });
   const { data: allUsers } = await sb.from('profiles').select('*');
@@ -2167,7 +2157,26 @@ async function toggleBan(userId, banStatus) {
     renderAdminData();
   }
 }
+async function cleanupOldSavedPosts() {
+  if(!currentUser || currentUser.email !== 'gds_gr@hotmail.gr') return;
+  
+  const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString();
+  
+  // Fetch posts that are saved and older than 2 days
+  const { data: oldPosts, error } = await sb
+    .from('posts')
+    .select('id')
+    .eq('saved', true)
+    .lt('savedAt', twoDaysAgo); // Note: Ensure your DB column is named 'savedAt' or 'saved_at'
 
+  if (!error && oldPosts && oldPosts.length > 0) {
+    for (const post of oldPosts) {
+      await sb.from('posts').delete().eq('id', post.id);
+    }
+    showToast(`🧹 Auto-cleaned ${oldPosts.length} old rescued posts.`, 'success');
+    renderAdminData(); // Refresh the dashboard
+  }
+}
 // ─── ADS ────────────────────────────────────
 function setAdType(type,el){
   currentAdType=type;
