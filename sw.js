@@ -7,7 +7,7 @@
    • Offline Support  (PWABuilder +1)
 ═══════════════════════════════════════════ */
 
-const CACHE_NAME = 'savethepaws-v4';
+const CACHE_NAME = 'savethepaws-v5'; // updated 2026-10-24
 const SYNC_TAG   = 'savethepaws-sync';
 const PERIODIC_TAG = 'savethepaws-periodic';
 
