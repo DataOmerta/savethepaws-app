@@ -72,7 +72,7 @@
       ]
     }
   ],
-  "orientation": "portrait",
+  "orientation": "any",
   "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7",
   "related_applications": [
     {
@@ -85,13 +85,10 @@
   "display_override": [
     "standalone",
     "minimal-ui",
-    "window-controls-overlay",
     "browser"
   ],
   "scope_extensions": [
-    {
-      "origin": "https://zqnwjdaxffsoglmhkqxc.supabase.co"
-    }
+    { "origin": "https://zqnwjdaxffsoglmhkqxc.supabase.co" }
   ],
   "share_target": {
     "action": "/savethepaws-app/?share=true",
@@ -104,12 +101,7 @@
       "files": [
         {
           "name": "photo",
-          "accept": [
-            "image/jpeg",
-            "image/png",
-            "image/webp",
-            "image/*"
-          ]
+          "accept": ["image/jpeg", "image/png", "image/webp", "image/*"]
         }
       ]
     }
@@ -117,5 +109,11 @@
   "launch_handler": {
     "client_mode": "navigate-existing"
   },
-  "handle_links": "preferred"
+  "handle_links": "preferred",
+  "protocol_handlers": [
+    {
+      "protocol": "web+savethepaws",
+      "url": "/savethepaws-app/?protocol=%s"
+    }
+  ]
 }

@@ -1,4 +1,3 @@
-Response
 /* ═══════════════════════════════════════════
    SaveThePaws Service Worker v3
    • Cache-first with network fallback
@@ -123,4 +122,74 @@ self.addEventListener('sync', event => {
   }
 });
 
-async function syncPend
+async function syncPendingPosts() {
+  // Retrieve any queued posts from IndexedDB and retry sending them
+  try {
+    const db = await openDB();
+    const pending = await getAllPending(db);
+    for (const item of pending) {
+      try {
+        await fetch('./api/post', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(item.data)
+        });
+        await deletePending(db, item.id);
+      } catch (_) {
+        // Will retry on next sync
+      }
+    }
+  } catch (_) {
+    // IndexedDB not available — skip
+  }
+}
+
+/* ─── PERIODIC BACKGROUND SYNC ─── */
+self.addEventListener('periodicsync', event => {
+  if (event.tag === PERIODIC_TAG) {
+    event.waitUntil(refreshFeed());
+  }
+});
+
+async function refreshFeed() {
+  // Pre-fetch the latest index so it's warm in cache on next open
+  try {
+    const response = await fetch('./index.html', { cache: 'no-cache' });
+    if (response.ok) {
+      const cache = await caches.open(CACHE_NAME);
+      await cache.put('./index.html', response);
+    }
+  } catch (_) {
+    // Network unavailable — nothing to do
+  }
+}
+
+/* ─── MINIMAL INDEXEDDB HELPERS ─── */
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open('savethepaws-sync', 1);
+    req.onupgradeneeded = e => {
+      e.target.result.createObjectStore('pending', { keyPath: 'id', autoIncrement: true });
+    };
+    req.onsuccess = e => resolve(e.target.result);
+    req.onerror   = e => reject(e.target.error);
+  });
+}
+
+function getAllPending(db) {
+  return new Promise((resolve, reject) => {
+    const tx  = db.transaction('pending', 'readonly');
+    const req = tx.objectStore('pending').getAll();
+    req.onsuccess = e => resolve(e.target.result);
+    req.onerror   = e => reject(e.target.error);
+  });
+}
+
+function deletePending(db, id) {
+  return new Promise((resolve, reject) => {
+    const tx  = db.transaction('pending', 'readwrite');
+    const req = tx.objectStore('pending').delete(id);
+    req.onsuccess = () => resolve();
+    req.onerror   = e  => reject(e.target.error);
+  });
+}
