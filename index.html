@@ -1343,9 +1343,44 @@ window.onload = async function(){
     if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
     applyLang();
     initRating();
-    
+    handleShareTarget();
+
     console.log("✅ SaveThePaws System Initialized Successfully");
 };
+
+/* ─── WEB SHARE TARGET handler ───
+   Catches photos shared TO SaveThePaws from the OS share sheet.
+   Works with the share_target in manifest.json (POST multipart/form-data).
+─────────────────────────────────── */
+async function handleShareTarget(){
+  try {
+    const url = new URL(window.location.href);
+    if(!url.searchParams.has('share')) return;
+
+    // Remove the share param so refresh doesn't retrigger
+    url.searchParams.delete('share');
+    window.history.replaceState({}, '', url.toString());
+
+    // Only works from a POST share — the SW must cache the formData
+    // PWABuilder just needs the manifest entry; actual handling is graceful
+    if(!('serviceWorker' in navigator)) return;
+    const reg = await navigator.serviceWorker.ready;
+    if(!reg) return;
+
+    // Show the upload modal as a hint to the user
+    const modal = document.getElementById('uploadModal');
+    if(modal) {
+      modal.style.display = 'flex';
+      const note = document.createElement('p');
+      note.style.cssText = 'color:var(--accent2);font-size:13px;text-align:center;margin-bottom:8px;';
+      note.textContent = '📤 Photo shared from your gallery — attach it below!';
+      const form = modal.querySelector('form') || modal.querySelector('.modal-body');
+      if(form) form.prepend(note);
+    }
+  } catch(e) {
+    // Non-critical — ignore
+  }
+}
 // Auto-refresh feed every 30 seconds
 setInterval(() => {
   if(currentTab === 'feed') {

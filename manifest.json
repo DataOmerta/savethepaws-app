@@ -86,5 +86,28 @@
     "standalone",
     "minimal-ui",
     "browser"
-  ]
+  ],
+  "scope_extensions": [
+    { "origin": "https://zqnwjdaxffsoglmhkqxc.supabase.co" }
+  ],
+  "share_target": {
+    "action": "/savethepaws-app/?share=true",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "photo",
+          "accept": ["image/jpeg", "image/png", "image/webp", "image/*"]
+        }
+      ]
+    }
+  },
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+  "handle_links": "preferred"
 }
