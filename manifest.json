@@ -5,7 +5,6 @@
   "start_url": "/savethepaws-app/",
   "scope": "/savethepaws-app/",
   "display": "standalone",
-  "orientation": "portrait",
   "background_color": "#0f0f1a",
   "theme_color": "#7c6fe0",
   "lang": "en",
