@@ -184,7 +184,6 @@ function getAllPending(db) {
     req.onerror   = e => reject(e.target.error);
   });
 }
-
 function deletePending(db, id) {
   return new Promise((resolve, reject) => {
     const tx  = db.transaction('pending', 'readwrite');
