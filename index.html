@@ -10,12 +10,12 @@
 <meta name="apple-mobile-web-app-title" content="SaveThePaws">
 <link rel="manifest" href="./manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title>SaveThePaws â€” Rescue Urban Animals</title>
+<title>SaveThePaws — Rescue Urban Animals</title>
    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════
    THEME TOKENS
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════════════════ */
 :root {
   --bg:#0f0f1a;--bg2:#16162a;--bg3:#1e1e35;--card:#1a1a2e;--card2:#22223a;
   --accent:#7c6fe0;--accent2:#a593f5;--accent-bg:rgba(124,111,224,0.12);
@@ -38,15 +38,15 @@
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;overflow-x:hidden;}
 body{overscroll-behavior:none;}
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════
    SCREENS
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════════════════ */
 .screen{display:none;min-height:100vh;flex-direction:column;}
 .screen.active{display:flex;}
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════
    TOPBAR
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════════════════ */
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:env(safe-area-inset-top) 14px 0;padding-left:calc(14px + env(safe-area-inset-left));padding-right:calc(14px + env(safe-area-inset-right));min-height:var(--topbar-h);height:calc(var(--topbar-h) + env(safe-area-inset-top));background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);}
 .logo{font-size:17px;font-weight:800;color:var(--accent2);letter-spacing:-0.5px;display:flex;align-items:center;gap:6px;cursor:pointer;}
 .logo-icon{font-size:22px;}
@@ -60,21 +60,21 @@ body{overscroll-behavior:none;}
 .notif-dot{position:absolute;top:2px;right:2px;width:8px;height:8px;background:var(--danger);border-radius:50%;display:none;}
 .notif-dot.show{display:block;}
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════
    NOTIFICATION BANNER
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════════════════ */
 .notif-banner{display:none;background:linear-gradient(135deg,var(--accent),#5b4fcf);color:#fff;padding:10px 16px;font-size:13px;align-items:center;gap:10px;position:sticky;top:var(--topbar-h);z-index:199;}
 .notif-banner.show{display:flex;}
 .notif-banner-close{margin-left:auto;background:none;border:none;color:#fff;cursor:pointer;font-size:16px;}
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════
    LAYOUT
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════════════════ */
 .layout{display:flex;flex:1;overflow:hidden;}
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════
    LEFT SIDEBAR
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════════════════ */
 .sidebar-left{width:190px;background:var(--bg2);border-right:1px solid var(--border);padding:14px 12px;display:flex;flex-direction:column;gap:10px;flex-shrink:0;overflow-y:auto;}
 .stat-card{background:var(--card);border:1px solid var(--border2);border-radius:var(--radius);padding:12px 14px;}
 .stat-card .s-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px;}
@@ -87,9 +87,9 @@ body{overscroll-behavior:none;}
 .sidebar-role .r-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px;}
 .sidebar-role .r-val{font-size:13px;font-weight:700;color:var(--text2);}
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════
    MAIN FEED
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════════════════ */
 .main-area{flex:1;display:flex;flex-direction:column;overflow:hidden;}
 .feed-tabs{display:flex;border-bottom:1px solid var(--border);background:var(--bg);flex-shrink:0;}
 .feed-tab{flex:1;padding:12px;text-align:center;font-size:13px;font-weight:600;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;}
@@ -166,9 +166,9 @@ body{overscroll-behavior:none;}
 .fchip{background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:5px 11px;font-size:12px;color:var(--text2);cursor:pointer;transition:all .15s;white-space:nowrap;}
 .fchip.active{background:var(--accent-bg);border-color:var(--accent);color:var(--accent2);}
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════
    SUBSCRIBE BANNER (in feed)
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════════════════ */
 .sub-banner {
   background: linear-gradient(135deg,rgba(124,111,224,.18),rgba(91,79,207,.08));
   border:1px solid var(--accent);
@@ -188,9 +188,9 @@ body{overscroll-behavior:none;}
 .sub-banner .sb-text strong{display:block;font-size:14px;font-weight:700;margin-bottom:2px;}
 .sub-banner .sb-text span{font-size:12px;color:var(--text2);}
 .sub-banner .sb-cta{background:var(--accent);border:none;color:#fff;border-radius:var(--radius-sm);padding:9px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;}
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════
    POST CARD
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════════════════ */
 .post-card{background:var(--card);border:1px solid var(--border2);border-radius:var(--radius);overflow:hidden;animation:fadeUp .35s ease;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 .pc-header{padding:11px 13px;display:flex;align-items:center;gap:9px;}
@@ -229,9 +229,9 @@ body{overscroll-behavior:none;}
 .btn-flag{background:var(--danger-bg);border:1px solid var(--danger);color:var(--danger);border-radius:var(--radius-sm);padding:9px 11px;font-size:13px;cursor:pointer;}
 .btn-flag:hover{background:var(--danger);color:#fff;}
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════
    AD CARD (injected in feed)
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════════════════ */
 .ad-card{background:linear-gradient(135deg,var(--bg2),var(--bg3));border:1px solid var(--border2);border-radius:var(--radius);overflow:hidden;position:relative;}
 .ad-label{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.5);color:var(--text3);border-radius:4px;padding:2px 7px;font-size:10px;letter-spacing:.5px;}
 .ad-img{width:100%;max-height:200px;object-fit:cover;display:block;}
@@ -242,9 +242,9 @@ body{overscroll-behavior:none;}
 .ad-link-btn{display:inline-block;background:var(--accent);color:#fff;border-radius:var(--radius-sm);padding:8px 16px;font-size:13px;font-weight:600;text-decoration:none;}
 .ad-text-only{padding:16px;font-size:14px;color:var(--text);line-height:1.5;}
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════
    RIGHT SIDEBAR
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════════════════ */
 .sidebar-right {
   width: 210px;
   background: var(--bg2);
@@ -286,9 +286,9 @@ body{overscroll-behavior:none;}
   color: var(--accent2);
   text-decoration: none;
 }
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════
    BOTTOM NAV
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════════════════ */
 .bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--border);z-index:200;}
 .bnav-inner{display:flex;align-items:center;padding:6px 0 max(6px,env(safe-area-inset-bottom));}
 .bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 0;cursor:pointer;color:var(--text3);font-size:10px;border:none;background:none;}
@@ -298,15 +298,15 @@ body{overscroll-behavior:none;}
 .bnav-fab{width:50px;height:50px;background:var(--accent);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 16px rgba(124,111,224,.5);transform:translateY(-8px);}
 .bnav-fab svg{width:22px;height:22px;color:#fff;}
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════
    FLOATING DONATION BUTTON
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════════════════ */
 .float-donate{position:fixed;bottom:80px;right:16px;z-index:300;background:linear-gradient(135deg,#f59e0b,#ef4444);border:none;color:#fff;border-radius:50px;padding:11px 16px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(239,68,68,.4);display:flex;align-items:center;gap:6px;animation:pulse 2.5s infinite;}
 @keyframes pulse{0%,100%{box-shadow:0 4px 20px rgba(239,68,68,.4)}50%{box-shadow:0 4px 28px rgba(239,68,68,.65)}}
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════
    MODALS
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════════════════ */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;align-items:center;justify-content:center;padding:14px;backdrop-filter:blur(5px);}
 .modal-overlay.open{display:flex;}
 .modal{background:var(--card);border:1px solid var(--border2);border-radius:20px;padding:22px;width:100%;max-width:460px;box-shadow:var(--shadow);animation:mIn .22s ease;max-height:90vh;overflow-y:auto;}
@@ -348,7 +348,7 @@ body{overscroll-behavior:none;}
 .plan-period{font-size:11px;color:var(--text3);margin-bottom:10px;}
 .plan-perks{list-style:none;text-align:left;margin-bottom:12px;}
 .plan-perks li{font-size:11px;color:var(--text2);padding:3px 0;display:flex;align-items:center;gap:5px;}
-.plan-perks li::before{content:"âœ“";color:var(--success);font-weight:800;}
+.plan-perks li::before{content:"✓";color:var(--success);font-weight:800;}
 .plan-btn{width:100%;background:var(--accent);border:none;color:#fff;border-radius:var(--radius-sm);padding:8px;font-size:13px;font-weight:700;cursor:pointer;}
 
 /* DONATE MODAL */
@@ -360,9 +360,9 @@ body{overscroll-behavior:none;}
 .donate-item .di-desc{font-size:12px;color:var(--text2);}
 .donate-item .di-btn{background:linear-gradient(135deg,#f59e0b,#ef4444);border:none;color:#fff;border-radius:var(--radius-sm);padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;}
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════
    ADMIN SCREEN
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════════════════ */
 .admin-screen{display:none;flex-direction:column;min-height:100vh;}
 .admin-screen.active{display:flex;}
 .admin-topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 18px;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
@@ -480,16 +480,16 @@ body{overscroll-behavior:none;}
   }
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════
    LOGOUT BUTTON
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════════════════ */
 .logout-btn{background:var(--danger-bg);border:1px solid var(--danger);color:var(--danger);border-radius:var(--radius);padding:9px;font-size:12px;font-weight:700;cursor:pointer;width:100%;display:none;margin-top:4px;}
 .logout-btn:hover{background:var(--danger);color:#fff;}
 .logout-btn.visible{display:block;}
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════
    RATING POPUP
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════════════════ */
 .rating-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:600;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px);}
 .rating-overlay.open{display:flex;}
 .rating-box{background:var(--card);border:1px solid var(--border2);border-radius:24px;padding:28px 24px;text-align:center;max-width:320px;width:100%;box-shadow:var(--shadow);animation:mIn .25s ease;}
@@ -606,7 +606,7 @@ body{overscroll-behavior:none;}
   margin-bottom: 10px;
 }
 
-/* â•â•â• FINAL MUSIC PLAYER CSS â•â•â• */
+/* ═══ FINAL MUSIC PLAYER CSS ═══ */
 .music-circular {
   position: fixed; bottom: 80px; right: 20px; width: 50px; height: 50px;
   background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center;
@@ -638,17 +638,17 @@ body{overscroll-behavior:none;}
 </head>
 <body>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• MAIN APP â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<!-- ═══════════════ MAIN APP ═══════════════ -->
 <div id="mainScreen" class="screen active">
 
   <div class="topbar">
     <div class="logo" onclick="goToMain()">
-      <span class="logo-icon">ðŸ¾</span>SaveThePaws
+      <span class="logo-icon">🐾</span>SaveThePaws
     </div>
 <div class="topbar-right">
 <button class="lang-btn" onclick="toggleLang()" id="langBtn">EL</button>
 <button class="notif-bell" onclick="openNotifPanel()" id="notifBell"><span class="notif-dot" id="notifDot"></span></button>
-<button class="login-btn" id="adminBtnTop" onclick="goToAdmin()" style="display:none;background:var(--warn-bg);border-color:var(--warn);color:var(--warn);">ðŸ›¡ Admin</button>
+<button class="login-btn" id="adminBtnTop" onclick="goToAdmin()" style="display:none;background:var(--warn-bg);border-color:var(--warn);color:var(--warn);">🛡 Admin</button>
 <button class="login-btn" id="loginBtnTop" onclick="handleAccountBtn()">Sign in</button>
 <button class="login-btn" id="logoutBtnTop" onclick="signOut()" style="display:none;background:var(--danger-bg);border-color:var(--danger);color:var(--danger);">Sign out</button>
 </div>
@@ -656,7 +656,7 @@ body{overscroll-behavior:none;}
 
   <div class="notif-banner" id="notifBanner">
     <span id="notifBannerText">Welcome to SaveThePaws</span>
-    <button class="notif-banner-close" onclick="closeNotifBanner()">âœ•</button>
+    <button class="notif-banner-close" onclick="closeNotifBanner()">✕</button>
   </div>
 
   <div class="layout">
@@ -669,7 +669,7 @@ body{overscroll-behavior:none;}
 
 <!-- A: Weekend Hero Box -->
 <div class="stat-card" style="border-color: var(--orange);">
-<div class="s-label" style="color: var(--orange);">ðŸ† Weekend Hero</div>
+<div class="s-label" style="color: var(--orange);">🏆 Weekend Hero</div>
 <div style="font-size: 11px; color: var(--text2); line-height: 1.5; margin-top: 6px;">
 Free 36-hour access every weekend<br>
 Sat 11AM - Sun 11PM<br>
@@ -679,7 +679,7 @@ Sat 11AM - Sun 11PM<br>
 
 <!-- B: Badge Rewards Ladder -->
 <div class="stat-card" id="badgeLadderCard">
-<div class="s-label">ðŸ“‹ Badge Progress</div>
+<div class="s-label">📋 Badge Progress</div>
 <div id="badgeLadder" style="margin-top: 8px;"></div>
 </div>
 
@@ -708,13 +708,13 @@ Sat 11AM - Sun 11PM<br>
 </div>
 
 <!-- Donate button (replaces old Sign Out position) -->
-<button onclick="openDonateModal()" style="background:var(--orange-bg);border:1px solid var(--orange);color:var(--orange);border-radius:var(--radius);padding:10px;font-size:13px;font-weight:700;cursor:pointer;width:100%;margin-top:4px;">â¤ï¸ Donate</button>
+<button onclick="openDonateModal()" style="background:var(--orange-bg);border:1px solid var(--orange);color:var(--orange);border-radius:var(--radius);padding:10px;font-size:13px;font-weight:700;cursor:pointer;width:100%;margin-top:4px;">❤️ Donate</button>
 
 <!-- Admin button -->
-<button id="sideAdminBtn" onclick="goToAdmin()" style="display:none;background:var(--warn-bg);border:1px solid var(--warn);color:var(--warn);border-radius:var(--radius);padding:10px;font-size:13px;font-weight:700;cursor:pointer;width:100%;margin-top:4px;">ðŸ›¡ Admin Dashboard</button>
+<button id="sideAdminBtn" onclick="goToAdmin()" style="display:none;background:var(--warn-bg);border:1px solid var(--warn);color:var(--warn);border-radius:var(--radius);padding:10px;font-size:13px;font-weight:700;cursor:pointer;width:100%;margin-top:4px;">🛡 Admin Dashboard</button>
 
 <!-- Sign Out (moved to topbar, kept here for mobile) -->
-<button class="logout-btn" id="sideLogoutBtn" onclick="signOut()">â†© Sign Out</button>
+<button class="logout-btn" id="sideLogoutBtn" onclick="signOut()">↩ Sign Out</button>
 </div>
 <!-- END LEFT SIDEBAR -->
 
@@ -726,28 +726,28 @@ Sat 11AM - Sun 11PM<br>
 <div class="search-wrap">
 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
 <input placeholder="Search animals, cities..." id="searchInput" oninput="renderPosts()" autocomplete="off">
-<button class="fchip" onclick="loadCloudPosts(false)" style="margin-left:8px; border-color:var(--accent); background:var(--accent-bg);">ðŸ”„ Refresh</button>
-<button class="fchip" onclick="showRatingPopup()" style="margin-left:4px; background:var(--orange-bg); border-color:var(--orange); color:var(--orange);">â­ Rate Us</button>
+<button class="fchip" onclick="loadCloudPosts(false)" style="margin-left:8px; border-color:var(--accent); background:var(--accent-bg);">🔄 Refresh</button>
+<button class="fchip" onclick="showRatingPopup()" style="margin-left:4px; background:var(--orange-bg); border-color:var(--orange); color:var(--orange);">⭐ Rate Us</button>
 </div>
 <div class="filter-row" id="filterRow1">
 <div class="fchip active" onclick="setFilter('all',this)" data-i18n="filter_all">All</div>
-<div class="fchip" onclick="setFilter('cat',this)">ðŸ± Cat</div>
-<div class="fchip" onclick="setFilter('dog',this)">ðŸ¶ Dog</div>
-<div class="fchip" onclick="setFilter('bird',this)">ðŸ¦ Bird</div>
-<div class="fchip" onclick="setFilter('rabbit',this)">ðŸ° Rabbit</div>
-<div class="fchip" onclick="setFilter('other',this)">ðŸ¾ Other</div>
+<div class="fchip" onclick="setFilter('cat',this)">🐱 Cat</div>
+<div class="fchip" onclick="setFilter('dog',this)">🐶 Dog</div>
+<div class="fchip" onclick="setFilter('bird',this)">🐦 Bird</div>
+<div class="fchip" onclick="setFilter('rabbit',this)">🐰 Rabbit</div>
+<div class="fchip" onclick="setFilter('other',this)">🐾 Other</div>
 </div>
 <div class="filter-row" id="filterRow2">
 <div class="fchip" onclick="setFilter('injured',this)"> Injured</div>
-<div class="fchip" onclick="setFilter('saved',this)" data-i18n="filter_saved">âœ“ Saved</div>
-<div class="fchip" onclick="setFilter('healthy',this)">ðŸ’š Healthy</div>
-<div class="fchip" onclick="setFilter('lost',this)">ðŸ· Lost</div>
-<div class="fchip" onclick="setFilter('collar',this)">ðŸ”” With Collar</div>
+<div class="fchip" onclick="setFilter('saved',this)" data-i18n="filter_saved">✓ Saved</div>
+<div class="fchip" onclick="setFilter('healthy',this)">💚 Healthy</div>
+<div class="fchip" onclick="setFilter('lost',this)">🏷 Lost</div>
+<div class="fchip" onclick="setFilter('collar',this)">🔔 With Collar</div>
 </div>
       <!-- FEED VIEW -->
 <div class="main-feed" id="mainFeed">
 <div class="sub-banner" id="subBanner">
-<div class="sb-icon">ðŸ”</div>
+<div class="sb-icon">🔐</div>
 <div class="sb-text">
 <strong data-i18n="sub_banner_title">Unlock location & contact details</strong>
 <span data-i18n="sub_banner_sub">Subscribe to claim animals and see GPS data</span>
@@ -755,14 +755,14 @@ Sat 11AM - Sun 11PM<br>
 <button class="sb-cta" onclick="openSubModal()" data-i18n="subscribe_btn">Subscribe</button>
 </div>
 <div id="postsContainer"></div>
-<button class="refresh-fab" onclick="loadCloudPosts(false)" title="Refresh Feed">ðŸ”„</button>
+<button class="refresh-fab" onclick="loadCloudPosts(false)" title="Refresh Feed">🔄</button>
 </div>
 
 
       <!-- MAP VIEW -->
       <div class="map-view" id="mapView">
         <div class="map-placeholder">
-          <div class="map-icon">ðŸ—º</div>
+          <div class="map-icon">🗺</div>
           <div style="font-size:15px;font-weight:700;color:var(--text2);">Live Animal Map</div>
           <div style="font-size:13px;color:var(--text3);max-width:280px;line-height:1.4;">All reported animals pinned by GPS location. Available to subscribers only.</div>
         </div>
@@ -773,7 +773,7 @@ Sat 11AM - Sun 11PM<br>
     <!-- RIGHT SIDEBAR -->
     <div class="sidebar-right">
       <div class="sr-section">
-         <h4>ðŸ† Badge Progress</h4>
+         <h4>🏆 Badge Progress</h4>
          <div id="badgeProgressLadder"></div>
       </div>
          <div class="sr-section">
@@ -790,28 +790,28 @@ Sat 11AM - Sun 11PM<br>
 <!-- MUSIC PLAYER -->
 <audio id="bgAudio" loop></audio>
 <div class="music-circular" id="musicCircular">
-<button class="mc-btn mc-btn-filled" id="mcShuffleBtn" title="Shuffle">ðŸ”€</button>
+<button class="mc-btn mc-btn-filled" id="mcShuffleBtn" title="Shuffle">🔀</button>
 <div class="mc-info" id="mcInfo">Loading...</div>
-<button class="mc-btn mc-btn-filled" id="mcPlayBtn" title="Play / Pause">â–¶</button>
-<button class="mc-btn mc-btn-filled" id="mcStopBtn" title="Stop">â¹</button>
+<button class="mc-btn mc-btn-filled" id="mcPlayBtn" title="Play / Pause">▶</button>
+<button class="mc-btn mc-btn-filled" id="mcStopBtn" title="Stop">⏹</button>
 <input class="mc-vol" id="mcVol" type="range" min="0" max="1" step="0.05" value="0.4" title="Volume">
 </div>
 
 <!-- RATING POPUP -->
 <div class="rating-overlay" id="ratingOverlay">
   <div class="rating-box">
-    <div class="rating-paw">ðŸ¾</div>
+    <div class="rating-paw">🐾</div>
     <h3>Enjoying SaveThePaws?</h3>
     <p>Your rating helps more people find stray animals that need help. It takes 5 seconds.</p>
     <div class="star-row" id="starRow">
-      <button class="star-btn" onclick="rateStar(1)">â­</button>
-      <button class="star-btn" onclick="rateStar(2)">â­</button>
-      <button class="star-btn" onclick="rateStar(3)">â­</button>
-      <button class="star-btn" onclick="rateStar(4)">â­</button>
-      <button class="star-btn" onclick="rateStar(5)">â­</button>
+      <button class="star-btn" onclick="rateStar(1)">⭐</button>
+      <button class="star-btn" onclick="rateStar(2)">⭐</button>
+      <button class="star-btn" onclick="rateStar(3)">⭐</button>
+      <button class="star-btn" onclick="rateStar(4)">⭐</button>
+      <button class="star-btn" onclick="rateStar(5)">⭐</button>
     </div>
     <div class="rating-actions">
-      <button class="rating-go-btn" id="ratingGoBtn" onclick="goRate()" style="display:none;">â­ Rate on Google Play</button>
+      <button class="rating-go-btn" id="ratingGoBtn" onclick="goRate()" style="display:none;">⭐ Rate on Google Play</button>
       <button class="rating-skip" onclick="skipRating()">Maybe later</button>
       <button class="rating-skip" onclick="neverRate()" style="font-size:11px;color:var(--text3);">Don't ask again</button>
     </div>
@@ -820,13 +820,13 @@ Sat 11AM - Sun 11PM<br>
 
 
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• ADMIN SCREEN â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<!-- ═══════════════ ADMIN SCREEN ═══════════════ -->
 <div id="adminScreen" class="admin-screen">
   <div class="admin-topbar">
-    <h1>ðŸ›¡ SaveThePaws Admin</h1>
+    <h1>🛡 SaveThePaws Admin</h1>
     <div style="display:flex;gap:8px;align-items:center;">
       <span id="adminUserLabel" style="font-size:12px;color:var(--text2);"></span>
-      <button class="login-btn" onclick="goToMain()">â† App</button>
+      <button class="login-btn" onclick="goToMain()">← App</button>
     </div>
   </div>
   <div class="admin-body">
@@ -923,7 +923,7 @@ Sat 11AM - Sun 11PM<br>
         <div class="sec-title">Send Notification to Users</div>
         <div class="notif-composer">
           <h3>Compose Notification</h3>
-          <div class="fg"><label>Message</label><textarea id="notifMsg" placeholder="e.g. New stray dogs found in Athens â€” check the feed!"></textarea></div>
+          <div class="fg"><label>Message</label><textarea id="notifMsg" placeholder="e.g. New stray dogs found in Athens — check the feed!"></textarea></div>
           <div class="fg-row">
             <div class="fg"><label>Target</label><select id="notifTarget"><option value="all">All Users</option><option value="subscribers">Subscribers Only</option><option value="registered">Registered (Free)</option></select></div>
             <div class="fg"><label>Delivery</label><select id="notifDelivery"><option value="banner">In-App Banner</option><option value="push">Push (if supported)</option><option value="both">Both</option></select></div>
@@ -938,11 +938,11 @@ Sat 11AM - Sun 11PM<br>
   <h4> Badge Rewards</h4>
   <div style="font-size: 11px; color: var(--text2); line-height: 1.6;">
     <div style="margin-bottom: 6px; padding: 6px; background: var(--bg3); border-radius: 4px;">
-      <strong style="color: var(--accent2);">ðŸ¥‰ Scout</strong><br>
+      <strong style="color: var(--accent2);">🥉 Scout</strong><br>
       <small>Post 10 reports OR claim 1 animal</small>
     </div>
     <div style="margin-bottom: 6px; padding: 6px; background: var(--bg3); border-radius: 4px;">
-      <strong style="color: var(--success);">ðŸ›¡ï¸ Guardian</strong><br>
+      <strong style="color: var(--success);">🛡️ Guardian</strong><br>
       <small>Claim 5 animals</small>
     </div>
     <div style="padding: 6px; background: var(--bg3); border-radius: 4px;">
@@ -958,7 +958,7 @@ Sat 11AM - Sun 11PM<br>
           <h3>Add Organization</h3>
           <div class="fg-row">
             <div class="fg"><label>Organization Name</label><input id="donorName" placeholder="e.g. PAWS Greece"></div>
-            <div class="fg"><label>Icon (emoji)</label><input id="donorIcon" placeholder="ðŸ¾" maxlength="4"></div>
+            <div class="fg"><label>Icon (emoji)</label><input id="donorIcon" placeholder="🐾" maxlength="4"></div>
           </div>
           <div class="fg"><label>Description</label><input id="donorDesc" placeholder="Short mission statement"></div>
           <div class="fg"><label>Donation URL</label><input id="donorUrl" placeholder="https://paypal.me/..."></div>
@@ -1005,33 +1005,33 @@ Sat 11AM - Sun 11PM<br>
   </div>
 </div>
 
-<!-- â•â•â• UPLOAD MODAL â•â•â• -->
+<!-- ═══ UPLOAD MODAL ═══ -->
 <div class="modal-overlay" id="uploadModal">
   <div class="modal">
-    <button class="modal-close" onclick="closeModal('uploadModal')">âœ•</button>
-    <h2>ðŸ“· <span data-i18n="report_title">Report an Animal</span></h2>
+    <button class="modal-close" onclick="closeModal('uploadModal')">✕</button>
+    <h2>📷 <span data-i18n="report_title">Report an Animal</span></h2>
     <p class="modal-sub" data-i18n="report_sub">Photo + description only. Location is collected automatically. Your identity is private.</p>
   <div class="photo-drop" id="photoDrop" onclick="document.getElementById('photoInput').click()">
-<div class="pd-icon">ðŸ“·</div>
+<div class="pd-icon">📷</div>
 <p data-i18n="photo_drop">Tap to take photo or upload from gallery</p>
 <input type="file" accept="image/*" capture="environment" id="photoInput" onchange="previewPhoto(this)" style="display:none;">
 </div>
     <img id="photoPreview" class="photo-preview-img" alt="Preview">
-    <div class="ai-checking" id="aiChecking">ðŸ¤– Verifying this is an animal photo...</div>
+    <div class="ai-checking" id="aiChecking">🤖 Verifying this is an animal photo...</div>
     <div class="fg-row" style="margin-top:12px;">
       <div class="fg"><label data-i18n="animalType">Animal Type</label>
         <select id="animalType">
-          <option value="cat">ðŸ± Cat</option>
-          <option value="dog">ðŸ¶ Dog</option>
-          <option value="bird">ðŸ¦ Bird</option>
-          <option value="rabbit">ðŸ° Rabbit</option>
-          <option value="other">ðŸ¾ Other</option>
+          <option value="cat">🐱 Cat</option>
+          <option value="dog">🐶 Dog</option>
+          <option value="bird">🐦 Bird</option>
+          <option value="rabbit">🐰 Rabbit</option>
+          <option value="other">🐾 Other</option>
         </select>
       </div>
       <div class="fg"><label data-i18n="condition">Condition</label>
         <select id="animalCondition">
           <option value="healthy">Healthy</option>
-          <option value="injured">Injured ðŸš‘</option>
+          <option value="injured">Injured 🚑</option>
           <option value="lost">Lost / Has Collar</option>
           <option value="stray">Stray</option>
         </select>
@@ -1049,21 +1049,21 @@ Sat 11AM - Sun 11PM<br>
       </div>
       <div class="geo-status" id="geoStatus">Getting GPS location...</div>
     </div>
-    <button class="btn-primary" onclick="submitPost()" id="submitPostBtn">ðŸ¾ Submit Report</button>
+    <button class="btn-primary" onclick="submitPost()" id="submitPostBtn">🐾 Submit Report</button>
   </div>
 </div>
 
-<!-- â•â•â• LOGIN MODAL â•â•â• -->
+<!-- ═══ LOGIN MODAL ═══ -->
 <div class="modal-overlay" id="loginModal">
   <div class="modal">
-    <button class="modal-close" onclick="closeModal('loginModal')">âœ•</button>
+    <button class="modal-close" onclick="closeModal('loginModal')">✕</button>
     <h2 id="loginTitle">Sign In</h2>
     <p class="modal-sub" id="loginSub">Access your account to post reports and more.</p>
     <div id="loginForm">
   <div class="fg"><label>Email</label><input type="email" id="loginEmail" placeholder="you@email.com"></div>
-  <div class="fg"><label>Password</label><input type="password" id="loginPass" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" autocomplete="new-password"></div>
+  <div class="fg"><label>Password</label><input type="password" id="loginPass" placeholder="••••••••" autocomplete="new-password"></div>
   <button class="btn-primary" onclick="doLogin()">Sign In</button>
-           <button class="btn-secondary" onclick="switchForm('register')">Create Free Account â†’</button>
+           <button class="btn-secondary" onclick="switchForm('register')">Create Free Account →</button>
           </div>
     <div id="registerForm" style="display:none;">
       <div class="fg-row">
@@ -1071,24 +1071,24 @@ Sat 11AM - Sun 11PM<br>
         <div class="fg"><label>Last Name</label><input id="regLast" placeholder="Smith"></div>
       </div>
       <div class="fg"><label>Email</label><input type="email" id="regEmail" placeholder="you@email.com"></div>
-      <div class="fg"><label>Password (min 8 chars)</label><input type="password" id="regPass" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" autocomplete="new-password"></div>
-      <button class="btn-primary" onclick="doRegister()">Create Account â€” Free</button>
-      <button class="btn-secondary" onclick="switchForm('login')">â† Back to Sign In</button>
+      <div class="fg"><label>Password (min 8 chars)</label><input type="password" id="regPass" placeholder="••••••••" autocomplete="new-password"></div>
+      <button class="btn-primary" onclick="doRegister()">Create Account — Free</button>
+      <button class="btn-secondary" onclick="switchForm('login')">← Back to Sign In</button>
       <div style="font-size:11px;color:var(--text3);margin-top:10px;text-align:center;">Free accounts: post reports, edit descriptions. No cookies stored without subscription.</div>
     </div>
   </div>
 </div>
 
-<!-- â•â•â• SUBSCRIBE MODAL â•â•â• -->
+<!-- ═══ SUBSCRIBE MODAL ═══ -->
 <div class="modal-overlay" id="subModal">
   <div class="modal">
-    <button class="modal-close" onclick="closeModal('subModal')">âœ•</button>
-    <h2>ðŸ”“ Unlock SaveThePaws</h2>
+    <button class="modal-close" onclick="closeModal('subModal')">✕</button>
+    <h2>🔓 Unlock SaveThePaws</h2>
     <p class="modal-sub">Subscribe to see GPS locations, contact uploaders, view the live map, and claim animals for rescue or adoption.</p>
     <div class="plans-grid">
       <div class="plan-card" onclick="doSubscribe('weekly')">
         <div class="plan-name">Weekly</div>
-        <div class="plan-price">â‚¬1.99</div>
+        <div class="plan-price">€1.99</div>
         <div class="plan-period">per week</div>
         <ul class="plan-perks">
           <li>GPS & location data</li>
@@ -1100,8 +1100,8 @@ Sat 11AM - Sun 11PM<br>
       </div>
       <div class="plan-card" onclick="doSubscribe('monthly')">
         <div class="plan-name">Monthly</div>
-        <div class="plan-price">â‚¬4.99</div>
-        <div class="plan-period">per month Â· save 37%</div>
+        <div class="plan-price">€4.99</div>
+        <div class="plan-period">per month · save 37%</div>
         <ul class="plan-perks">
           <li>GPS & location data</li>
           <li>Contact uploaders</li>
@@ -1114,8 +1114,8 @@ Sat 11AM - Sun 11PM<br>
       <div class="plan-card" onclick="doSubscribe('quarterly')">
         <div class="plan-badge">POPULAR</div>
         <div class="plan-name">3 Months</div>
-        <div class="plan-price">â‚¬11.99</div>
-        <div class="plan-period">per quarter Â· save 46%</div>
+        <div class="plan-price">€11.99</div>
+        <div class="plan-period">per quarter · save 46%</div>
         <ul class="plan-perks">
           <li>Everything in Monthly</li>
           <li>Priority support</li>
@@ -1137,19 +1137,19 @@ Sat 11AM - Sun 11PM<br>
      
    <!-- Add this AFTER the Weekend Hero card, BEFORE the Annual card -->
 <div class="plan-card" style="border-color: var(--accent); cursor: default;">
-  <div class="plan-name">ðŸ† Badge Rewards System</div>
+  <div class="plan-name">🏆 Badge Rewards System</div>
   <div style="font-size:12px;color:var(--text2);text-align:left;padding:10px;line-height:1.6;">
-    <div style="margin-bottom:8px;"><strong style="color:var(--accent2);">ðŸ¥‰ Scout</strong><br>
-    <small>Post 10 reports OR claim 1 animal<br>â†’ Priority support access</small></div>
+    <div style="margin-bottom:8px;"><strong style="color:var(--accent2);">🥉 Scout</strong><br>
+    <small>Post 10 reports OR claim 1 animal<br>→ Priority support access</small></div>
     
     <div style="margin-bottom:8px;"><strong style="color:var(--success);"> Guardian</strong><br>
-    <small>Claim 5 animals<br>â†’ Rescue org badge on profile</small></div>
+    <small>Claim 5 animals<br>→ Rescue org badge on profile</small></div>
     
     <div style="margin-bottom:8px;"><strong style="color:var(--warn);"> Hero</strong><br>
-    <small>Claim 10 animals<br>â†’ Featured rescuer spotlight</small></div>
+    <small>Claim 10 animals<br>→ Featured rescuer spotlight</small></div>
     
-    <div><strong style="color:var(--danger);">ðŸ‘‘ Legend</strong><br>
-    <small>Claim 25 animals<br>â†’ Lifetime premium access</small></div>
+    <div><strong style="color:var(--danger);">👑 Legend</strong><br>
+    <small>Claim 25 animals<br>→ Lifetime premium access</small></div>
   </div>
   <button class="plan-btn" style="background:var(--bg3);color:var(--text2);border:1px solid var(--border2);cursor:default;">Learn More</button>
 </div>          
@@ -1157,8 +1157,8 @@ Sat 11AM - Sun 11PM<br>
       <div class="plan-card featured" onclick="doSubscribe('annual')">
         <div class="plan-badge" style="background:var(--success);">BEST VALUE</div>
         <div class="plan-name">Annual</div>
-        <div class="plan-price">â‚¬29</div>
-        <div class="plan-period">per year Â· save 71%</div>
+        <div class="plan-price">€29</div>
+        <div class="plan-period">per year · save 71%</div>
         <ul class="plan-perks">
           <li>Everything included</li>
           <li>Priority support</li>
@@ -1172,46 +1172,46 @@ Sat 11AM - Sun 11PM<br>
   </div>
 </div>
 
-<!-- â•â•â• DONATE MODAL â•â•â• -->
+<!-- ═══ DONATE MODAL ═══ -->
 <div class="modal-overlay" id="donateModal">
   <div class="modal">
-    <button class="modal-close" onclick="closeModal('donateModal')">âœ•</button>
-    <h2>â¤ï¸ Support Animal Rescue</h2>
+    <button class="modal-close" onclick="closeModal('donateModal')">✕</button>
+    <h2>❤️ Support Animal Rescue</h2>
     <p class="modal-sub">Every donation goes directly to registered organizations helping urban stray animals. Choose where your support goes.</p>
     <div class="donate-grid" id="donateList"></div>
   </div>
 </div>
 
-<!-- â•â•â• EDIT POST MODAL â•â•â• -->
+<!-- ═══ EDIT POST MODAL ═══ -->
 <div class="modal-overlay" id="editModal">
   <div class="modal">
-    <button class="modal-close" onclick="closeModal('editModal')">âœ•</button>
-    <h2>âœï¸ Edit Description</h2>
+    <button class="modal-close" onclick="closeModal('editModal')">✕</button>
+    <h2>✏️ Edit Description</h2>
     <p class="modal-sub">You can update the description of your report.</p>
     <div class="fg"><label>Description</label><textarea id="editDesc" style="min-height:100px;"></textarea></div>
     <button class="btn-primary" onclick="saveEdit()">Save Changes</button>
   </div>
 </div>
 
-<!-- â•â•â• CLAIM MODAL â•â•â• -->
+<!-- ═══ CLAIM MODAL ═══ -->
 <div class="modal-overlay" id="claimModal">
   <div class="modal">
-    <button class="modal-close" onclick="closeModal('claimModal')">âœ•</button>
-    <h2>ðŸ  Claim this Animal</h2>
+    <button class="modal-close" onclick="closeModal('claimModal')">✕</button>
+    <h2>🏠 Claim this Animal</h2>
     <p class="modal-sub">Confirm you are rescuing or adopting this animal. A Saved watermark will be applied to the post.</p>
     <div class="fg"><label>Your Note</label><textarea id="claimNote" placeholder="e.g. Taking to vet, fostering, adopting..."></textarea></div>
-    <button class="btn-primary" onclick="confirmClaim()">âœ“ Confirm Rescue</button>
+    <button class="btn-primary" onclick="confirmClaim()">✓ Confirm Rescue</button>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+<!-- ═══════════════════════════════════════════
      JAVASCRIPT
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+═══════════════════════════════════════════ -->
    
 <script>
-// â”€â”€â”€ i18n â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── i18n ───────────────────────────────────
    const mewSound = new Audio('./mew.mp3');
 const chimeSound = new Audio('./chime.mp3');
 mewSound.volume = 0.3;
@@ -1226,23 +1226,23 @@ const LANG = {
     photo_drop:'Tap to take photo or upload from gallery',animalType:'Animal Type',
     condition:'Condition',description:'Description',adopted:'adopted / claimed',
     all_posts:'all community posts',awaiting:'awaiting moderation',
-    filter_all:'All',filter_saved:'âœ“ Saved',
+    filter_all:'All',filter_saved:'✓ Saved',
     sub_banner_title:'Unlock location & contact details',
     sub_banner_sub:'Subscribe to claim animals and see GPS data',
     subscribe_btn:'Subscribe',
   },
   el: {
-    report_btn:'Î‘Î½Î±Ï†Î¿ÏÎ¬ Î–ÏŽÎ¿Ï…',saved_label:'Î–ÏŽÎ± Î£ÏŽÎ¸Î·ÎºÎ±Î½',posted_label:'Î£Ï…Î½Î¿Î»Î¹ÎºÎ­Ï‚ Î‘Î½Î±Ï†Î¿ÏÎ­Ï‚',
-    pending_label:'Î£Îµ Î‘Î½Î±Î¼Î¿Î½Î®',your_role:'Î¡ÏŒÎ»Î¿Ï‚ Î£Î±Ï‚',feed_tab:'Î¡Î¿Î®',map_tab:'Î§Î¬ÏÏ„Î·Ï‚',
-    donate_tab:'Î”Ï‰ÏÎµÎ¬',activity_title:'Î ÏÏŒÏƒÏ†Î±Ï„Î· Î”ÏÎ±ÏƒÏ„Î·ÏÎ¹ÏŒÏ„Î·Ï„Î±',donate_title:'Î¥Ï€Î¿ÏƒÏ„Î®ÏÎ¹Î¾Î· ÎŸÏÎ³Î±Î½Î¹ÏƒÎ¼ÏŽÎ½',
-    donate_float:'Î”Ï‰ÏÎµÎ¬',report_title:'Î‘Î½Î±Ï†Î¿ÏÎ¬ Î–ÏŽÎ¿Ï…',
-    report_sub:'ÎœÏŒÎ½Î¿ Ï†Ï‰Ï„Î¿Î³ÏÎ±Ï†Î¯Î± + Ï€ÎµÏÎ¹Î³ÏÎ±Ï†Î®. Î— Ï„Î¿Ï€Î¿Î¸ÎµÏƒÎ¯Î± ÎµÎ½Ï„Î¿Ï€Î¯Î¶ÎµÏ„Î±Î¹ Î±Ï…Ï„ÏŒÎ¼Î±Ï„Î±.',
-    photo_drop:'Î Î±Ï„Î®ÏƒÏ„Îµ Î³Î¹Î± Ï†Ï‰Ï„Î¿Î³ÏÎ±Ï†Î¯Î± Î® Î¼ÎµÏ„Î±Ï†ÏŒÏÏ„Ï‰ÏƒÎ·',animalType:'Î•Î¯Î´Î¿Ï‚ Î–ÏŽÎ¿Ï…',
-    condition:'ÎšÎ±Ï„Î¬ÏƒÏ„Î±ÏƒÎ·',description:'Î ÎµÏÎ¹Î³ÏÎ±Ï†Î®',adopted:'Ï…Î¹Î¿Î¸ÎµÏ„Î®Î¸Î·ÎºÎ±Î½ / Î´Î¹ÎµÎºÎ´Î¹ÎºÎ®Î¸Î·ÎºÎ±Î½',
-    all_posts:'ÏŒÎ»ÎµÏ‚ Î¿Î¹ Î±Î½Î±Ï†Î¿ÏÎ­Ï‚',awaiting:'Î±Î½Î±Î¼Î­Î½Î¿Ï…Î½ Î­Î³ÎºÏÎ¹ÏƒÎ·',
-    filter_all:'ÎŒÎ»Î±',filter_saved:'âœ“ Î£ÏŽÎ¸Î·ÎºÎ±Î½',
-    sub_banner_title:'ÎžÎµÎºÎ»ÎµÎ¹Î´ÏŽÏƒÏ„Îµ Ï„Î¿Ï€Î¿Î¸ÎµÏƒÎ¯Î± & ÏƒÏ„Î¿Î¹Ï‡ÎµÎ¯Î± ÎµÏ€Î¹ÎºÎ¿Î¹Î½Ï‰Î½Î¯Î±Ï‚',
-    sub_banner_sub:'Î•Î³Î³ÏÎ±Ï†ÎµÎ¯Ï„Îµ Î³Î¹Î± Ï€Î»Î®ÏÎ· Ï€ÏÏŒÏƒÎ²Î±ÏƒÎ·',subscribe_btn:'Î•Î³Î³ÏÎ±Ï†Î®',
+    report_btn:'Αναφορά Ζώου',saved_label:'Ζώα Σώθηκαν',posted_label:'Συνολικές Αναφορές',
+    pending_label:'Σε Αναμονή',your_role:'Ρόλος Σας',feed_tab:'Ροή',map_tab:'Χάρτης',
+    donate_tab:'Δωρεά',activity_title:'Πρόσφατη Δραστηριότητα',donate_title:'Υποστήριξη Οργανισμών',
+    donate_float:'Δωρεά',report_title:'Αναφορά Ζώου',
+    report_sub:'Μόνο φωτογραφία + περιγραφή. Η τοποθεσία εντοπίζεται αυτόματα.',
+    photo_drop:'Πατήστε για φωτογραφία ή μεταφόρτωση',animalType:'Είδος Ζώου',
+    condition:'Κατάσταση',description:'Περιγραφή',adopted:'υιοθετήθηκαν / διεκδικήθηκαν',
+    all_posts:'όλες οι αναφορές',awaiting:'αναμένουν έγκριση',
+    filter_all:'Όλα',filter_saved:'✓ Σώθηκαν',
+    sub_banner_title:'Ξεκλειδώστε τοποθεσία & στοιχεία επικοινωνίας',
+    sub_banner_sub:'Εγγραφείτε για πλήρη πρόσβαση',subscribe_btn:'Εγγραφή',
   }
 };
 let currentLang = 'en';
@@ -1267,7 +1267,7 @@ function initDB(){
       {id:'a1',type:'full',title:'Help Street Cats This Winter',description:'Donate blankets, food, or funds to help feral cats survive the cold months.',media:'',link:'https://example.com/donate',freq:6,active:true}
     ],
     donors: [
-      {id:'d1',name:'SaveThePaws Fund',icon:'ðŸ¾',description:'All donations go directly to supporting stray animal rescue operations, veterinary care, and platform maintenance.',url:'https://paypal.me/JimOem'}
+      {id:'d1',name:'SaveThePaws Fund',icon:'🐾',description:'All donations go directly to supporting stray animal rescue operations, veterinary care, and platform maintenance.',url:'https://paypal.me/JimOem'}
     ],
     activity: [],
     notifications: [],
@@ -1291,7 +1291,7 @@ function saveDB(d){
     localStorage.setItem(DB_KEY, JSON.stringify(safeCache));
   } catch(e) {}
 }
-// â”€â”€â”€ STATE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── STATE ─────────────────────────────────
 // 1. Initialize Supabase Client
 const SUPABASE_URL = 'https://zqnwjdaxffsoglmhkqxc.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxbndqZGF4ZmZzb2dsbWhrcXhjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxODQwODYsImV4cCI6MjEwNzc2MDA4Nn0.KfvfbcwZYdaVVebPiqLDIDgjdkqxd2Q_sPNCT91ad84';
@@ -1308,9 +1308,9 @@ let currentAdType = 'image_link';
 let themeMode = 'dark';
 let currentLocationMode = 'all'; // 'all', 'near', or 'country'
 
-const ANIMAL_KEYWORDS = ['cat','dog','bird','rabbit','animal','stray','injured','lost','paw','fur','feather','kitten','puppy','feral','rescue','adopt','pet','meow','bark','collar','vet','wounded','limping','hungry','scared','domestic','pigeon','parrot','hamster','turtle','Î¶ÏŽÎ¿','Î³Î¬Ï„Î±','ÏƒÎºÏÎ»Î¿Ï‚','Ï€Î¿Ï…Î»Î¯','ÎºÎ¿Ï…Ï„Î¬Î²Î¹','Î³Î±Ï„Î¬ÎºÎ¹'];
+const ANIMAL_KEYWORDS = ['cat','dog','bird','rabbit','animal','stray','injured','lost','paw','fur','feather','kitten','puppy','feral','rescue','adopt','pet','meow','bark','collar','vet','wounded','limping','hungry','scared','domestic','pigeon','parrot','hamster','turtle','ζώο','γάτα','σκύλος','πουλί','κουτάβι','γατάκι'];
 
-// â”€â”€â”€ BOOT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── BOOT ───────────────────────────────────
 window.onload = async function(){
    
     // 1. Check if user is already logged in via Supabase
@@ -1344,13 +1344,13 @@ window.onload = async function(){
     applyLang();
     handleShareTarget();
 
-    console.log("âœ… SaveThePaws System Initialized Successfully");
+    console.log("✅ SaveThePaws System Initialized Successfully");
 };
 
-/* â”€â”€â”€ WEB SHARE TARGET handler â”€â”€â”€
+/* ─── WEB SHARE TARGET handler ───
    Catches photos shared TO SaveThePaws from the OS share sheet.
    Works with the share_target in manifest.json (POST multipart/form-data).
-â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+─────────────────────────────────── */
 async function handleShareTarget(){
   try {
     const url = new URL(window.location.href);
@@ -1360,7 +1360,7 @@ async function handleShareTarget(){
     url.searchParams.delete('share');
     window.history.replaceState({}, '', url.toString());
 
-    // Only works from a POST share â€” the SW must cache the formData
+    // Only works from a POST share — the SW must cache the formData
     // PWABuilder just needs the manifest entry; actual handling is graceful
     if(!('serviceWorker' in navigator)) return;
     const reg = await navigator.serviceWorker.ready;
@@ -1372,12 +1372,12 @@ async function handleShareTarget(){
       modal.style.display = 'flex';
       const note = document.createElement('p');
       note.style.cssText = 'color:var(--accent2);font-size:13px;text-align:center;margin-bottom:8px;';
-      note.textContent = 'ðŸ“¤ Photo shared from your gallery â€” attach it below!';
+      note.textContent = '📤 Photo shared from your gallery — attach it below!';
       const form = modal.querySelector('form') || modal.querySelector('.modal-body');
       if(form) form.prepend(note);
     }
   } catch(e) {
-    // Non-critical â€” ignore
+    // Non-critical — ignore
   }
 }
 // Auto-refresh feed every 30 seconds
@@ -1398,34 +1398,34 @@ function checkPendingNotif(){
   }
 }
 
-// â”€â”€â”€ THEME â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── THEME ──────────────────────────────────
 function toggleTheme(){
   themeMode = themeMode === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', themeMode);
-  document.getElementById('themeBtn').textContent = themeMode === 'dark' ? 'ðŸŒ™ Dark' : 'â˜€ï¸ Light';
+  document.getElementById('themeBtn').textContent = themeMode === 'dark' ? '🌙 Dark' : '☀️ Light';
   document.getElementById('metaTheme').content = themeMode === 'dark' ? '#1a1a2e' : '#f5f5fa';
 }
 
-// â”€â”€â”€ GEO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── GEO ────────────────────────────────────
 function startGeo(){
   const gs = document.getElementById('geoStatus');
-  if(!navigator.geolocation){gs.textContent='GPS not supported â€” enter manually';gs.className='geo-status err';return;}
+  if(!navigator.geolocation){gs.textContent='GPS not supported — enter manually';gs.className='geo-status err';return;}
   navigator.geolocation.getCurrentPosition(pos=>{
     document.getElementById('animalCity').placeholder = 'Detected...';
     const gs2 = document.getElementById('geoStatus');
-    gs2.textContent = 'âœ“ GPS: '+pos.coords.latitude.toFixed(4)+', '+pos.coords.longitude.toFixed(4);
+    gs2.textContent = '✓ GPS: '+pos.coords.latitude.toFixed(4)+', '+pos.coords.longitude.toFixed(4);
     gs2.className = 'geo-status ok';
     window._geoLat = pos.coords.latitude.toFixed(6);
    window._geoLon = pos.coords.longitude.toFixed(6);
     window._userCountry = 'Greece'; // Matches your mock data country
   }, ()=>{
     const gs2 = document.getElementById('geoStatus');
-    gs2.textContent = 'âš  GPS unavailable â€” enter city manually';
+    gs2.textContent = '⚠ GPS unavailable — enter city manually';
     gs2.className = 'geo-status err';
   });
 }
 
-// â”€â”€â”€ STATS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── STATS ──────────────────────────────────
 function renderStats(){
 const live = db.posts.filter(p=>p.status==='live');
 document.getElementById('statSaved').textContent = live.filter(p=>p.saved).length;
@@ -1438,7 +1438,7 @@ const pend = db.posts.filter(p=>p.status==='pending').length;
 renderUserStats();
 }
 
-// â”€â”€â”€ ACTIVITY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── ACTIVITY ───────────────────────────────
 function renderActivity(){
   document.getElementById('activityFeed').innerHTML = db.activity.slice(0,8).map(a=>`
     <div class="activity-item">
@@ -1447,21 +1447,21 @@ function renderActivity(){
     </div>`).join('');
 }
 
-// â”€â”€â”€ SIDEBAR DONATIONS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── SIDEBAR DONATIONS ──────────────────────
 function renderSidebarDonations(){
   // Use Supabase data if available, fallback to local
   const donorsToUse = (db.donors && db.donors.length > 0) ? db.donors : [
-    {icon:'ðŸ¾', name:'SaveThePaws Fund', url:'https://paypal.me/JimOem'}
+    {icon:'🐾', name:'SaveThePaws Fund', url:'https://paypal.me/JimOem'}
   ];
   document.getElementById('sidebarDonations').innerHTML = donorsToUse.slice(0,3).map(d=>`
     <div class="donate-org-item">
       <strong>${d.icon} ${d.name}</strong>
-      <a href="${d.url}" target="_blank" rel="noopener">Donate â†’</a>
+      <a href="${d.url}" target="_blank" rel="noopener">Donate →</a>
     </div>`).join('');
 }
 
-// â”€â”€â”€ POSTS RENDER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-function animalEmoji(t){return{cat:'ðŸ±',dog:'ðŸ¶',bird:'ðŸ¦',rabbit:'ðŸ°',other:'ðŸ¾'}[t]||'ðŸ¾';}
+// ─── POSTS RENDER ───────────────────────────
+function animalEmoji(t){return{cat:'🐱',dog:'🐶',bird:'🐦',rabbit:'🐰',other:'🐾'}[t]||'🐾';}
 function animalGrad(t){return{cat:'linear-gradient(135deg,#2d1f3d,#4a2d5a)',dog:'linear-gradient(135deg,#1f2d3d,#2d4a5a)',bird:'linear-gradient(135deg,#1f3d2d,#2d5a4a)',rabbit:'linear-gradient(135deg,#3d2d1f,#5a4a2d)',other:'linear-gradient(135deg,#2d2d3d,#3d3d5a)'}[t]||'linear-gradient(135deg,#2d2d3d,#3d3d5a)';}
 function fmtTime(ts){const d=Date.now()-ts;if(d<3600000)return Math.floor(d/60000)+' min ago';if(d<86400000)return Math.floor(d/3600000)+' hr ago';return Math.floor(d/86400000)+'d ago';}
    // Haversine distance formula (returns km)
@@ -1523,7 +1523,7 @@ if(q) posts=posts.filter(p=>(p.description || '').toLowerCase().includes(q) || (
 
   const container = document.getElementById('postsContainer');
   if(finalItems.length===0){
-    container.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3);font-size:14px;">No animals found. Be the first to report one! ðŸ¾</div>';
+    container.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3);font-size:14px;">No animals found. Be the first to report one! 🐾</div>';
     return;
   }
 
@@ -1535,40 +1535,40 @@ if(q) posts=posts.filter(p=>(p.description || '').toLowerCase().includes(q) || (
 
 function renderPostCard(post, isSub, isReg){
   const isOwner = currentUser && currentUser.name === post.uploader_name;
-  const condTag = post.condition==='injured' ? '<span class="atag injured">ðŸš‘ Injured</span>' :
-                  post.condition==='lost' ? '<span class="atag" style="background:var(--warn-bg);color:var(--warn);border-color:var(--warn);">ðŸ· Lost</span>' : '';
-  const savedTag = post.saved_by ? '<span class="atag saved">âœ“ Saved</span>' : '';
+  const condTag = post.condition==='injured' ? '<span class="atag injured">🚑 Injured</span>' :
+                  post.condition==='lost' ? '<span class="atag" style="background:var(--warn-bg);color:var(--warn);border-color:var(--warn);">🏷 Lost</span>' : '';
+  const savedTag = post.saved_by ? '<span class="atag saved">✓ Saved</span>' : '';
 
   const photoContent = post.photo_data
     ? `<img src="${post.photo_data}" class="pc-img" alt="Animal photo" loading="lazy">`
     : `<div class="pc-img-placeholder" style="background:${animalGrad(post.animal_type)}">${animalEmoji(post.animal_type)}</div>`;
 
-  const savedWM = post.saved_by ? `<div class="saved-wm"><div class="wm">âœ“ Saved</div></div>` : '';
+  const savedWM = post.saved_by ? `<div class="saved-wm"><div class="wm">✓ Saved</div></div>` : '';
   const waitTime = fmtTime(post.timestamp).replace('ago', '');
   const urgencyText = !isSub ? `<div style="color:var(--danger);font-size:12px;font-weight:700;margin-top:8px;animation:pulse 2s infinite; line-height:1.4;">This ${post.animal_type} has been waiting for ${waitTime}. I could be there in 5 minutes if I could just see the map.</div>` : '';
 
     const coords = isSub
     ? `<span class="info-chip" onclick="openMapModal('${post.lat}', '${post.lon}', '${post.city}')" style="cursor: pointer; font-weight: 600;"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="10" r="3"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg> View Exact Map</span>
        <span class="info-chip"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>${post.city}, ${post.country}</span>`
-    : `<span class="info-chip blurred-chip" onclick="openSubModal()">ðŸ“ ${post.lat}, ${post.lon}</span>
-       <span class="info-chip blurred-chip" onclick="openSubModal()">ðŸ™ ${post.city}, ${post.country}</span>
-       <span class="lock-pill" onclick="openSubModal()">ðŸ”’ Subscribe to unlock map</span>`;
+    : `<span class="info-chip blurred-chip" onclick="openSubModal()">📍 ${post.lat}, ${post.lon}</span>
+       <span class="info-chip blurred-chip" onclick="openSubModal()">🏙 ${post.city}, ${post.country}</span>
+       <span class="lock-pill" onclick="openSubModal()">🔒 Subscribe to unlock map</span>`;
 
   const claimBtn = post.saved_by
-    ? `<button class="btn-claim claimed" disabled>âœ“ Adopted</button>`
+    ? `<button class="btn-claim claimed" disabled>✓ Adopted</button>`
     : isSub
-      ? `<button class="btn-claim" onclick="openClaim('${post.id}')">ðŸ  Claim</button>`
-      : `<button class="btn-claim" style="background:var(--bg3);color:var(--text3);" onclick="openSubModal()">ðŸ”’ Subscribe to Claim</button>`;
+      ? `<button class="btn-claim" onclick="openClaim('${post.id}')">🏠 Claim</button>`
+      : `<button class="btn-claim" style="background:var(--bg3);color:var(--text3);" onclick="openSubModal()">🔒 Subscribe to Claim</button>`;
 
-  const editBtn = isOwner ? `<button class="btn-edit" onclick="openEdit('${post.id}')" title="Edit description">âœï¸</button>` : '';
-  const flagBtn = `<button class="btn-flag" onclick="flagPost('${post.id}')" title="Flag as inappropriate">âš‘</button>`;
+  const editBtn = isOwner ? `<button class="btn-edit" onclick="openEdit('${post.id}')" title="Edit description">✏️</button>` : '';
+  const flagBtn = `<button class="btn-flag" onclick="flagPost('${post.id}')" title="Flag as inappropriate">⚑</button>`;
 
   return `
     <div class="post-card" id="post-${post.id}">
       <div class="pc-header">
         <div class="pc-avatar">${animalEmoji(post.animal_type)}</div>
         <div class="pc-meta">
-          <div class="pc-user">${isSub ? post.uploader_name : 'â€¢â€¢â€¢â€¢â€¢â€¢'}</div>
+          <div class="pc-user">${isSub ? post.uploader_name : '••••••'}</div>
           <div class="pc-time">${fmtTime(post.timestamp)}</div>
         </div>
         <div class="pc-tags">
@@ -1579,7 +1579,7 @@ function renderPostCard(post, isSub, isReg){
       <div class="pc-img-wrap">${photoContent}${savedWM}</div>
            <div class="pc-desc">${post.description || ''}${urgencyText}</div>
       <div class="pc-info">${coords}</div>
-      <div class="pc-actions">${claimBtn}${editBtn}${flagBtn}<button class="btn-edit" onclick="sharePost('${post.id}')" title="Share this post">ðŸ“¤</button></div>
+      <div class="pc-actions">${claimBtn}${editBtn}${flagBtn}<button class="btn-edit" onclick="sharePost('${post.id}')" title="Share this post">📤</button></div>
     </div>`;
 }
 
@@ -1593,21 +1593,21 @@ function renderAdCard(ad){
   }
   const bodyHtml = ad.type==='text'
     ? `<div class="ad-text-only">${ad.title}${ad.desc?'<br><br><span style="color:var(--text2);font-size:13px;">'+ad.desc+'</span>':''}</div>`
-    : `<div class="ad-body"><h3>${ad.title}</h3>${ad.desc?`<p>${ad.desc}</p>`:''} ${ad.link?`<a class="ad-link-btn" href="${ad.link}" target="_blank" rel="noopener">Learn More â†’</a>`:''}</div>`;
+    : `<div class="ad-body"><h3>${ad.title}</h3>${ad.desc?`<p>${ad.desc}</p>`:''} ${ad.link?`<a class="ad-link-btn" href="${ad.link}" target="_blank" rel="noopener">Learn More →</a>`:''}</div>`;
 
   return `<div class="ad-card">${mediaHtml}<span class="ad-label">PROMOTED</span>${bodyHtml}</div>`;
 }
 
-// â”€â”€â”€ MAP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── MAP ────────────────────────────────────
 function renderMap(){
 const isSub = currentUser && currentUser.subscribed;
 if(!isSub) return;
 const pins = db.posts.filter(p=>p.status==='live'&&!p.saved);
   document.getElementById('mapPins').innerHTML = pins.map(p=>`
-    <div class="map-pin">${animalEmoji(p.animal_type)} ${p.city} â€” ${p.animal_type}</div>`).join('');
+    <div class="map-pin">${animalEmoji(p.animal_type)} ${p.city} — ${p.animal_type}</div>`).join('');
 }
 
-// â”€â”€â”€ TABS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── TABS ───────────────────────────────────
 function switchTab(tab, el){
   const isSub = currentUser && currentUser.subscribed;
   if(tab==='map' && !isSub){ openSubModal(); return; }
@@ -1626,14 +1626,14 @@ function switchTab(tab, el){
 }
 function setMobileTab(tab){ switchTab(tab); }
 
-// â”€â”€â”€ FILTER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── FILTER ─────────────────────────────────
 function setFilter(f, el){
   currentFilter = f;
   document.querySelectorAll('.fchip').forEach(c=>c.classList.remove('active'));
   el.classList.add('active');
   renderPosts();
 }
-// â”€â”€â”€ IMAGE COMPRESSION â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── IMAGE COMPRESSION ─────────────────────────
 async function compressImage(file, maxWidth = 1080, quality = 0.7) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -1659,7 +1659,7 @@ async function compressImage(file, maxWidth = 1080, quality = 0.7) {
     reader.onerror = reject;
   });
 }
-   // â”€â”€â”€ POST SUBMISSION + SMART FILTER â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   // ─── POST SUBMISSION + SMART FILTER ─────────
 function handlePostBtn(){
   if(!currentUser){ showToast('Please register or sign in to post a report','warn'); openLoginModal(); return; }
   openModal('uploadModal');
@@ -1675,7 +1675,7 @@ function previewPhoto(input){
     const prev = document.getElementById('photoPreview');
     prev.src = e.target.result;
     prev.style.display = 'block';
-    document.querySelector('#photoDrop .pd-icon').textContent = 'âœ“';
+    document.querySelector('#photoDrop .pd-icon').textContent = '✓';
     document.querySelector('#photoDrop p').textContent = file.name;
   };
   reader.readAsDataURL(file);
@@ -1712,7 +1712,7 @@ async function moderateImage(base64Data) {
 
 async function sightengineCheck(imageData) {
   // SIGHTENGINE TRIAL EXPIRED - bypassing moderation
-  console.log('âš ï¸ Sightengine moderation');
+  console.log('⚠️ Sightengine moderation');
   return true; // Always allow
 
 }
@@ -1739,21 +1739,21 @@ async function submitPost(){
 
   const btn = document.getElementById('submitPostBtn');
   btn.disabled = true; 
-  btn.textContent = hasPhoto ? 'ðŸ”„ Compressing Image...' : 'â˜ï¸ Uploading to Cloud...';
+  btn.textContent = hasPhoto ? '🔄 Compressing Image...' : '☁️ Uploading to Cloud...';
 
   let photoUrl = null;
   let base64ForModeration = null;
 
   if(hasPhoto) {
     try {
-      btn.textContent = 'ðŸ”„ Compressing Image...';
+      btn.textContent = '🔄 Compressing Image...';
       base64ForModeration = await compressImage(fileInput.files[0], 1080, 0.7);
       
       const res = await fetch(base64ForModeration);
       const blob = await res.blob();
       const fileName = `post_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.jpg`;
       
-      btn.textContent = 'â˜ï¸ Uploading to Storage...';
+      btn.textContent = '☁️ Uploading to Storage...';
          const { data: uploadData, error: uploadError } = await sb.storage
 .from('PHOTOS')
 .upload(fileName, blob, { contentType: 'image/jpeg', upsert: false });
@@ -1766,7 +1766,7 @@ async function submitPost(){
     } catch(e) {
 console.error("UPLOAD ERROR DETAILS:", e);
 showToast('Image upload failed. Check storage settings.', 'danger');
-      btn.disabled = false; btn.textContent = 'ðŸ¾ Submit Report';
+      btn.disabled = false; btn.textContent = '🐾 Submit Report';
       return;
     }
   }
@@ -1778,12 +1778,12 @@ showToast('Image upload failed. Check storage settings.', 'danger');
   }
 
   if(!isSafe) {
-    btn.disabled = false; btn.textContent = 'ðŸ¾ Submit Report';
-    showToast('âš ï¸ Upload blocked: Image does not meet safety guidelines.', 'danger');
+    btn.disabled = false; btn.textContent = '🐾 Submit Report';
+    showToast('⚠️ Upload blocked: Image does not meet safety guidelines.', 'danger');
     return;
   }
 
-  btn.textContent = 'ðŸ’¾ Saving to Database...';
+  btn.textContent = '💾 Saving to Database...';
 const newPost = {
 uploader_name: currentUser.name,
 animal_type: type,
@@ -1800,27 +1800,27 @@ photo_data: photoUrl
 };
 
     const { error } = await sb.from('posts').insert([newPost]);
-  btn.disabled = false; btn.textContent = 'ðŸ¾ Submit Report';
+  btn.disabled = false; btn.textContent = '🐾 Submit Report';
 
   if(error) {
     showToast('Upload failed. Check internet.','danger');
     console.error(error);
   } else {
     localStorage.setItem(uploadKey, (todayUploads + 1).toString());
-    showToast('Report submitted! Pending admin review ðŸ”','success');
+    showToast('Report submitted! Pending admin review 🔍','success');
     closeModal('uploadModal');
     document.getElementById('animalDesc').value='';
     document.getElementById('animalCity').value='';
     document.getElementById('animalCountry').value='';
     document.getElementById('photoPreview').style.display='none';
-    document.querySelector('#photoDrop .pd-icon').textContent='ðŸ“·';
+    document.querySelector('#photoDrop .pd-icon').textContent='📷';
     document.querySelector('#photoDrop p').textContent=LANG[currentLang].photo_drop;
     fileInput.value = '';
     loadCloudPosts(false);
   }
 }
 
-// â”€â”€â”€ CLAIM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── CLAIM ──────────────────────────────────
 function openClaim(postId){
   if(!currentUser||!currentUser.subscribed){openSubModal();return;}
   claimTargetId=postId;
@@ -1845,7 +1845,7 @@ async function confirmClaim(){
   
   if(!updateError) {
     localStorage.setItem(claimKey, (todayClaims + 1).toString());
-    showToast('Animal marked as Saved! ðŸ ','success');
+    showToast('Animal marked as Saved! 🏠','success');
     closeModal('claimModal');
     loadCloudPosts(false);
     renderStats();
@@ -1855,7 +1855,7 @@ async function confirmClaim(){
   }
 }
   
-// â”€â”€â”€ EDIT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── EDIT ───────────────────────────────────
 function openEdit(postId){
   editTargetId=postId;
    const post=db.posts.find(p=>p.id===postId);
@@ -1875,7 +1875,7 @@ function saveEdit(){
   showToast('Description updated','success');
 }
 
-// â”€â”€â”€ FLAG â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── FLAG ───────────────────────────────────
 function flagPost(postId){
   const post=db.posts.find(p=>p.id===postId);
   if(!post)return;
@@ -1887,7 +1887,7 @@ function flagPost(postId){
   showToast('Post flagged for admin review','warn');
 }
 
-   // â”€â”€â”€ SHARE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   // ─── SHARE ───────────────────────────────────
 function sharePost(postId) {
   const post = posts.find(p => p.id === postId);
   if (!post) return;
@@ -1900,7 +1900,7 @@ function sharePost(postId) {
     showToast('Post link copied to clipboard!', 'success');
   }
 }
-   // â”€â”€â”€ USER STATS HELPER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   // ─── USER STATS HELPER ─────────────────────────
 function getUserStats() {
 if (!currentUser) return { posts: 0, claims: 0, injured: 0 };
 const userPosts = db.posts.filter(p => p.uploader_name === currentUser.name);
@@ -1912,7 +1912,7 @@ const userClaims = db.posts.filter(p => p.saved_by === currentUser.name);
     injured: userInjured.length
   };
 }
-   // â”€â”€â”€ BADGE SYSTEM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   // ─── BADGE SYSTEM ───────────────────────────
 function checkBadges() {
 if (!currentUser) return;
 const badgesKey = `stp_badges_${currentUser.id}`;
@@ -1922,34 +1922,34 @@ const userClaims = db.posts.filter(p => p.saved_by === currentUser.name).length;
   const userStats = getUserStats(); // Define it first!
   if (!earnedBadges.includes('scout') && (userStats.posts >= 10 || userClaims >= 1)) {
     earnedBadges.push('scout');
-    showToast('ðŸŽ‰ You earned the Scout badge!', 'success');
+    showToast('🎉 You earned the Scout badge!', 'success');
   }
   if (!earnedBadges.includes('guardian') && userClaims >= 5) {
     earnedBadges.push('guardian');
-    showToast('ðŸŽ‰ You earned the Guardian badge!', 'success');
+    showToast('🎉 You earned the Guardian badge!', 'success');
   }
   if (!earnedBadges.includes('hero') && userClaims >= 10) {
     earnedBadges.push('hero');
-    showToast('ðŸŽ‰ You earned the Hero badge!', 'success');
+    showToast('🎉 You earned the Hero badge!', 'success');
   }
   
   localStorage.setItem(badgesKey, JSON.stringify(earnedBadges));
   
   const sideBadges = document.getElementById('sideBadges');
   if (sideBadges && earnedBadges.length > 0) {
-    sideBadges.textContent = 'ðŸ† ' + earnedBadges.map(b => b.charAt(0).toUpperCase() + b.slice(1)).join(', ');
+    sideBadges.textContent = '🏆 ' + earnedBadges.map(b => b.charAt(0).toUpperCase() + b.slice(1)).join(', ');
   }
 }
-   // â”€â”€â”€ BADGE LADDER + USER STATS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   // ─── BADGE LADDER + USER STATS ─────────────────
 function renderBadgeLadder() {
   const container = document.getElementById('badgeLadder');
   if (!container) return;
   
   const badges = [
-    { name: 'Scout', icon: 'ðŸ¥‰', req: 10, type: 'posts', color: 'var(--accent2)', reward: 'Priority support' },
-    { name: 'Guardian', icon: 'ðŸ›¡ï¸', req: 5, type: 'claims', color: 'var(--success)', reward: 'Rescue badge' },
-    { name: 'Hero', icon: 'ðŸ¦¸', req: 10, type: 'claims', color: 'var(--warn)', reward: 'Featured spotlight' },
-    { name: 'Legend', icon: 'ðŸ‘‘', req: 25, type: 'claims', color: 'var(--danger)', reward: 'Lifetime premium' }
+    { name: 'Scout', icon: '🥉', req: 10, type: 'posts', color: 'var(--accent2)', reward: 'Priority support' },
+    { name: 'Guardian', icon: '🛡️', req: 5, type: 'claims', color: 'var(--success)', reward: 'Rescue badge' },
+    { name: 'Hero', icon: '🦸', req: 10, type: 'claims', color: 'var(--warn)', reward: 'Featured spotlight' },
+    { name: 'Legend', icon: '👑', req: 25, type: 'claims', color: 'var(--danger)', reward: 'Lifetime premium' }
   ];
   
   const stats = getUserStats();
@@ -1970,9 +1970,9 @@ function renderBadgeLadder() {
         <div class="badge-ladder-icon">${b.icon}</div>
         <div class="badge-ladder-info">
           <div class="badge-ladder-name" style="color:${b.color}">${b.name}</div>
-          <div class="badge-ladder-desc">${b.type === 'posts' ? 'Post' : 'Claim'} ${b.req} ${b.type} â†’ ${b.reward}</div>
+          <div class="badge-ladder-desc">${b.type === 'posts' ? 'Post' : 'Claim'} ${b.req} ${b.type} → ${b.reward}</div>
         </div>
-        <div class="badge-ladder-progress">${earned ? 'âœ“' : progress + '%'}</div>
+        <div class="badge-ladder-progress">${earned ? '✓' : progress + '%'}</div>
       </div>
     `;
   }).join('');
@@ -1992,7 +1992,7 @@ function renderUserStats() {
     <div class="user-stat-row"><span class="user-stat-label">Badges</span><span class="user-stat-value">${JSON.parse(localStorage.getItem(`stp_badges_${currentUser?.id}`) || '[]').length}/4</span></div>
   `;
 }
-   // â”€â”€â”€ INFINITE SCROLL CLOUD LOADING â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   // ─── INFINITE SCROLL CLOUD LOADING ───────────
 let currentPage = 0;
 const pageSize = 50;
 let isLoadingPosts = false;
@@ -2022,7 +2022,7 @@ db.posts = data;
   }
   isLoadingPosts = false;
 }
-// â”€â”€â”€ AUTH â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── AUTH ───────────────────────────────────
 function handleAccountBtn(){
   if(currentUser){
     if(confirm('Sign out of '+currentUser.name+'?')) signOut();
@@ -2037,7 +2037,7 @@ const choice = confirm('Go to Admin Dashboard?\nOK = Admin Dashboard\nCancel = S
   }
 }
 function openLoginModal(){ openModal('loginModal'); }
-// â”€â”€â”€ SECURE CLOUD LOGIN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── SECURE CLOUD LOGIN ───────────────────────────
 async function doLogin() {
   const email = document.getElementById('loginEmail').value.trim();
   const pass = document.getElementById('loginPass').value;
@@ -2046,7 +2046,7 @@ async function doLogin() {
   if(!email || !pass) { showToast('Enter email and password', 'warn'); return; }
 
   // Disable button to prevent double-submit
-  if(btn) { btn.disabled = true; btn.textContent = 'Signing inâ€¦'; }
+  if(btn) { btn.disabled = true; btn.textContent = 'Signing in…'; }
 
   const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
 
@@ -2079,11 +2079,11 @@ async function doLogin() {
   if(btn) { btn.disabled = false; btn.textContent = 'Sign In'; }
 
   updateUI();
-  showToast('Welcome back, ' + currentUser.name + '! ðŸ‘‹', 'success');
+  showToast('Welcome back, ' + currentUser.name + '! 👋', 'success');
   loadCloudPosts(false);
 }
 
-// â”€â”€â”€ SECURE CLOUD REGISTRATION â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── SECURE CLOUD REGISTRATION ────────────────────
 async function doRegister() {
   const first = document.getElementById('regFirst').value.trim();
   const last = document.getElementById('regLast').value.trim();
@@ -2181,7 +2181,7 @@ function doSubscribe(plan){
     closeModal('subModal');
     updateUI();
     renderPosts();
-    showToast(`ðŸŽ‰ Weekend Hero activated! ${hoursLeft} hours of access.`, 'success');
+    showToast(`🎉 Weekend Hero activated! ${hoursLeft} hours of access.`, 'success');
     
     // Set auto-reminder for next Friday 17:00
     scheduleWeekendReminder();
@@ -2216,14 +2216,14 @@ function scheduleWeekendReminder(){
   setTimeout(() => {
     if(Notification.permission === 'granted') {
       new Notification('SaveThePaws', {
-        body: 'ðŸŽ‰ Weekend Hero starts tomorrow at 11:00 AM! Get ready to rescue.',
+        body: '🎉 Weekend Hero starts tomorrow at 11:00 AM! Get ready to rescue.',
         icon: 'icon-192.png'
       });
     }
   }, timeUntilFriday);
 }
 
-// â”€â”€â”€ SECURE LOGOUT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── SECURE LOGOUT ────────────────────────────────
 async function signOut() {
     await sb.auth.signOut();
     currentUser = null;
@@ -2233,7 +2233,7 @@ async function signOut() {
 }
    function showAdminBtn(){
   document.getElementById('adminBtnTop').style.display = 'flex';
-  const sideBtn = document.getElementById('sideAdminBtn');  // â† Use different name
+  const sideBtn = document.getElementById('sideAdminBtn');  // ← Use different name
   if(sideBtn) sideBtn.style.display = 'block';
 }
 function hideAdminBtn(){
@@ -2247,7 +2247,7 @@ function updateUI(){
   // STRICT ADMIN CHECK: Only this specific email gets admin features
   const isAdmin = currentUser && currentUser.email === 'gds_gr@hotmail.gr'; 
   
-  document.getElementById('loginBtnTop').textContent = currentUser ? ('ðŸ‘¤ '+currentUser.name.split(' ')[0]) : 'Sign in';
+  document.getElementById('loginBtnTop').textContent = currentUser ? ('👤 '+currentUser.name.split(' ')[0]) : 'Sign in';
   document.getElementById('sideRole').textContent = isAdmin?'Admin':isSub?'Subscriber':currentUser?'Registered':'Guest';
   document.getElementById('sideRole').style.color = isAdmin?'var(--warn)':isSub?'var(--success)':currentUser?'var(--text2)':'var(--text3)';
   
@@ -2280,7 +2280,7 @@ function switchForm(to){
   document.getElementById('loginTitle').textContent = to==='login'?'Sign In':'Create Account';
 }
 
-// â”€â”€â”€ DONATIONS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── DONATIONS ──────────────────────────────
 function openDonateModal(){
   renderDonateList();
   openModal('donateModal');
@@ -2295,11 +2295,11 @@ function renderDonateList(){
         <div class="di-name">${d.name}</div>
         <div class="di-desc">${d.desc}</div>
       </div>
-      <button class="di-btn" onclick="window.open('${d.url}','_blank')">Donate â†’</button>
+      <button class="di-btn" onclick="window.open('${d.url}','_blank')">Donate →</button>
     </div>`).join('');
 }
 
-// â”€â”€â”€ NOTIFICATIONS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── NOTIFICATIONS ──────────────────────────
 function showNotifBanner(msg){
   document.getElementById('notifBannerText').textContent=msg;
   document.getElementById('notifBanner').classList.add('show');
@@ -2334,21 +2334,21 @@ document.getElementById('osmLink').href = `https://www.openstreetmap.org/?mlat=$
 openModal('mapModal');
 }
  
-// â”€â”€â”€ MODALS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── MODALS ─────────────────────────────────
 function openModal(id){ document.getElementById(id).classList.add('open'); }
 function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 document.querySelectorAll('.modal-overlay').forEach(m=>{
   m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});
 });
 
-// â”€â”€â”€ TOAST â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── TOAST ──────────────────────────────────
 function showToast(msg,type=''){
   const t=document.getElementById('toast');
   t.textContent=msg; t.className='toast show '+(type||'');
   setTimeout(()=>t.className='toast',2800);
 }
 
-// â”€â”€â”€ ADMIN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── ADMIN ──────────────────────────────────
   function goToAdmin(){
 const isAdmin = currentUser && (currentUser.role === 'admin' || currentUser.email === 'gds_gr@hotmail.gr');
 if(!isAdmin){
@@ -2397,7 +2397,7 @@ async function renderAdminData(){
     {l:'Total Posts', v:live.length, s:pend+' pending'},
     {l:'Animals Saved', v:saved, s:Math.round(saved/(live.length||1)*100)+'% save rate'},
     {l:'Total Users', v:users.length, s:subs+' subscribers'},
-    {l:'Est. Revenue', v:'â‚¬'+(subs*29), s:'annual basis'},
+    {l:'Est. Revenue', v:'€'+(subs*29), s:'annual basis'},
     {l:'Ads Active', v:db.ads.filter(a=>a.active).length, s:'in feed rotation'},
     {l:'Donors Listed', v:db.donors.length, s:'organizations'}
   ].map(s => `<div class="astat"><div class="al">${s.l}</div><div class="av">${s.v}</div><div class="as">${s.s}</div></div>`).join('');
@@ -2426,7 +2426,7 @@ async function renderAdminData(){
       <td>${u.name || 'Unknown'}</td>
       <td style="color:var(--text3);font-size:12px;">${u.email}</td>
       <td><span class="badge ${u.role==='admin'?'yellow':u.is_subscriber?'green':'purple'}">${u.role || 'user'}</span></td>
-      <td style="color:var(--text3);font-size:12px;">${u.sub_expires ? new Date(u.sub_expires).toLocaleDateString() : 'â€”'}</td>
+      <td style="color:var(--text3);font-size:12px;">${u.sub_expires ? new Date(u.sub_expires).toLocaleDateString() : '—'}</td>
       <td>${posts.filter(p => p.uploader_name === (u.name || u.email)).length}</td>
       <td>
         ${u.role!=='admin'?`<button class="abtn warn" onclick="makeAdmin('${u.id}')">Admin</button>`:''}
@@ -2477,16 +2477,16 @@ async function renderPending(){
         : `<div class="pci-placeholder">${animalEmoji(p.animal_type || p.animal_type)}</div>`
       }
       <div class="pending-info">
-        <h4>${animalEmoji(p.animal_type || p.animal_type)} ${p.animal_type || p.animal_type} â€” ${p.city}, ${p.country}</h4>
+        <h4>${animalEmoji(p.animal_type || p.animal_type)} ${p.animal_type || p.animal_type} — ${p.city}, ${p.country}</h4>
         <p>${p.description || ''}</p>
-        ${p.flag_reason ? `<div class="pi-reason">âš  ${p.flag_reason}</div>` : ''}
+        ${p.flag_reason ? `<div class="pi-reason">⚠ ${p.flag_reason}</div>` : ''}
         <div class="pending-actions">
           <select onchange="updatePostStatus('${p.id}', this.value)" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);padding:4px 9px;border-radius:var(--radius-sm);font-size:12px;cursor:pointer;">
             <option value="pending" selected>Pending</option>
             <option value="live">Approve (Live)</option>
             <option value="rejected">Reject</option>
           </select>
-          <button class="abtn danger" onclick="deletePost('${p.id}')">âœ• Delete</button>
+          <button class="abtn danger" onclick="deletePost('${p.id}')">✕ Delete</button>
         </div>
       </div>
     </div>
@@ -2566,11 +2566,11 @@ async function cleanupOldSavedPosts() {
     for (const post of oldPosts) {
       await sb.from('posts').delete().eq('id', post.id);
     }
-    showToast(`ðŸ§¹ Auto-cleaned ${oldPosts.length} old rescued posts.`, 'success');
+    showToast(`🧹 Auto-cleaned ${oldPosts.length} old rescued posts.`, 'success');
     renderAdminData(); // Refresh the dashboard
   }
 }
-// â”€â”€â”€ ADS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── ADS ────────────────────────────────────
 function setAdType(type,el){
   currentAdType=type;
   document.querySelectorAll('.ad-type-btn').forEach(b=>b.classList.remove('active'));
@@ -2605,7 +2605,7 @@ function renderAdsList(){
     <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:12px;margin-bottom:10px;display:flex;align-items:center;gap:10px;">
       <div style="flex:1;">
         <div style="font-size:14px;font-weight:700;">${a.title}</div>
-        <div style="font-size:12px;color:var(--text3);">Type: ${a.type} Â· Freq: every ${a.freq} posts Â· <span style="color:${a.active?'var(--success)':'var(--danger)'}">${a.active?'Active':'Inactive'}</span></div>
+        <div style="font-size:12px;color:var(--text3);">Type: ${a.type} · Freq: every ${a.freq} posts · <span style="color:${a.active?'var(--success)':'var(--danger)'}">${a.active?'Active':'Inactive'}</span></div>
       </div>
       <button class="abtn warn" onclick="toggleAd('${a.id}')">${a.active?'Pause':'Activate'}</button>
       <button class="abtn danger" onclick="deleteAd('${a.id}')">Delete</button>
@@ -2614,7 +2614,7 @@ function renderAdsList(){
 function toggleAd(id){const a=db.ads.find(x=>x.id===id);if(a){a.active=!a.active;saveDB(db);renderAdsList();renderPosts();}}
 function deleteAd(id){db.ads=db.ads.filter(a=>a.id!==id);saveDB(db);renderAdsList();renderPosts();}
 
-// â”€â”€â”€ NOTIFICATIONS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── NOTIFICATIONS ──────────────────────────
 function sendNotification(){
   const msg=document.getElementById('notifMsg').value.trim();
   if(!msg){showToast('Message required','warn');return;}
@@ -2631,18 +2631,18 @@ function sendNotification(){
   document.getElementById('notifHistory').innerHTML=db.notifications.map(n=>`
     <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:8px;">
       <div style="font-size:13px;font-weight:600;">${n.msg}</div>
-      <div style="font-size:11px;color:var(--text3);margin-top:3px;">To: ${n.target} Â· Via: ${n.delivery} Â· ${n.sent}</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:3px;">To: ${n.target} · Via: ${n.delivery} · ${n.sent}</div>
     </div>`).join('');
   document.getElementById('notifMsg').value='';
   showToast('Notification sent','success');
 }
 
-// â”€â”€â”€ DONOR ADMIN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── DONOR ADMIN ────────────────────────────
 function addDonor(){
   const name=document.getElementById('donorName').value.trim();
   const url=document.getElementById('donorUrl').value.trim();
   if(!name||!url){showToast('Name and URL required','warn');return;}
-  db.donors.push({id:'d'+Date.now(),name,icon:document.getElementById('donorIcon').value||'ðŸ¾',description:document.getElementById('donorDesc').value.trim(),url});
+  db.donors.push({id:'d'+Date.now(),name,icon:document.getElementById('donorIcon').value||'🐾',description:document.getElementById('donorDesc').value.trim(),url});
   saveDB(db);renderDonorList();renderSidebarDonations();
   document.getElementById('donorName').value='';
   document.getElementById('donorDesc').value='';
@@ -2658,7 +2658,7 @@ function renderDonorList(){
         <div class="doa-name">${d.icon} ${d.name}</div>
         <div class="doa-url">${d.url}</div>
       </div>
-      <button class="abtn warn" onclick="editDonor('${d.id}')" style="margin-right:8px;">âœï¸ Edit</button>
+      <button class="abtn warn" onclick="editDonor('${d.id}')" style="margin-right:8px;">✏️ Edit</button>
       <button class="abtn danger" onclick="removeDonor('${d.id}')">Remove</button>
     </div>`).join('');
 }
@@ -2687,10 +2687,10 @@ function editDonor(id){
 }
 function removeDonor(id){db.donors=db.donors.filter(d=>d.id!==id);saveDB(db);renderDonorList();renderSidebarDonations();}
 
-// â”€â”€â”€ SETTINGS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── SETTINGS ───────────────────────────────
 function saveSettings(){showToast('Settings saved','success');}
 
-// â”€â”€â”€ MUSIC PLAYER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── MUSIC PLAYER ───────────────────────────
 const tracks = ['Free Soul.mp3', 'Purify.mp3', 'Fairytale.mp3'];
 let currentTrackIndex = 0;
 let isPlaying = false;
@@ -2718,8 +2718,8 @@ if (mcShuffleBtn) {
 
 mcPlayBtn.addEventListener('click', () => {
   if (!audio.src) loadTrack(0);
-  if (isPlaying) { audio.pause(); isPlaying = false; mcPlayBtn.textContent = 'â–¶'; } 
-  else { audio.play().catch(()=>{}); isPlaying = true; mcPlayBtn.textContent = 'â¸'; }
+  if (isPlaying) { audio.pause(); isPlaying = false; mcPlayBtn.textContent = '▶'; } 
+  else { audio.play().catch(()=>{}); isPlaying = true; mcPlayBtn.textContent = '⏸'; }
 });
 
 audio.addEventListener('ended', () => { 
@@ -2766,7 +2766,7 @@ document.addEventListener('touchmove', onDrag, {passive: false});
 document.addEventListener('mouseup', endDrag);
 document.addEventListener('touchend', endDrag);
 
-// â”€â”€â”€ LOGOUT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── LOGOUT ─────────────────────────────────
 function updateLogoutBtn(){
   const btn = document.getElementById('sideLogoutBtn');
   if(!btn) return;
@@ -2774,8 +2774,8 @@ function updateLogoutBtn(){
   else btn.classList.remove('visible');
 }
 
-// â”€â”€â”€ RATING POPUP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// Google Play URL â€” update com.savethepaws.app once live on Play Store
+// ─── RATING POPUP ───────────────────────────
+// Google Play URL — update com.savethepaws.app once live on Play Store
 const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.savethepaws.app&reviewId=0';
 let selectedStars = 0;
 const RATING_KEY = 'stp_rating_state';
@@ -2836,10 +2836,10 @@ function neverRate(){
   document.getElementById('ratingOverlay').classList.remove('open');
 }
 
-// updateLogoutBtn is called inside updateUI already â€” no patch needed
+// updateLogoutBtn is called inside updateUI already — no patch needed
 // All init is handled in window.onload below
 initRating();
-   // â”€â”€â”€ REAL-TIME CLOUD LISTENER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   // ─── REAL-TIME CLOUD LISTENER ────────────────
 if (typeof window.supabase !== 'undefined') {
   sb.channel('public:posts')
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, (payload) => {
@@ -2860,7 +2860,7 @@ function playProximityAlert() {
   for (let i = 0; i < 4; i++) {
     setTimeout(() => {
       try {
-        // chimeSound is Web Audio synthesis â€” call play() directly, no currentTime
+        // chimeSound is Web Audio synthesis — call play() directly, no currentTime
         if (typeof makeChimeSound === 'function') {
           makeChimeSound().play().catch(() => {});
         } else if (typeof chimeSound !== 'undefined' && chimeSound.play) {
@@ -2878,8 +2878,8 @@ function playProximityAlert() {
 <div class="modal-overlay" id="mapModal">
   <div class="modal" style="max-width: 600px; padding: 0; overflow: hidden;">
     <div style="padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border);">
-      <h3 style="margin: 0; font-size: 16px;">ðŸ“ Exact Rescue Location</h3>
-      <button class="modal-close" onclick="closeModal('mapModal')" style="position: static; margin: 0;">âœ•</button>
+      <h3 style="margin: 0; font-size: 16px;">📍 Exact Rescue Location</h3>
+      <button class="modal-close" onclick="closeModal('mapModal')" style="position: static; margin: 0;">✕</button>
     </div>
     <div id="mapFrameContainer" style="width: 100%; height: 400px; background: var(--bg3);">
       <!-- Interactive map iframe will be injected here -->
@@ -2891,7 +2891,7 @@ function playProximityAlert() {
   </div>
 </div>
 <div class="credits-watermark" style="position: fixed; bottom: 8px; left: 0; right: 0; text-align: center; font-size: 11px; color: rgba(124,111,224,0.4); z-index: 100; pointer-events: none;">
-  Sound/Art Direction by Bill Melachrinos â€¢ Planning/Development Dimitris Paraschidis â€¢ Communication/Advertising Aneta Conic
+  Sound/Art Direction by Bill Melachrinos • Planning/Development Dimitris Paraschidis • Communication/Advertising Aneta Conic
 </div>
 </body>
 </html>
